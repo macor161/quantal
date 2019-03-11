@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/macor161/eblocks/issues"
   },
-  "homepage": "https://github.com/macor161/eblocks#readme"
+  "homepage": "https://github.com/macor161/eblocks#readme",
+  "dependencies": {
+    "openzeppelin-solidity": "^2.1.3"
+  }
 }
