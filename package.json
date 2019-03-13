@@ -4,11 +4,10 @@
   "description": "",
   "main": "dist/eblocks.esm.js",
   "module": "dist/eblocks.esm.js",
-  "browser": "dist/eblocks.esm.browser.js",
-  "browser-legacy": "dist/eblocks.umd.js",
+  "browser": "dist/eblocks.umd.js",
   "scripts": {
     "build": "rollup -c",
-    "dev": "rollup -c -w",
+    "start": "rollup -c -w",
     "test": "echo \"Error: no test specified\" && exit 1",
     "pretest": "npm run build"
   },
@@ -23,15 +22,18 @@
   },
   "homepage": "https://github.com/macor161/eblocks#readme",
   "dependencies": {
-    "openzeppelin-solidity": "^2.1.3"
+    "openzeppelin-solidity": "^2.1.3",
+    "web3": "^1.0.0-beta.48"
   },
   "devDependencies": {
     "rollup": "^1.0.0",
+    "rollup-plugin-auto-external": "^2.0.0",
     "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-json": "^3.1.0",
     "rollup-plugin-node-resolve": "^4.0.0",
     "serve": "^10.1.2"
   },
   "files": [
     "dist"
-  ] 
+  ]
 }

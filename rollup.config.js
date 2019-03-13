@@ -1,40 +1,40 @@
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import pkg from './package.json';
+import resolve from 'rollup-plugin-node-resolve'
+import commonjs from 'rollup-plugin-commonjs'
+import json from 'rollup-plugin-json'
+import pkg from './package.json'
+
+
+const jsonPlugin = json({
+	preferConst: true, 
+	compact: true
+})
+
 
 export default [
-	// modern browser ESM module
+	// browser-friendly UMD build	
 	{
 		input: 'src/index.js',
 		output: {
-			name: 'howLongUntilLunch',
+			name: 'eblocks',
 			file: pkg.browser,
-			format: 'esm'
-		},
-		plugins: [
-			resolve(), // so Rollup can find `ms`
-			commonjs() // so Rollup can convert `ms` to an ES module
-		]
-	},	
-	// browser-friendly UMD build
-	{
-		input: 'src/index.js',
-		output: {
-			name: 'howLongUntilLunch',
-			file: pkg['browser-legacy'],
 			format: 'umd'
 		},
+		external: ['web3'],
 		plugins: [
 			resolve(), 
-			commonjs() 
+			commonjs(),
+			jsonPlugin
 		]
 	},
-
 	{
 		input: 'src/index.js',
-		external: [],
+		external: ['web3'],
 		output: [
-			{ file: pkg.module, format: 'es' }
+			{ file: pkg.module, format: 'es' },
+		],
+		plugins: [
+			jsonPlugin
 		]
 	}
+
 ];
