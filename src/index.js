@@ -9,4 +9,9 @@ export class Test {
 
         const web3 = await getWeb3()
     }
+
+
+    lkjh() {
+        console.log('fewf')
+    }
 }
