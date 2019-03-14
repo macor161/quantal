@@ -28,7 +28,7 @@ export default [
 	},
 	{
 		input: 'src/index.js',
-		external: ['web3'],
+		external: [],
 		output: [
 			{ file: pkg.module, format: 'es' },
 		],
