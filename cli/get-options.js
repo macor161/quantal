@@ -8,7 +8,8 @@ const defaultOptions = {
     contractsDir: './contracts',
     builtContractsDir: './build/contracts',
     generatedJsDir: './src/generated-eblocks',
-    deploymentsDir: './deployments'
+    deploymentsDir: './deployments',
+    libraryName: 'eblocks'
 }
 
 // Options that represents a path

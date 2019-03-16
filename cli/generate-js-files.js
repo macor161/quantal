@@ -13,7 +13,7 @@ require('./utils/array-async')
  * @param {string} opts.generatedJsDir
  */
 async function generateJsFiles(opts) {
-    const { builtContractsDir, generatedJsDir } = opts
+    const { builtContractsDir, generatedJsDir, libraryName } = opts
     const files = await readdir(builtContractsDir)
 
     await mkdirp(generatedJsDir)
@@ -22,7 +22,7 @@ async function generateJsFiles(opts) {
         .filter(isJsonFile)
         .mapAsync(fileName => getContractInfo(path.join(builtContractsDir, fileName)))
         .then(filterOutInterfacesAndLibraries)
-        .then(contractInfos => contractInfos.mapAsync(appendJsSource))        
+        .then(contractInfos => contractInfos.mapAsync(info => appendJsSource(info, libraryName)))        
         .then(contractInfos => contractInfos.forEachAsync(contractInfo => writeJsSource(contractInfo, generatedJsDir)))
 }
 
@@ -34,10 +34,10 @@ function filterOutInterfacesAndLibraries(contractInfos) {
     return contractInfos.filter(info => info.abi.length > 0 && info.bytecode.length > 2)
 }
 
-async function appendJsSource(contractInfo) {
+async function appendJsSource(contractInfo, libraryName) {
     return {
         ...contractInfo,
-        jsSource: await eblockClassTemplate(contractInfo)
+        jsSource: await eblockClassTemplate(contractInfo, libraryName)
     }
 }
 
