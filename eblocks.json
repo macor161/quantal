@@ -1,4 +1,4 @@
 {
-    "generatedJsDir": "src/generated-eblocks",
-    "libraryName": "../eblocks"
+    "generatedJsDir": "src/eblocks",
+    "libraryName": "../eblock"
 }

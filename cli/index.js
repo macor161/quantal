@@ -7,7 +7,11 @@ const { generateJsFiles } = require('./generate-js-files')
 async function main() {
     const options = getOptions()
     //console.log(options)
-    await generateJsFiles(options)
+    try {
+        await generateJsFiles(options)
+    } catch(err) {
+        console.log('Error: ', err)
+    }
     //console.log(await getAbisInFolder(getPath('./build/contracts')))
     //console.log(await getContractInfosFromFolder(getPath('./build/contracts')))
     //await generateEblockJsFile(getPath('./build/contracts/ERC20.json'), getPath('./src/generated-eblocks'))

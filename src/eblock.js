@@ -12,6 +12,12 @@ class Eblock {
                 
     }
 
+    async deploy(...args) {
+        /*
+        return (await this.getContract())
+            .deploy() */
+    }
+
     async getContract() {
         if (this._contract)
             return this._contract
@@ -28,5 +34,10 @@ class Eblock {
 }
 
 Eblock.prototype.methods = {}
+
+
+function sendTransaction() {
+    
+}
 
 export { Eblock }
