@@ -20,9 +20,6 @@ const getContractInfosFromFolder = async folderPath => {
 async function getContractInfo(path) {
     const { contractName, abi, ast, bytecode, devdoc } = getContractFile(path)
 
-    if (abi.length === 0 || bytecode.length < 3)
-        return null
-        
     return {
         name: contractName,
         abi,

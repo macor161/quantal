@@ -21,13 +21,17 @@ async function generateJsFiles(opts) {
     return files
         .filter(isJsonFile)
         .mapAsync(fileName => getContractInfo(path.join(builtContractsDir, fileName)))
-        .then(contractInfos => contractInfos.filter(info => info))
+        .then(filterOutInterfacesAndLibraries)
         .then(contractInfos => contractInfos.mapAsync(appendJsSource))        
         .then(contractInfos => contractInfos.forEachAsync(contractInfo => writeJsSource(contractInfo, generatedJsDir)))
 }
 
 function isJsonFile(fileName) {
     return path.extname(fileName).toLowerCase() === '.json'
+}
+
+function filterOutInterfacesAndLibraries(contractInfos) {
+    return contractInfos.filter(info => info.abi.length > 0 && info.bytecode.length > 2)
 }
 
 async function appendJsSource(contractInfo) {
