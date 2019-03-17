@@ -1,29 +1,42 @@
 const getOptions = require('./get-options')
 const getPath = require('./get-path')
 const { generateJsFiles } = require('./generate-js-files')
-
+const compileContracts = require('./compile-contracts')
 
 //console.log(eblockClassTemplate({ name: 'ERC20', abi }))
 async function main() {
     const options = getOptions()
     //console.log(options)
+    
     try {
-        await generateJsFiles(options)
+        //await generateJsFiles(options)
+        await compileContracts()
     } catch(err) {
-        console.log('Error: ', err)
+        console.log('Error: ', err.message)
     }
-    //console.log(await getAbisInFolder(getPath('./build/contracts')))
-    //console.log(await getContractInfosFromFolder(getPath('./build/contracts')))
-    //await generateEblockJsFile(getPath('./build/contracts/ERC20.json'), getPath('./src/generated-eblocks'))
-    //console.log(options)
+    
+
+    await wait(15000)
+    console.log('aewf')
+
+
+
 }
 
 
+function wait(ms) {
+    return new Promise(res => setTimeout(res, ms))
+}
 
+process.on('uncaughtException', function (err) {
+    console.log('fawefa')
+    //console.error((new Date).toUTCString() + ' uncaughtException:', err.message)
+    //console.error(err.stack)
+  })
 
-
-//function generateEblock()
+process.on('unhandledRejection', error => {
+    // Will print "unhandledRejection err is not defined"
+    console.log('unhandledRejection')
+})
 
 main()
-
-
