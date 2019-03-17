@@ -18,8 +18,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
  * compliant implementations may not do it.
  */
 contract ERC20 is IERC20 {
-    g
-    using SafeMath for uint256;
+    using SafeMath for uint256; 
 
     mapping (address => uint256) private _balances;
 

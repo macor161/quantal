@@ -2,25 +2,29 @@ const getOptions = require('./get-options')
 const getPath = require('./get-path')
 const { generateJsFiles } = require('./generate-js-files')
 const compileContracts = require('./compile-contracts')
+const fs = require('fs')
 
 //console.log(eblockClassTemplate({ name: 'ERC20', abi }))
 async function main() {
     const options = getOptions()
-    //console.log(options)
     
     try {
-        //await generateJsFiles(options)
-        await compileContracts()
+        console.log('Updating files')
+        await compileContracts(options)
+        await generateJsFiles(options)
+        console.log('done')
     } catch(err) {
         console.log('Error: ', err.message)
     }
-    
 
-    await wait(15000)
-    console.log('aewf')
+}
 
 
-
+async function watch() {
+    fs.watch(getPath('contracts'), async (eventType, fileName) => {
+        console.log(`${eventType} file change: ${fileName}`)
+        await main()
+    })
 }
 
 
@@ -29,14 +33,11 @@ function wait(ms) {
 }
 
 process.on('uncaughtException', function (err) {
-    console.log('fawefa')
-    //console.error((new Date).toUTCString() + ' uncaughtException:', err.message)
-    //console.error(err.stack)
-  })
-
-process.on('unhandledRejection', error => {
-    // Will print "unhandledRejection err is not defined"
-    console.log('unhandledRejection')
+    console.log('Error: ', err.message)
 })
 
-main()
+process.on('unhandledRejection', error => {
+    // truffle-compile throws an unhandled promise rejection.   
+})
+
+watch()
