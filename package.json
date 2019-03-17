@@ -23,6 +23,7 @@
   "homepage": "https://github.com/macor161/eblocks#readme",
   "dependencies": {
     "fs-extra": "^7.0.1",
+    "ganache-cli": "^6.4.1",
     "import-fresh": "^3.0.0",
     "mkdirp": "^0.5.1",
     "openzeppelin-solidity": "^2.1.3",

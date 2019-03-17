@@ -9,7 +9,9 @@ const defaultOptions = {
     builtContractsDir: './build/contracts',
     generatedJsDir: './src/generated-eblocks',
     deploymentsDir: './deployments',
-    libraryName: 'eblocks'
+    libraryName: 'eblocks',
+    ganacheSeed: 'Ganache seed data for development',
+    throttle: 50
 }
 
 // Options that represents a path
