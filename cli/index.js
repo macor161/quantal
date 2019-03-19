@@ -1,64 +1,17 @@
 const getOptions = require('./get-options')
-const getPath = require('./get-path')
-const { generateJsFiles } = require('./generate-js-files')
-const compileContracts = require('./compile-contracts')
-const fs = require('fs')
-const path = require('path')
-const { throttle } = require('lodash')
-const options = getOptions()
+const { build, watch } = require('./build')
+const { ganacheServer } = require('./ganache-server')
 
 
-let isBuildRunning = false
-
-const build = throttle(async (options) => {    
-    try {
-        if (isBuildRunning) 
-            return
-
-        isBuildRunning = true
-        console.log('Building')
-        await compileContracts(options)
-        await generateJsFiles(options)
-        console.log('done')
-
-        isBuildRunning = false
-
-    } catch(err) {
-        console.log('Error: ', err.message)
-    }
-}, options.throttle, { trailing: false })
-
-//async function build(options) { return buildThrottled(options) }
-
-async function ganacheServer(options) {
-    var ganache = require("ganache-cli")
-    var server = ganache.server()
-    server.listen(8545, (err, blockchain) => {
-        if (err) {
-            console.log('Ganache error: ', err)
-        }
-
-        console.log(blockchain)
-    })    
-}
-
-
-async function watch() {
-    
-    fs.watch(getPath('contracts'), async (eventType, fileName) => {
-        if (path.extname(fileName).toLowerCase() !== '.sol')
-            return
-
-        console.log(`${eventType} file change: ${fileName}`)
-        await build(options)
-    })
+async function main() {
+    //watch()
+    const ganacheInfo = await ganacheServer()
+    console.log(ganacheInfo.formattedInfo)
 }
 
 
 
-function isDuplicatedEvent(event, fileName) {
 
-}
 
 
 function wait(ms) {
@@ -73,5 +26,5 @@ process.on('unhandledRejection', error => {
     // truffle-compile throws an unhandled promise rejection.   
 })
 
-watch()
+main()
 //ganacheServer()
