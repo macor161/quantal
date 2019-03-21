@@ -5,7 +5,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 
 /**
- * @title Standard ERC20 token
+ * @title Standard ERC20 token 
  *
  * @dev Implementation of the basic standard token. 
  * https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
@@ -18,9 +18,9 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
  * compliant implementations may not do it.
  */
 contract ERC20 is IERC20 {
-    using SafeMath for uint256; 
+    using SafeMath for uint256;
 
-    mapping (address => uint256) private _balances;
+    mapping (address => uint256) private _balances; 
 
     mapping (address => mapping (address => uint256)) private _allowed;
 
@@ -30,6 +30,7 @@ contract ERC20 is IERC20 {
     * @dev Total number of tokens in existence
     */
     function totalSupply() public view returns (uint256) {
+        uint256 t = 3;
         return _totalSupply;
     }
 

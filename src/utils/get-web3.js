@@ -33,8 +33,7 @@ async function _getWeb3() {
   if (window.ethereum) {
     _web3 = new Web3(window.ethereum)
     await window.ethereum.enable()
-    return _web3
-
+    return appendHelpers(_web3)
   }
   // Legacy dapp browsers...
   else if (window.web3) {
@@ -48,6 +47,19 @@ async function _getWeb3() {
     )
     return  new Web3(provider)
   }
+}
+
+
+function appendHelpers(web3) {
+
+  web3.eth.getCachedAccounts = async function() {
+    if (!web3.eth._cachedAccounts)
+      web3.eth._cachedAccounts = await web3.eth.getAccounts()
+
+    return web3.eth._cachedAccounts 
+  }
+  
+  return web3
 }
 
 export default getWeb3

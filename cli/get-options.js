@@ -10,7 +10,9 @@ const defaultOptions = {
     generatedJsDir: './src/generated-eblocks',
     deploymentsDir: './deployments',
     libraryName: 'eblocks',
-    ganacheSeed: 'Ganache seed data for development',
+    ganache: {
+        seed: 'Ganache seed for development',
+    },
     throttle: 50
 }
 

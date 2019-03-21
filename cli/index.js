@@ -1,12 +1,16 @@
 const getOptions = require('./get-options')
-const { build, watch } = require('./build')
+const build = require('./build')
 const { ganacheServer } = require('./ganache-server')
 
 
 async function main() {
+    const options = getOptions()
     //watch()
-    const ganacheInfo = await ganacheServer()
+    console.log('Starting Ganache server')
+    const ganacheInfo = await ganacheServer(options.ganache)
     console.log(ganacheInfo.formattedInfo)
+    console.log('Building smart contracts')
+    await build({ watch: true })
 }
 
 

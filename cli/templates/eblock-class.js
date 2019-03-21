@@ -6,7 +6,7 @@ const outdentOpts = { trimTrailingNewline: false }
 module.exports = ({ name, abi, bytecode }, libraryName) => `
 import { Eblock } from '${libraryName}'
 
-class ${name} extends Eblock {
+export class ${name} extends Eblock {
 
     constructor(address, opts) {
         super(${name}._abi, address, opts)
