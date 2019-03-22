@@ -25,12 +25,19 @@ const PATHS = [
 ]
 
 module.exports = function getOptions(configFile = CONFIG_PATH) {
+    return _(defaultOptions)
+        .merge(getConfigFile(getPath(configFile)))
+        .mapValues((value, key) => PATHS.includes(key) ? getPath(value) : value)
+        .value()
+    
+
+    /*
     return _.mapValues({
         ...defaultOptions,
         ...getConfigFile(getPath(configFile))
     }, 
         (value, key) => PATHS.includes(key) ? getPath(value) : value
-    )
+    )*/
 }
 
 
