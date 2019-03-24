@@ -1,13 +1,15 @@
 import Web3 from "web3"
 
+let web3
+let accounts = []
 
-export async function init(web3) {
-  if (web3) {
-    setWeb3(web3)
-    return web3
-  }
 
-  setWeb3(await initWeb3())
+export async function init(web3Instance) {
+  if (web3Instance) 
+    await setWeb3(web3Instance)
+  else
+    await setWeb3(await initWeb3())
+
   return getWeb3()
 
 }
@@ -34,21 +36,31 @@ async function initWeb3() {
 }
 
 
-let _web3
+
 
 export function getWeb3() {
-  if (!_web3) 
+  if (!web3) 
     throw 'web3 is not initialized'
 
-  return _web3
+  return web3
 }
 
-export function setWeb3(web3) {
-  _web3 = web3
+export async function setWeb3(web3Instance) {
+  web3 = web3Instance
+  await updateAccounts()  
 }
 
 
 
+export function getAccounts() {
+  return accounts
+}
+
+
+
+async function updateAccounts() {
+  accounts = await web3.eth.getAccounts()
+}
 
 /**
  * Returns a new web3 instance
@@ -58,7 +70,7 @@ async function _getWeb3() {
   if (window.ethereum) {
     let web3 = new Web3(window.ethereum)
     await window.ethereum.enable()
-    return appendHelpers(web3)
+    return web3
   }
   // Legacy dapp browsers...
   else if (window.web3) {
@@ -75,16 +87,5 @@ async function _getWeb3() {
 }
 
 
-function appendHelpers(web3) {
 
-  web3.eth.getCachedAccounts = async function() {
-    if (!web3.eth._cachedAccounts)
-      web3.eth._cachedAccounts = await web3.eth.getAccounts()
 
-    return web3.eth._cachedAccounts 
-  }
-  
-  return web3
-}
-
-export default initWeb3
