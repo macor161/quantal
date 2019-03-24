@@ -1,7 +1,21 @@
 import Web3 from "web3"
 
-const getWeb3 = async () => {
+
+export async function init(web3) {
+  if (web3) {
+    setWeb3(web3)
+    return web3
+  }
+
+  setWeb3(await initWeb3())
+  return getWeb3()
+
+}
+
+
+async function initWeb3() {
   
+    // If document is already loaded
     if (document.readyState === 'complete') 
       return _getWeb3()
 
@@ -19,21 +33,32 @@ const getWeb3 = async () => {
     })
 }
 
-var _web3 = null
+
+let _web3
+
+export function getWeb3() {
+  if (!_web3) 
+    throw 'web3 is not initialized'
+
+  return _web3
+}
+
+export function setWeb3(web3) {
+  _web3 = web3
+}
+
+
 
 
 /**
- * Returns a single instance of web3 
+ * Returns a new web3 instance
  */
 async function _getWeb3() {
-  if (_web3)
-    return _web3
-
   // Modern dapp browsers...
   if (window.ethereum) {
-    _web3 = new Web3(window.ethereum)
+    let web3 = new Web3(window.ethereum)
     await window.ethereum.enable()
-    return appendHelpers(_web3)
+    return appendHelpers(web3)
   }
   // Legacy dapp browsers...
   else if (window.web3) {
@@ -62,4 +87,4 @@ function appendHelpers(web3) {
   return web3
 }
 
-export default getWeb3
+export default initWeb3

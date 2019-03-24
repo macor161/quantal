@@ -1,11 +1,13 @@
-import getWeb3 from './utils/get-web3'
+import { getWeb3 } from './web3'
 
 class Eblock {
 
-    constructor(abi, address, opts) {
+    constructor(abi, address, opts = {}) {
         this._abi = abi
         this._address = address
         this._opts = opts
+
+        this.web3Contract = new this.web3.eth.Contract(abi, address, opts)
 
         for (const methodName in this.methods) 
             this.methods[methodName] = this.methods[methodName].bind(this)
@@ -18,17 +20,9 @@ class Eblock {
             .deploy() */
     }
 
-    async getContract() {
-        if (this._contract)
-            return this._contract
 
-        const web3 = await this.getWeb3()
-        this._contract = new web3.eth.Contract(this._abi, this._address, this._opts)
-        return this._contract
-    }
-
-    async getWeb3() {
-        return getWeb3()
+    get web3() {
+        return this._opts.web3 || getWeb3()
     }
 
 }

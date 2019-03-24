@@ -15,8 +15,8 @@ export class ${name} extends Eblock {
 }
 
 ${map(getCallFunctions(abi), member => outdent(outdentOpts)`
-    ${name}.prototype.methods['${member.name}'] = async function(...args) { 
-        return (await this.getContract()).methods['${member.name}'](...args).call()
+    ${name}.prototype.methods['${member.name}'] = function(...args) { 
+        return this.web3Contract.methods['${member.name}'](...args).call()
     }
 `
 )}
