@@ -3,11 +3,11 @@ import { getWeb3 } from './web3'
 class Eblock {
 
     constructor(abi, address, opts = {}) {
-        this._abi = abi
         this._address = address
         this._opts = opts
 
         this.web3Contract = new this.web3.eth.Contract(abi, address, opts)
+
 
         for (const methodName in this.methods) 
             this.methods[methodName] = this.methods[methodName].bind(this)

@@ -14,7 +14,6 @@ export async function init(web3Instance) {
 
 }
 
-
 async function initWeb3() {
   
     // If document is already loaded
@@ -46,20 +45,19 @@ export function getWeb3() {
 }
 
 export async function setWeb3(web3Instance) {
+  if (web3)
+    web3.eth.currentProvider.removeListener('accountsChanged', setDefaultAccount)
+    
   web3 = web3Instance
-  await updateAccounts()  
+  setDefaultAccount(await web3.eth.getAccounts())  
+  web3.eth.currentProvider.on('accountsChanged', setDefaultAccount)
 }
 
 
 
-export function getAccounts() {
-  return accounts
-}
 
-
-
-async function updateAccounts() {
-  accounts = await web3.eth.getAccounts()
+function setDefaultAccount(accounts) {
+  web3.eth.defaultAccount = accounts[0]
 }
 
 /**
