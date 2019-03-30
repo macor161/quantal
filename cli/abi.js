@@ -3,6 +3,7 @@ const { readdir } = require('fs-extra')
 const path = require('path')
  
 const getCallFunctions = abi => abi.filter(member => member.constant)
+const getFunctions = abi => abi.filter(member => member.type === 'function')
 
 
 /**
@@ -26,4 +27,4 @@ const getAbiFromFile = path => importFresh(path).abi
 
 
 
-module.exports = { getCallFunctions, getAbiFromFile, getAbisInFolder }
+module.exports = { getCallFunctions, getAbiFromFile, getAbisInFolder, getFunctions }

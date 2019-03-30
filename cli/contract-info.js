@@ -1,6 +1,7 @@
 const importFresh = require('import-fresh')
 const { readdir } = require('fs-extra')
 const path = require('path')
+const _ = require('lodash')
 
 const FUNCTION_TYPE = 'function'
 
@@ -26,14 +27,14 @@ async function getContractInfo(path) {
         ast,
         bytecode,
         devdoc,
-        viewFunctions: getViewFunctions(abi, devdoc),
+        methods: getFunctions(abi, devdoc),
         stateModifierFunctions: getStateModifierFunctions(abi, devdoc)
     }
 }
 
-function getViewFunctions(abi, devdoc) {
+function getFunctions(abi, devdoc) {
     return abi
-        .filter(member => member.constant && member.type === FUNCTION_TYPE)
+        .filter(member => member.type === FUNCTION_TYPE)
         .map(viewFunction => ({
             ...viewFunction,
             doc: getDocForAbiFunction(viewFunction, devdoc)
@@ -55,7 +56,18 @@ function getStateModifierFunctions(abi, devdoc) {
  * @param {Object} devdoc 
  */
 function getDocForAbiFunction(abiFunction, devdoc) {
-    return {}
+    if (!devdoc || !devdoc.methods)
+        return null
+
+    const docMethods = _.filter(devdoc.methods, (doc, method) => method.indexOf(`${abiFunction.name}(`) === 0 )
+    
+    const doc = docMethods[0]
+
+    // We currently don't support functions with multiple signatures
+    if (docMethods.length > 1)
+        delete doc.params
+
+    return doc
 }
 
 

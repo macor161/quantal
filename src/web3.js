@@ -46,9 +46,10 @@ export function getWeb3() {
 
 export async function setWeb3(web3Instance) {
   if (web3)
-    web3.eth.currentProvider.removeListener('accountsChanged', setDefaultAccount)
+    web3.eth.givenProvider.off('accountsChanged', setDefaultAccount)
     
   web3 = web3Instance
+  web3.eth.transactionConfirmationBlocks = 1
   setDefaultAccount(await web3.eth.getAccounts())  
   web3.eth.currentProvider.on('accountsChanged', setDefaultAccount)
 }
