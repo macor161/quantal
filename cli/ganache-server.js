@@ -30,7 +30,7 @@ function getServerInfo(ganacheInfo, port) {
                 secretKey: account.secretKey
             }))
             .slice(0, DISPLAY_ACCOUNTS)
-            .values(),
+            .value(),
 
         port,
         ganacheInfo: ganacheInfo
