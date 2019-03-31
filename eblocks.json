@@ -1,4 +1,6 @@
 {
     "generatedJsDir": "src/eblocks",
-    "libraryName": "../eblock"
+    "libraryName": "..",
+    "ganache": {
+    }
 }

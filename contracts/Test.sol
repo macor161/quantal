@@ -11,6 +11,10 @@ contract Test {
     value = supply;
   }
 
+  function setValue(uint256 _value) public {
+    value = _value;
+  }
+
   function getToken() public view returns(ERC20) {
     return token;
   }
@@ -21,10 +25,14 @@ contract Test {
 
 contract Test2 {
 
-  string public s;
+  uint256 public s;
 
   constructor() public {
 
   }
+
+ function setS(uint256 _value) public {
+    s = _value;
+  }  
 
 }

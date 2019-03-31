@@ -18,15 +18,6 @@ commands.forEach(cmd => yargs.command(cmd.command, cmd.desc, cmd.builder, cmd.ha
 
 yargs
   .scriptName("eblocks")
-
-
-  .command('ganache', 'Start ganache server', (yargs) => {
-  }, async function (argv) {
-    const options = getOptions()
-    const ganacheInfo = await ganacheServer(options.ganache)
-    console.log(ganacheInfo.formattedInfo)
-  })
-
   .alias('v', 'version')
   .version()
   .describe('v', 'show version information')
