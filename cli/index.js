@@ -3,35 +3,22 @@
 const getOptions = require('./get-options')
 const build = require('./build')
 const { ganacheServer } = require('./ganache-server')
+const requireDir = require('require-dir')
+const { join, resolve } = require('path')
+const yargs = require('yargs')
 
+let dep = { getOptions }
 
-require('yargs')
+// Load commands from folder and pass dependencies
+const commandsFn = requireDir(join(__dirname, 'commands'))
+const commands = Object.keys(commandsFn).map((i) => commandsFn[i](dep))
+
+// Init CLI commands and options
+commands.forEach(cmd => yargs.command(cmd.command, cmd.desc, cmd.builder, cmd.handler))
+
+yargs
   .scriptName("eblocks")
-  .command('start', 'Start ganache server, compile contracts and generate json/js files', (yargs) => {
-    yargs.option('w', {
-        alias : 'watch',
-        describe: 'Rebuild on file change',
-        type: 'boolean', 
-        default: false
-    })
-  }, async function (argv) {
-    const options = getOptions()
-    console.log('Starting Ganache server')
-    const ganacheInfo = await ganacheServer(options.ganache)
-    console.log(ganacheInfo.formattedInfo)
-    await build({ watch: true })
-  })
 
-  .command('build', 'Compile contracts and generate json/js files', (yargs) => {
-    yargs.option('w', {
-        alias : 'watch',
-        describe: 'Rebuild on file change',
-        type: 'boolean', 
-        default: false
-    })
-  }, async function (argv) {
-    await build({ watch: argv.watch })
-  })
 
   .command('ganache', 'Start ganache server', (yargs) => {
   }, async function (argv) {
