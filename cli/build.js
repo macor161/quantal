@@ -4,6 +4,9 @@ const { generateJsFiles } = require('./generate-js-files')
 const compileContracts = require('./compile-contracts')
 const fs = require('fs')
 const path = require('path')
+const { formatErrors } = require('./formatting/format-error')
+const { formatWarnings } = require('./formatting/format-warnings')
+const chalk = require('chalk')
 
 
 /**
@@ -36,17 +39,28 @@ async function build(opts) {
 
         console.log('Building')
         const options = getOptions()
-        await compileContracts(options)
+        const result = await compileContracts(options)
         await generateJsFiles(options)
         
         if (opts.onComplete)
             opts.onComplete()
 
-        console.log('done')
+        if (result.warnings.length)
+            console.log(formatWarnings(result.warnings))
+        else
+            console.log(chalk.bold.green('Build successful'))
+
         return true
 
-    } catch(err) {
-        console.log('Error: ', err.message)
+    } catch(errors) {
+        if (errors.length) {
+            console.log(formatErrors(errors))
+        }
+        else {
+            console.log('error: ', errors.stack)
+        }
+
+        
         return false
     }
 }

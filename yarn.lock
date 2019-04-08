@@ -269,7 +269,7 @@ bn.js@4.11.6:
   version "4.11.6"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.6.tgz#53344adb14617a13f6e8dd2ce28905d1c0ba3215"
 
-bn.js@4.11.8, bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.11.6, bn.js@^4.4.0:
+bn.js@4.11.8, bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.11.6, bn.js@^4.11.8, bn.js@^4.4.0:
   version "4.11.8"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.8.tgz#2cde09eb5ee341f484746bb0309b3253b1b1442f"
 
@@ -2598,6 +2598,13 @@ p-try@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.1.0.tgz#c1a0f1030e97de018bb2c718929d2af59463e505"
 
+pad-left@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/pad-left/-/pad-left-2.1.0.tgz#16e6a3b2d44a8e138cb0838cc7cb403a4fc9e994"
+  integrity sha1-FuajstRKjhOMsIOMx8tAOk/J6ZQ=
+  dependencies:
+    repeat-string "^1.5.4"
+
 pad-right@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/pad-right/-/pad-right-0.2.2.tgz#6fbc924045d244f2a2a244503060d3bfc6009774"
@@ -2889,7 +2896,7 @@ repeat-element@^1.1.2:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/repeat-element/-/repeat-element-1.1.3.tgz#782e0d825c0c5a3bb39731f84efee6b742e6b1ce"
 
-repeat-string@^1.5.2, repeat-string@^1.6.1:
+repeat-string@^1.5.2, repeat-string@^1.5.4, repeat-string@^1.6.1:
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/repeat-string/-/repeat-string-1.6.1.tgz#8dcae470e1c88abc2d600fff4a776286da75e637"
 
@@ -3641,6 +3648,18 @@ tough-cookie@~2.4.3:
     psl "^1.1.24"
     punycode "^1.4.1"
 
+truffle-artifactor@^4.0.10:
+  version "4.0.10"
+  resolved "https://registry.yarnpkg.com/truffle-artifactor/-/truffle-artifactor-4.0.10.tgz#a604329dfd0d004a4c6299062dbb226ce411ce8e"
+  dependencies:
+    async "2.6.1"
+    debug "^4.1.0"
+    fs-extra "6.0.1"
+    lodash "4.17.11"
+    truffle-contract "^4.0.11"
+    truffle-contract-schema "^3.0.6"
+    truffle-expect "^0.0.7"
+
 truffle-artifactor@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/truffle-artifactor/-/truffle-artifactor-4.0.8.tgz#61321570378036b2a9aca7fcfc053fe206b3d898"
@@ -3666,6 +3685,25 @@ truffle-compile-vyper@^1.0.8:
     eslint "^5.5.0"
     minimatch "^3.0.4"
     truffle-compile "^4.0.8"
+
+truffle-compile@^4.0.10:
+  version "4.0.10"
+  resolved "https://registry.yarnpkg.com/truffle-compile/-/truffle-compile-4.0.10.tgz#ecc5ec91760392f3ec5bc0bb86c1b95b68357dab"
+  dependencies:
+    async "2.6.1"
+    colors "^1.1.2"
+    debug "^4.1.0"
+    ora "^3.0.0"
+    original-require "^1.0.1"
+    request "^2.85.0"
+    request-promise "^4.2.2"
+    require-from-string "^2.0.2"
+    semver "^5.6.0"
+    solc "0.5.0"
+    truffle-config "^1.1.7"
+    truffle-contract-sources "^0.1.3"
+    truffle-error "^0.0.4"
+    truffle-expect "^0.0.7"
 
 truffle-compile@^4.0.8:
   version "4.0.8"
@@ -3697,9 +3735,28 @@ truffle-config@^1.1.6:
     truffle-error "^0.0.4"
     truffle-provider "^0.1.5"
 
+truffle-config@^1.1.7:
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/truffle-config/-/truffle-config-1.1.7.tgz#dba089e6479cbe7bdb2a5d661624c61b4ffe67b1"
+  dependencies:
+    configstore "^4.0.0"
+    find-up "^2.1.0"
+    lodash "4.17.11"
+    original-require "1.0.1"
+    truffle-error "^0.0.4"
+    truffle-provider "^0.1.6"
+
 truffle-contract-schema@^3.0.3:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/truffle-contract-schema/-/truffle-contract-schema-3.0.3.tgz#32b886d549ae92a278e8aee86ba98ea90a8009bb"
+  dependencies:
+    ajv "^5.1.1"
+    crypto-js "^3.1.9-1"
+    debug "^4.1.0"
+
+truffle-contract-schema@^3.0.6:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/truffle-contract-schema/-/truffle-contract-schema-3.0.6.tgz#d28c43ccbc15524a2be81326ccb8c036332f7371"
   dependencies:
     ajv "^5.1.1"
     crypto-js "^3.1.9-1"
@@ -3711,6 +3768,21 @@ truffle-contract-sources@^0.1.3:
   dependencies:
     debug "^4.1.0"
     glob "^7.1.2"
+
+truffle-contract@^4.0.11:
+  version "4.0.11"
+  resolved "https://registry.yarnpkg.com/truffle-contract/-/truffle-contract-4.0.11.tgz#587d0e032c33ad320b7e12f1093eb789c62a8275"
+  dependencies:
+    bignumber.js "^7.2.1"
+    ethers "^4.0.0-beta.1"
+    truffle-blockchain-utils "^0.0.8"
+    truffle-contract-schema "^3.0.6"
+    truffle-error "^0.0.4"
+    truffle-interface-adapter "^0.1.2"
+    web3 "1.0.0-beta.37"
+    web3-core-promievent "1.0.0-beta.37"
+    web3-eth-abi "1.0.0-beta.37"
+    web3-utils "1.0.0-beta.37"
 
 truffle-contract@^4.0.9:
   version "4.0.9"
@@ -3744,6 +3816,13 @@ truffle-external-compile@^1.0.5:
     truffle-expect "^0.0.7"
     web3-utils "1.0.0-beta.37"
 
+truffle-interface-adapter@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/truffle-interface-adapter/-/truffle-interface-adapter-0.1.2.tgz#b544e726a3a0833911ce6dadb1197cef53ad801b"
+  dependencies:
+    bn.js "^4.11.8"
+    web3 "1.0.0-beta.37"
+
 truffle-provider@^0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/truffle-provider/-/truffle-provider-0.1.5.tgz#658d7c41a8f56099d7d83e5b62030edea5b069c0"
@@ -3751,9 +3830,30 @@ truffle-provider@^0.1.5:
     truffle-error "^0.0.4"
     web3 "1.0.0-beta.37"
 
+truffle-provider@^0.1.6:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/truffle-provider/-/truffle-provider-0.1.6.tgz#efbed3bb0fc3e34744e915cf1c60fc37cf628097"
+  dependencies:
+    truffle-error "^0.0.4"
+    truffle-interface-adapter "^0.1.2"
+    web3 "1.0.0-beta.37"
+
 truffle-provisioner@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/truffle-provisioner/-/truffle-provisioner-0.1.2.tgz#e40c3c8e10bdadf3db482fb36b01a746105f1118"
+
+truffle-provisioner@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/truffle-provisioner/-/truffle-provisioner-0.1.4.tgz#a470f7e603d069b481481dba92f5c9d2f1a8526a"
+
+truffle-resolver@^5.0.10:
+  version "5.0.10"
+  resolved "https://registry.yarnpkg.com/truffle-resolver/-/truffle-resolver-5.0.10.tgz#4009263b16d9c954b671d464987b7db911b32a78"
+  dependencies:
+    async "2.6.1"
+    truffle-contract "^4.0.11"
+    truffle-expect "^0.0.7"
+    truffle-provisioner "^0.1.4"
 
 truffle-resolver@^5.0.8:
   version "5.0.8"

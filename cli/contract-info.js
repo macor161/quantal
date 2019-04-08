@@ -20,7 +20,7 @@ const getContractInfosFromFolder = async folderPath => {
 
 async function getContractInfo(path) {
     const { contractName, abi, ast, bytecode, devdoc } = getContractFile(path)
-
+    
     return {
         name: contractName,
         abi,
