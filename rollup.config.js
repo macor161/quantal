@@ -19,7 +19,7 @@ export default [
 			file: pkg.browser,
 			format: 'umd'
 		},
-		external: ['web3'],
+		external: ['web3-eth'],
 		plugins: [
 			resolve(), 
 			commonjs(),

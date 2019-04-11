@@ -1,9 +1,9 @@
 export class PromiseTransaction {
 
-    constructor(transaction, requestType, middleware) {
+    constructor(transaction, requestType, resolveMiddleware) {
         this._requestType = requestType
         this._transaction = transaction
-        this._middleware = middleware || (response => response)
+        this._middleware = resolveMiddleware || (response => response)
 
         return new Proxy(transaction, {
             get: this._proxyHandler.bind(this)

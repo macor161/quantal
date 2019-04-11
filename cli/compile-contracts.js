@@ -11,7 +11,9 @@ const DEFAULT_COMPILER = 'solc'
 
 module.exports = function compileContracts(options) {
     return new Promise((res, rej) => {
-        const config = Config.detect({})  
+        // Currently recompiles all contracts everytime to make sure
+        // we receive all warning messages
+        const config = Config.detect({ all: true })  
         
         Contracts.compile(config, (err, result) => {
             if (err) 

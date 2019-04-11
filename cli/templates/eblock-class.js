@@ -4,7 +4,7 @@ const outdent = require('outdent')
 const outdentOpts = { trimTrailingNewline: false }
 
 module.exports = ({ name, abi, bytecode, methods, devdoc }, libraryName) => `
-import { Eblock, getWeb3, PromiseTransaction } from '${libraryName}'
+import { Eblock, getInstance, PromiseTransaction, properties } from '${libraryName}'
 
 export class ${name} extends Eblock {
 
@@ -18,7 +18,7 @@ export class ${name} extends Eblock {
 
 ${name}.deploy = function(...args) {
     if (!${name}._web3Contract)
-        ${name}._web3Contract = new getWeb3().eth.Contract(${name}._abi)
+        ${name}._web3Contract = new getInstance().Contract(${name}._abi)
 
     const tx = ${name}._web3Contract.deploy({ data: ${name}._bytecode, arguments: args })
     return new PromiseTransaction(tx, 'send', response => new ${name}(response.address))
@@ -34,7 +34,7 @@ ${map(methods, member => outdent(outdentOpts)`
      `)} */
     `}
     ${name}.prototype['${member.name}'] = function(...args) { 
-        return this.executeMethod('${member.name}', args)    
+        return this[properties.executeMethod]('${member.name}', args)    
     }
 `
 )}
