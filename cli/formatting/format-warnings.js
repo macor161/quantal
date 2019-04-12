@@ -11,7 +11,7 @@ function formatWarnings(warnings) {
     
         ${chalk.bold.yellow(`Compiled with ${warnings.length} warnings`)}
 
-        ${map(warnings, err => `${formatWarning(err)}\n`)}
+        ${map(warnings, err => `${formatWarning(err)}\n\n\n`)}
     `
 }
 

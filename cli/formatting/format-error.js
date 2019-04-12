@@ -11,7 +11,7 @@ function formatErrors(errors) {
     
         ${chalk.bold.red('Failed to compile.')}
 
-        ${map(errors, err => `${formatError(err)}\n`)}
+        ${map(errors, err => `${formatError(err)}\n\n\n`)}
     `
 }
 
