@@ -1,19 +1,19 @@
-import { getInstance } from './quantal-eth'
-import { PromiseTransaction } from './promise-transaction'
+import { getInstance, QEth } from './qeth'
+import { QTransaction } from './qtransaction'
 
 export const properties = {
     web3Contract: Symbol('web3Contract'),
     executeMethod: Symbol('executeMethod')
 }
 
-export class Eblock {
+export class QContract {
 
     constructor(abi, address, opts = {}) {
         this._address = address
         this._opts = opts
 
         if (opts.provider)
-            this._opts.eth = new QuantalEth({ provider: opts.provider })
+            this._opts.eth = new QEth({ provider: opts.provider })
 
         this.web3Contract = this[properties.web3Contract] = new this.eth.Contract(abi, address, opts)                
     }
@@ -23,7 +23,7 @@ export class Eblock {
     [properties.executeMethod](methodName, args, txResponseMiddleware) {
         const requestType = getRequestType(this[properties.web3Contract].abiModel.getMethod(methodName).abiItem)
         const tx = this[properties.web3Contract].methods[methodName](...args)
-        return new PromiseTransaction(tx, requestType, txResponseMiddleware)
+        return new QTransaction(tx, requestType, txResponseMiddleware)
     }
 
 }

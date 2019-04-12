@@ -45,18 +45,6 @@ async function writeJsSource(contractInfo, outputPath) {
     return writeFile(path.join(outputPath, `${contractInfo.name}.js`), contractInfo.jsSource)
 }
 
-/**
- * Returns null for interfaces and libraries
- * 
- * @param {string} inputPath 
- * @param {string} outputPath 
- */
-async function generateEblockJsFile(inputPath, outputPath) {
-    await mkdirp(outputPath)
-    const info = await getContractInfo(inputPath)
-    const templ = await eblockClassTemplate(info)
-    await writeFile(path.join(outputPath, `${info.name}.js`), templ)
-    //console.log(templ)
-}
+
 
 module.exports = { generateJsFiles }

@@ -8,7 +8,7 @@ const DEFAULT_OPTIONS = {
     syncDefaultAccount: true
 }
 
-export class QuantalEth extends Eth {
+export class QEth extends Eth {
 
     constructor(options) {
         const opts = { 
@@ -42,7 +42,7 @@ export class QuantalEth extends Eth {
 
 
 
-let ethInstance
+let qethInstance
 const DEFAULT_INIT_OPTIONS = { }
 
 export async function init(options = DEFAULT_INIT_OPTIONS) {
@@ -52,18 +52,18 @@ export async function init(options = DEFAULT_INIT_OPTIONS) {
     provider: options.provider || await getProvider()
   }
 
-  ethInstance = new QuantalEth(ethOptions)
+  qethInstance = new QEth(ethOptions)
 
-  return ethInstance  
+  return qethInstance  
 }
 
 
 
 export function getInstance() {
-  if (!ethInstance) 
+  if (!qethInstance) 
     throw 'eth is not initialized'
 
-  return ethInstance
+  return qethInstance
 }
 
 

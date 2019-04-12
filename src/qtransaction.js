@@ -1,4 +1,4 @@
-export class PromiseTransaction {
+export class QTransaction {
 
     constructor(transaction, requestType, resolveMiddleware) {
         this._requestType = requestType

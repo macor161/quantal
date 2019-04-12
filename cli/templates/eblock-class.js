@@ -4,9 +4,9 @@ const outdent = require('outdent')
 const outdentOpts = { trimTrailingNewline: false }
 
 module.exports = ({ name, abi, bytecode, methods, devdoc }, libraryName) => `
-import { Eblock, getInstance, PromiseTransaction, properties } from '${libraryName}'
+import { QContract, getInstance, QTransaction, properties } from '${libraryName}'
 
-export class ${name} extends Eblock {
+export class ${name} extends QContract {
 
     constructor(address, opts) {
         super(${name}._abi, address, opts)
@@ -21,7 +21,7 @@ ${name}.deploy = function(...args) {
         ${name}._web3Contract = new getInstance().Contract(${name}._abi)
 
     const tx = ${name}._web3Contract.deploy({ data: ${name}._bytecode, arguments: args })
-    return new PromiseTransaction(tx, 'send', response => new ${name}(response.address))
+    return new QTransaction(tx, 'send', response => new ${name}(response.address))
 }
 
 ${map(methods, member => outdent(outdentOpts)`
