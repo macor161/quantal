@@ -4,7 +4,9 @@ const outdent = require('outdent')
 const outdentOpts = { trimTrailingNewline: false }
 
 module.exports = ({ name, abi, bytecode, methods, devdoc }, libraryName) => `
-import { QContract, getInstance, QTransaction, properties } from '${libraryName}'
+import { QContract, getInstance, QTransaction } from '${libraryName}'
+
+const { executeMethod } = QContract.properties
 
 export class ${name} extends QContract {
 
@@ -13,8 +15,6 @@ export class ${name} extends QContract {
     }
 
 }
-
-
 
 ${name}.deploy = function(...args) {
     if (!${name}._web3Contract)
@@ -25,23 +25,24 @@ ${name}.deploy = function(...args) {
 }
 
 ${map(methods, member => outdent(outdentOpts)`
-    ${member.doc && outdent`
+    ${member.doc ? outdent`
     /**
      * ${member.doc.details}
      * 
-     ${member.doc.params && map(member.doc.params, (desc, param) => outdent(outdentOpts)`
+     ${member.doc.params ? map(member.doc.params, (desc, param) => outdent(outdentOpts)`
         * @param ${param} ${desc}
-     `)} */
-    `}
+     `) : ''} */
+    ` : ''}
     ${name}.prototype['${member.name}'] = function(...args) { 
-        return this[properties.executeMethod]('${member.name}', args)    
+        return this[executeMethod]('${member.name}', args)
     }
 `
 )}
 
 ${name}._abi = ${JSON.stringify(abi)}
 ${name}._bytecode = ${JSON.stringify(bytecode)}
-${name}._doc = ${JSON.stringify(devdoc)}
+
+QContract.preGeneratedContracts['${name}'] = ${name}
 
 `
 

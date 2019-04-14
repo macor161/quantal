@@ -5,11 +5,25 @@ function getContract(ast, contractName) {
     )
 }
 
+/**
+ * 
+ * TODO: Support inherited methods
+ * @param {Object} astConract 
+ * @param {Object} abiMethod 
+ */
 function getMethod(astConract, abiMethod) {
-    return astConract.nodes.find(node =>
-        node.nodeType === 'FunctionDefinition' 
-        && node.name === abiMethod.name  
-        && compareParameters(node.parameters.parameters, abiMethod.inputs) 
+    return astConract.nodes.find(node => (
+            node.nodeType === 'FunctionDefinition' 
+            && node.name === abiMethod.name  
+            && compareParameters(node.parameters.parameters, abiMethod.inputs) 
+        ) || (
+            abiMethod.inputs.length === 0
+            && abiMethod.outputs.length === 1
+            && node.nodeType === 'VariableDeclaration' 
+            && node.visibility === 'public'
+            && node.name === abiMethod.name  
+        )
+
     )
 }
 
@@ -26,11 +40,27 @@ function compareParameters(astMethodParams, abiMethodParams) {
 
              
     for(const i in astMethodParams) {
-        if (astMethodParams[i].typeName.name !== abiMethodParams[i].type)
-            return false
+        if (!isParamEqual(astMethodParams[i], abiMethodParams[i])) 
+            return false        
     }
 
     return true
+}
+
+function isParamEqual(astMethodParam, abiMethodParam) {
+    if (abiMethodParam.type === 'address' 
+        && astMethodParam.typeDescriptions.typeString.indexOf('contract ') === 0) {
+        return true
+    }
+
+    return parseType(astMethodParam.typeName.name) === parseType(abiMethodParam.type)
+}
+
+function parseType(type) {
+    if (type === 'uint')
+        return 'uint256'
+
+    return type
 }
 
 

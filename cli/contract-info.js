@@ -2,6 +2,7 @@ const importFresh = require('import-fresh')
 const { readdir } = require('fs-extra')
 const path = require('path')
 const _ = require('lodash')
+const ast = require('./ast')
 
 const FUNCTION_TYPE = 'function'
 
@@ -27,18 +28,48 @@ async function getContractInfo(path) {
         ast,
         bytecode,
         devdoc,
-        methods: getFunctions(abi, devdoc),
+        methods: getFunctions(contractName, abi, ast, devdoc),
         stateModifierFunctions: getStateModifierFunctions(abi, devdoc)
     }
 }
 
-function getFunctions(abi, devdoc) {
+
+
+function getFunctions(contractName, abi, astInfo, devdoc) {
+    const astContract = ast.getContract(astInfo, contractName)
+
     return abi
         .filter(member => member.type === FUNCTION_TYPE)
-        .map(viewFunction => ({
-            ...viewFunction,
-            doc: getDocForAbiFunction(viewFunction, devdoc)
-        }))
+        .map(viewFunction => {
+            const astMethod = ast.getMethod(astContract, viewFunction)
+
+            if (astMethod) {
+                // Public function
+                if (astMethod.nodeType === 'FunctionDefinition') {
+                    for (const i in viewFunction.outputs) {
+                        const abiOutput = viewFunction.outputs[i]
+                        const astOutput = astMethod.returnParameters.parameters[i]
+                      
+                        if (abiOutput.type === 'address' && astOutput.typeName.name !== 'address') {
+                            console.log('good: ', astMethod.name)
+                            abiOutput.contractName = astOutput.typeName.name                        
+                        }
+                    }
+                }
+                // Public variable
+                else if (astMethod.nodeType === 'VariableDeclaration') {
+                    viewFunction.outputs[0].contractName = astMethod.typeName.name
+                }
+            }
+            else {
+                console.log(`${contractName} method not found: `, viewFunction.name)
+            }
+
+            return {
+                ...viewFunction,
+                doc: getDocForAbiFunction(viewFunction, devdoc)
+            }
+        })
 }
 
 function getStateModifierFunctions(abi, devdoc) { 
