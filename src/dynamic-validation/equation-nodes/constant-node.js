@@ -3,16 +3,16 @@ import { OpCodes } from '../op-codes'
 
 const SUPPORTED_TYPES = ['uint', 'uint256']
 
-export class MethodParamNode extends EquationNode {
+export class ConstantNode extends EquationNode {
 
-    constructor(type, position) {
-        super(OpCodes.PARAM)
+    constructor(type, value) {
+        super(OpCodes.CONST)
 
         if (!SUPPORTED_TYPES.includes(type))
             throw `Unsupported type: ${type}`
 
         this.type = type
-        this.values.push(position)
+        this.values.push(value)
     }
 
     addNode(node) {
