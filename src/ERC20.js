@@ -1,49 +1,67 @@
 import { ERC20 } from './index'
+import { Equation } from './index'
+import { equationFactory } from './index'
 
-ERC20.prototype.deploy = function(...args) { 
-    const result = this.web3Contract.deploy({ data: ERC20._bytecode, arguments: args }).send()
-    //return tx
-    result.once('transactionHash', hash => console.log('tx hash: ', hash))
-    .once('receipt', receipt => console.log('once receipt: ', receipt))
-    .on('confirmation', (confNumber, receipt) => console.log(`confirmation ${confNumber}: `, receipt))
-    //.on('error', error => console.log('on error: ', error))
-    .then(function(receipt){
-        console.log('then: ', receipt)
-    })
-}
-ERC20.prototype.methods['setValue'] = function(...args) { 
-    const result = this.web3Contract.methods['setValue'](...args)
-    result.once('transactionHash', hash => console.log('tx hash: ', hash))
-    .once('receipt', receipt => console.log('once receipt: ', receipt))
-    .on('confirmation', (confNumber, receipt) => console.log(`confirmation ${confNumber}: `, receipt))
-    //.on('error', error => console.log('on error: ', error))
-    .then(function(receipt){
-        console.log('then: ', receipt)
-    })
-}
+/**
+ * @typedef {import("./dynamic-validation").Operators} Operators
+ */
 
-Test2.prototype.deploy = function(...args) { 
-    return this.web3Contract.deploy({ data: Test2._bytecode, arguments: args })
+
+export class ERC20Test extends ERC20 {
 
 }
-Test2.prototype.methods['setValue'] = function(...args) { 
-    return this.web3Contract.methods['setS'](...args)
 
-}
-Test2.prototype.methods['s'] = function(...args) { 
-    return this.web3Contract.methods['s'](...args)
-}
-/*
-ERC20.prototype.deploy = async function(...args) { 
-    const contract = await this.getContract()
-    const accounts = await (await this.getWeb3()).eth.getCachedAccounts()
-    const result = contract.deploy({ data: ERC20._bytecode, arguments: args }).send({ from: accounts[0] })
-    result.once('transactionHash', hash => console.log('tx hash: ', hash))
-    .once('receipt', receipt => console.log('once receipt: ', receipt))
-    .on('confirmation', (confNumber, receipt) => console.log(`confirmation ${confNumber}: `, receipt))
-    //.on('error', error => console.log('on error: ', error)})
-    .then(function(receipt){
-        console.log('then: ', receipt)
-    })
-    .catch(err => console.log('catch error: ', err))
-}*/
+
+/**
+ * @typedef {Object} myMethodParams
+ * @property {Operators} param1
+ * @property {Operators} param2
+ */
+Object.defineProperty(ERC20Test, 'myMethod', {
+    get() { 
+        const _this = this
+        return {
+            /**
+             * @type {myMethod2Params}
+             */
+            get require() {
+                const methodInfo = { 
+                    name: 'myMethod',
+                    params: [{ name: 'param1', type: 'uint', position: 45 }]
+                }
+                const equation = new Equation(methodInfo.name)
+                return equationFactory(_this, methodInfo, equation)
+            }
+        }
+    }
+})
+
+
+/**
+ * @typedef {Object} myMethod2Params
+ * @property {Operators} param1
+ * @property {Operators} param2
+ */
+Object.defineProperty(ERC20Test, 'myMethod2', {
+    get() { 
+        const _this = this
+        return {
+            /**
+             * @type {myMethod2Params}
+             */
+            get require() {
+                const methodInfo = { 
+                    name: 'myMethod2',
+                    params: [{ name: 'param2', type: 'uint', position: 45 }]
+                }
+                const equation = new Equation(methodInfo.name)
+                return equationFactory(_this, methodInfo, equation)
+            }
+        }
+    }
+})
+
+
+
+
+
