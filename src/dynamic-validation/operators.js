@@ -19,14 +19,13 @@ import { OpCodes } from './op-codes'
  * @param {class} contractClass
  * @param {Object} methodInfo
  * @param {Equation} equation
- * @param {boolean} not
+ * @param {boolean} not Operators are preceded by a 'not' operator
  */
 export function createOperators(contractClass, methodInfo, equation, not = false) {
     return {
-        ...( not 
+        not: not 
             ? null
-            : { not: createOperators(contractClass, methodInfo, equation) }  
-        ),
+            : createOperators(contractClass, methodInfo, equation, true),
 
         get toEqual() {
             const opcode = not ? OpCodes.NE : OpCodes.EQ
@@ -59,4 +58,5 @@ export function createOperators(contractClass, methodInfo, equation, not = false
         }        
     }
 }
+
 
