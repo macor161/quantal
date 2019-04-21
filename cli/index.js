@@ -1,57 +1,59 @@
 #!/usr/bin/env node
+const debugMain = require('debug')('main')
 
+debugMain('quantal start')
 const getOptions = require('./get-options')
 const build = require('./build')
 const { ganacheServer } = require('./ganache-server')
 const requireDir = require('require-dir')
 const { join, resolve } = require('path')
-const yargs = require('yargs')
+const package = require('../package.json')
 
-let dep = { getOptions }
 
-// Load commands from folder and pass dependencies
-const commandsFn = requireDir(join(__dirname, 'commands'))
-const commands = Object.keys(commandsFn).map((i) => commandsFn[i](dep))
 
-// Init CLI commands and options
-commands.forEach(cmd => yargs.command(cmd.command, cmd.desc, cmd.builder, cmd.handler))
-
-yargs
-  .scriptName("eblocks")
-  .alias('v', 'version')
-  .version()
-  .describe('v', 'show version information')
-  .usage('$0 <cmd> [args]')
-  .help()
-  .argv
+main()
 
 
 async function main() {
-    const options = getOptions()
-    //watch()
-    console.log('Starting Ganache server')
-    const ganacheInfo = await ganacheServer(options.ganache)
-    console.log(ganacheInfo.formattedInfo)
-    console.log('Building smart contracts')
-    await build({ watch: true })
+    try {
+        const argv = require('commander')
+            .option('-w, --watch', 'Watch for changes')
+            .option('-s', 'Start a ganache server')
+            .option('-v, --version', 'Show version information')
+            .parse(process.argv)
+
+        debugMain('argv loaded')
+
+        const command = loadCommand(argv)
+        debugMain('command loaded')
+
+        await command()
+        debugMain('command executed successfully')
+    } catch(e) {
+        console.log('Error: ', e.message)
+        debugMain('Error: ', e)
+    }
+
 }
 
 
 
-
-
-
-function wait(ms) {
-    return new Promise(res => setTimeout(res, ms))
+function loadCommand(argv) {
+    if (argv.help) {
+        return require('./commands/version')
+    }
+    else {
+        return () => argv.help()
+    }
 }
 
-process.on('uncaughtException', function (err) {
-    console.log('Error: ', err.message)
+
+process.on('uncaughtException', function (e) {
+    console.log('Error: ', e.message)
+    debugMain('Error: ', e)
 })
 
 process.on('unhandledRejection', error => {
     // truffle-compile throws an unhandled promise rejection.   
 })
 
-//main()
-//ganacheServer()
