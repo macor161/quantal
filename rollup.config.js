@@ -31,6 +31,7 @@ export default [
 		external: [],
 		output: [
 			{ file: pkg.module, format: 'es' },
+			{ file: 'dist/eblocks.cjs.js', format: 'cjs' },
 		],
 		plugins: [
 			jsonPlugin
