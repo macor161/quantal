@@ -2,29 +2,25 @@
 const debugMain = require('debug')('main')
 
 debugMain('quantal start')
-const getOptions = require('./get-options')
-const build = require('./build')
-const { ganacheServer } = require('./ganache-server')
-const requireDir = require('require-dir')
-const { join, resolve } = require('path')
 const package = require('../package.json')
-
 
 
 main()
 
-
 async function main() {
     try {
+        const logger = console.log
+
         const argv = require('commander')
+            .version(package.version)
             .option('-w, --watch', 'Watch for changes')
-            .option('-s', 'Start a ganache server')
+            .option('-s, --serve', 'Start a ganache server')
             .option('-v, --version', 'Show version information')
             .parse(process.argv)
 
         debugMain('argv loaded')
 
-        const command = loadCommand(argv)
+        const command = loadCommand({ argv, logger })
         debugMain('command loaded')
 
         await command()
@@ -38,13 +34,22 @@ async function main() {
 
 
 
-function loadCommand(argv) {
-    if (argv.help) {
-        return require('./commands/version')
+function loadCommand({ argv, logger }) {
+    // TODO: commander.js doesn't support overriding the --version flag
+    // We are temporarily using the commander.version() function
+    // if (argv.version) {
+    //     return require('./commands/version')({ argv, logger })
+    // }
+    // else if (argv.s) {
+    if (argv.serve) {
+        const getOptions = require('./get-options')
+        return require('./commands/serve')({ argv, logger, getOptions })
     }
     else {
-        return () => argv.help()
+        const getOptions = require('./get-options')
+        return require('./commands/build')({ argv, logger, getOptions })
     }
+    
 }
 
 
