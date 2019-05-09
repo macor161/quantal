@@ -9,9 +9,10 @@ const { map } = require('../template-literals')
 function formatErrors(errors) {
     return outdent`
     
+        ${map(errors, err => `${formatError(err)}`)}
+
         ${chalk.bold.red('Failed to compile.')}
 
-        ${map(errors, err => `${formatError(err)}\n\n\n`)}
     `
 }
 

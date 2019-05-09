@@ -9,9 +9,9 @@ const { map } = require('../template-literals')
 function formatWarnings(warnings) {
     return outdent`
     
+        ${map(warnings, err => `${formatWarning(err)}`)}    
         ${chalk.bold.yellow(`Compiled with ${warnings.length} warnings`)}
 
-        ${map(warnings, err => `${formatWarning(err)}\n\n\n`)}
     `
 }
 
@@ -26,6 +26,8 @@ function formatWarning(warning) {
        ${chalk.bold(`Line ${warning.sourceLocation.line}:`)} ${warning.message}
 
     ${formatSource(warning.sourceContext, { postLineParse: postLineParse(warning) })}
+
+
     `
 }
 
