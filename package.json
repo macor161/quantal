@@ -7,8 +7,7 @@
   },
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "pretest": "npm run build"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -52,6 +51,7 @@
     "v8-compile-cache": "^2.0.2"
   },
   "devDependencies": {
+    "jest": "^24.8.0",
     "openzeppelin-solidity": "2.1.3"
   }
 }
