@@ -1,7 +1,7 @@
 const compileContracts = require('./compile-contracts')
 const getOptions = require('./get-options')
 const getPath = require('./get-path')
-const { generateJsFiles } = require('./generate-js-files')
+//const { generateJsFiles } = require('./generate-js-files')
 const fs = require('fs')
 const path = require('path')
 const { formatErrors } = require('./formatting/format-error')
