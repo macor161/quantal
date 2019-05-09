@@ -2,12 +2,11 @@
   "name": "quantal",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/eblocks.esm.js",
-  "module": "dist/eblocks.esm.js",
-  "browser": "dist/eblocks.umd.js",
+  "bin": {
+    "quantal": "src/index.js"
+  },
+  "main": "src/index.js",
   "scripts": {
-    "build": "rollup -c",
-    "start": "rollup -c -w",
     "test": "echo \"Error: no test specified\" && exit 1",
     "pretest": "npm run build"
   },
@@ -42,18 +41,8 @@
     "truffle-resolver": "^5.0.10",
     "truffle-workflow-compile": "^2.0.8",
     "v8-compile-cache": "^2.0.2",
-    "web3-eth": "^1.0.0-beta.52",
-    "yargs": "^13.2.2"
+    "web3-eth": "^1.0.0-beta.52"
   },
   "devDependencies": {
-    "rollup": "^1.0.0",
-    "rollup-plugin-auto-external": "^2.0.0",
-    "rollup-plugin-commonjs": "^9.2.0",
-    "rollup-plugin-json": "^3.1.0",
-    "rollup-plugin-node-resolve": "^4.0.0",
-    "serve": "^10.1.2"
-  },
-  "files": [
-    "dist"
-  ]
+  }
 }
