@@ -41,6 +41,7 @@
     "truffle-expect": "^0.0.7",
     "truffle-resolver": "^5.0.10",
     "truffle-workflow-compile": "^2.0.8",
+    "v8-compile-cache": "^2.0.2",
     "web3-eth": "^1.0.0-beta.52",
     "yargs": "^13.2.2"
   },

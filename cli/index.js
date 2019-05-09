@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+require('v8-compile-cache')
 const debugMain = require('debug')('main')
 
 debugMain('quantal start')

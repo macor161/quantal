@@ -1,7 +1,7 @@
+const compileContracts = require('./compile-contracts')
 const getOptions = require('./get-options')
 const getPath = require('./get-path')
 const { generateJsFiles } = require('./generate-js-files')
-const compileContracts = require('./compile-contracts')
 const fs = require('fs')
 const path = require('path')
 const { formatErrors } = require('./formatting/format-error')
@@ -40,7 +40,7 @@ async function build(opts) {
         console.log('Building')
         const options = getOptions()
         const result = await compileContracts(options)
-        await generateJsFiles(options)
+        //await generateJsFiles(options)
         
         if (opts.onComplete)
             opts.onComplete()

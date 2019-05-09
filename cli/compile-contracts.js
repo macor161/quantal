@@ -1,7 +1,7 @@
+const solcCompile = require("truffle-compile");
 const mkdirp = require("mkdirp");
 const { callbackify, promisify } = require("util");
 const Config = require("truffle-config");
-const solcCompile = require("truffle-compile");
 const expect = require("truffle-expect");
 const Resolver = require("truffle-resolver");
 const Artifactor = require("truffle-artifactor");
@@ -125,7 +125,7 @@ const SUPPORTED_COMPILERS = {
           let [contracts, output, compilerUsed, warnings] = await multiPromisify(
             compileFunc
           )(config);
-
+          //console.log('compiled successful:', contracts)
           if (compilerUsed) {
             config.compilersInfo[compilerUsed.name] = {
               version: compilerUsed.version
