@@ -19,7 +19,7 @@ async function init() {
     if (!(await fs.exists(mainFolderPath)))
         await fs.mkdir(mainFolderPath)
 
-    if (!(await fs.exists(mainFolderPath)))
+    if (!(await fs.exists(solcCachePath)))
         await fs.mkdir(solcCachePath)
 }
 
