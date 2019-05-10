@@ -2,7 +2,6 @@ const debug = require("debug")("multiprocess-compiler")
 const os = require('os')
 const { DependencyTree } = require('../dependency-tree')
 const cpus = os.cpus()
-//const cpus = [1]
 const Worker = require('./worker')
 const workers = initWorkers()
 const { basename } = require('path')

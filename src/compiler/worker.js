@@ -2,6 +2,7 @@ const loadCompile = require('./compile')
 const { spawn } = require('child_process')
 const path = require('path')
 const JSONStream = require('JSONStream')
+const { loadCompiler } = require('./load-compiler')
 
 const DEFAULT_OPTIONS = {
     settings: {
@@ -81,8 +82,9 @@ module.exports = class Worker {
     }
 
     _sendInputToProcess() {
-        return new Promise((res, rej) => {    
-            const solc = spawn(path.join(__dirname,'../solc/solc-0.5.0'), ['--standard-json'])
+        return new Promise(async (res, rej) => {    
+            const compilerPath = await loadCompiler()
+            const solc = spawn(compilerPath, ['--standard-json'])
             let result
             solc.stdin.setEncoding('utf-8')         
 

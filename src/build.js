@@ -7,6 +7,8 @@ const path = require('path')
 const { formatErrors } = require('./formatting/format-error')
 const { formatWarnings } = require('./formatting/format-warnings')
 const chalk = require('chalk')
+const { isCompilerInCache, downloadCompiler } = require('./compiler/load-compiler')
+
 
 
 /**
@@ -15,6 +17,10 @@ const chalk = require('chalk')
  * @param {Function} opts.onComplete Called everytime a build is successfully completed
  */
 module.exports = async function(options = {}) {
+
+    if (!(await isCompilerInCache()))
+        await downloadCompiler()
+        
     const buildFn = preventConcurentCalls(build)
     
     if (options.watch) {
@@ -37,7 +43,7 @@ module.exports = async function(options = {}) {
 async function build(opts) {    
     try {
 
-        console.log('Building')
+        console.log('Starting build task')
         const options = getOptions()
         const result = await compileContracts(options)
         //await generateJsFiles(options)

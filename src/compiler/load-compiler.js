@@ -1,5 +1,5 @@
 const { platform } = require('os')
-const { createWriteStream, exists } = require('fs-extra')
+const { createWriteStream, exists, chmodSync } = require('fs-extra')
 const qconfig = require('../qconfig')
 const path = require('path')
 const request = require('request')
@@ -101,10 +101,13 @@ function downloadFile(from, to) {
          
 
         file.on('finish', () => {
-            file.close(() => res(filePath))  
+            file.close(() => {
+                chmodSync(filePath, "755")
+                res(filePath)
+            })  
         }) 
     })   
 }
 
 
-module.exports = { loadCompiler, downloadFile, getCompilerFilename, isCompilerInCache }
+module.exports = { loadCompiler, downloadCompiler, getCompilerFilename, isCompilerInCache }
