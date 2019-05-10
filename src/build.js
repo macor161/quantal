@@ -1,13 +1,12 @@
 const compileContracts = require('./compile-contracts')
 const getOptions = require('./get-options')
 const getPath = require('./get-path')
-//const { generateJsFiles } = require('./generate-js-files')
 const fs = require('fs')
 const path = require('path')
 const { formatErrors } = require('./formatting/format-error')
 const { formatWarnings } = require('./formatting/format-warnings')
 const chalk = require('chalk')
-const { isCompilerInCache, downloadCompiler } = require('./compiler/load-compiler')
+const { preloadCompiler } = require('./compiler/load-compiler')
 
 
 
@@ -18,8 +17,7 @@ const { isCompilerInCache, downloadCompiler } = require('./compiler/load-compile
  */
 module.exports = async function(options = {}) {
 
-    if (!(await isCompilerInCache()))
-        await downloadCompiler()
+    await preloadCompiler()
         
     const buildFn = preventConcurentCalls(build)
     

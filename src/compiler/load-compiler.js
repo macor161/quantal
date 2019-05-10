@@ -11,6 +11,21 @@ const SUPPORTED_OS = [ 'linux', /*'darwin', 'win32'*/ ]
 const DOWNLOAD_URL = 'http://solc.quantal.io'
 const LATEST_VERSION = '0.5.8'
 
+/**
+ * Download compiler if not already in cache.
+ * Set its permission as executable
+ * 
+ * @param {string} version 
+ */
+async function preloadCompiler(version = LATEST_VERSION) {
+    await qconfig.init()
+    const cachedCompilerPath = await getCachedCompilerPath(version)
+
+    if (!(await exists(cachedCompilerPath)))
+        await downloadCompiler(version)
+
+    chmodSync(cachedCompilerPath, "755")
+}
 
 /**
  * Download the solc compiler if not already cached
@@ -28,6 +43,12 @@ async function loadCompiler(version = LATEST_VERSION) {
         ? await getCachedCompiler(version)
         : downloadCompiler(version)
          
+}
+
+
+async function getCachedCompilerPath(version = LATEST_VERSION) {
+    const filename = getCompilerFilename(version)
+    return path.resolve(qconfig.getSolcCachePath(), filename)
 }
 
 /**
@@ -102,7 +123,6 @@ function downloadFile(from, to) {
 
         file.on('finish', () => {
             file.close(() => {
-                chmodSync(filePath, "755")
                 res(filePath)
             })  
         }) 
@@ -110,4 +130,4 @@ function downloadFile(from, to) {
 }
 
 
-module.exports = { loadCompiler, downloadCompiler, getCompilerFilename, isCompilerInCache }
+module.exports = { preloadCompiler, loadCompiler, downloadCompiler, getCompilerFilename, isCompilerInCache }
