@@ -1,1 +1,3 @@
-# eblocks
+# Quantal
+
+Lightweight Solidity build tool
