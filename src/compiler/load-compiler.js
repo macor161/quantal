@@ -7,7 +7,7 @@ const progress = require('request-progress')
 
 // TODO: Add checksum verification
 
-const SUPPORTED_OS = [ 'linux', 'darwin', 'win32' ]
+const SUPPORTED_OS = [ 'linux', /*'darwin', 'win32'*/ ]
 const DOWNLOAD_URL = 'http://solc.quantal.io'
 const LATEST_VERSION = '0.5.8'
 
