@@ -1,5 +1,5 @@
 const { platform } = require('os')
-const { createWriteStream, exists } = require('fs')
+const { createWriteStream, exists } = require('fs-extra')
 const qconfig = require('../qconfig')
 const path = require('path')
 const request = require('request')
@@ -24,11 +24,9 @@ async function loadCompiler(version = LATEST_VERSION) {
 
     await qconfig.init()
 
-    const solcFilename = getCompilerFilename(version)
-    const compilerPath = await getCachedCompiler(filename)
-
-    return compilerPath
-        || downloadFile(`${DOWNLOAD_URL}/${solcFilename}`, qconfig.getSolcCachePath())
+    return (await isCompilerInCache(version))
+        ? await getCachedCompiler(version)
+        : downloadCompiler(version)
          
 }
 
@@ -36,23 +34,36 @@ async function loadCompiler(version = LATEST_VERSION) {
  * Returns the compiler's path if it exists,
  * returns null otherwise
  * 
- * @param {string} filename 
+ * @param {string} version 
  * @returns {string}
  */
-async function getCachedCompiler(filename) {
+async function getCachedCompiler(version = LATEST_VERSION) {
+    const filename = getCompilerFilename(version)
     const filePath = path.resolve(qconfig.getSolcCachePath(), filename)
-    return exists(filePath)
+
+    return (await exists(filePath))
         ? filePath
         : null
 }
 
+async function isCompilerInCache(version = LATEST_VERSION) {
+    return (await getCachedCompiler(version)) !== null
+}
 
-function getCompilerFilename(version) {
+
+function getCompilerFilename(version = LATEST_VERSION) {
     const os = platform().replace('darwin', 'mac')
 
     return os === 'win32'
         ? `solc-${os}-${version}.exe`
         : `solc-${os}-${version}`
+}
+
+
+function downloadCompiler(version = LATEST_VERSION) {
+    const filename = getCompilerFilename(version)
+    
+    return downloadFile(`${DOWNLOAD_URL}/${version}/${filename}`, qconfig.getSolcCachePath())
 }
 
 
@@ -96,4 +107,4 @@ function downloadFile(from, to) {
 }
 
 
-module.exports = { loadCompiler, downloadFile, getCompilerFilename }
+module.exports = { loadCompiler, downloadFile, getCompilerFilename, isCompilerInCache }
