@@ -13,11 +13,10 @@ async function main() {
         const logger = console.log
 
         const argv = require('commander')
-            .version(package.version)
-            .option('-w, --watch', 'Watch for changes')
-            .option('-s, --serve', 'Start a ganache server')
-            .option('-v, --version', 'Show version information')
-            .parse(process.argv)
+        .option('-w, --watch', 'Watch for changes')
+        .option('-s, --serve', 'Start a ganache server')
+        .version(package.version)
+        .parse(process.argv)
 
         debugMain('argv loaded')
 
