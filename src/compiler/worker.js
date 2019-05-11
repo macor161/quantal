@@ -1,6 +1,4 @@
-const loadCompile = require('./compile')
 const { spawn } = require('child_process')
-const path = require('path')
 const JSONStream = require('JSONStream')
 const { loadCompiler } = require('./load-compiler')
 

@@ -6,7 +6,6 @@ const OS = require("os");
 const path = require("path");
 const Profiler = require("./profiler");
 const CompileError = require("./compileerror");
-const CompilerSupplier = require("./compilerSupplier");
 const expect = require("truffle-expect");
 const find_contracts = require("truffle-contract-sources");
 const Config = require("truffle-config");
@@ -461,5 +460,4 @@ compile.display = function(paths, options) {
   }
 };
 
-compile.CompilerSupplier = CompilerSupplier;
 module.exports = compile;
