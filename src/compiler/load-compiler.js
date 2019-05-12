@@ -2,8 +2,7 @@ const { platform } = require('os')
 const { createWriteStream, exists, chmodSync } = require('fs-extra')
 const qconfig = require('../qconfig')
 const path = require('path')
-const request = require('request')
-const progress = require('request-progress')
+
 
 // TODO: Add checksum verification
 
@@ -91,34 +90,33 @@ function downloadCompiler(version = LATEST_VERSION) {
 function downloadFile(from, to) {
     return new Promise((res, rej) => {
         const fileName = path.basename(from)
-        const filePath = path.resolve(to, fileName)
-        const file = createWriteStream(filePath)
 
         console.log(`Downloading ${fileName}...`)
 
-        progress(request(from))
-        .pipe(file)
+        const request = require('request')
+        const progress = require('request-progress')
+        const cliProgress = require('cli-progress')
+        const progressBar = new cliProgress.Bar({}, cliProgress.Presets.shades_classic)
+        progressBar.start(100, 0)
+
+        const filePath = path.resolve(to, fileName)
+        const file = createWriteStream(filePath)
+
+
+        progress(request(from), {
+            throttle: 500
+        })
         .on('progress', state => {
-            // The state is an object that looks like this:
-            // {
-            //     percent: 0.5,               // Overall percent (between 0 to 1)
-            //     speed: 554732,              // The download speed in bytes/sec
-            //     size: {
-            //         total: 90044871,        // The total payload size in bytes
-            //         transferred: 27610959   // The transferred payload size in bytes
-            //     },
-            //     time: {
-            //         elapsed: 36.235,        // The total elapsed seconds since the start (3 decimals)
-            //         remaining: 81.403       // The remaining seconds to finish (3 decimals)
-            //     }
-            // }
+            progressBar.update(parseInt(state.percent * 100))
         })
         .on('error', err => {
             
         })
         .on('end', () => {
-            
+            progressBar.update(100)
+            progressBar.stop()
         })
+        .pipe(file)
          
 
         file.on('finish', () => {
