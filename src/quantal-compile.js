@@ -429,35 +429,12 @@ compile.with_dependencies = function(options, callback) {
     (err, allSources, required) => {
       if (err) return callback(err);
 
-      var hasTargets = required.length;
-
-      hasTargets
-        ? self.display(required, options)
-        : self.display(allSources, options);
-
       options.compilationTargets = required;
       compile(allSources, options, callback);
     }
   );
 };
 
-compile.display = function(paths, options) {
-  if (options.quiet !== true) {
-    if (!Array.isArray(paths)) {
-      paths = Object.keys(paths);
-    }
 
-    const blacklistRegex = /^truffle\//;
 
-    paths.sort().forEach(contract => {
-      if (path.isAbsolute(contract)) {
-        contract =
-          "." + path.sep + path.relative(options.working_directory, contract);
-      }
-      if (contract.match(blacklistRegex)) return;
-      options.logger.log("> Compiling " + contract);
-    });
-  }
-};
-
-module.exports = compile;
+module.exports = compile
