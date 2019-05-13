@@ -4,7 +4,6 @@ const { loadCompiler } = require('./load-compiler')
 
 const DEFAULT_OPTIONS = {
     settings: {
-      optimizer: { enabled: true, runs: 200 },
       evmVersion: undefined,
       outputSelection: {
         "*": {
@@ -41,24 +40,15 @@ module.exports = class Worker {
         }
         this._debug = require('debug')(`worker-${id}`)
 
-        if (childProcess) {
-            /*
-            const { fork } = require('child_process')
-            
-            this._process = fork(path.join(__dirname, 'compile-process.js'), [id])*/
-        }
     }
 
     addSource(sourceNode) {
-        //debug('adding sourceNode %o', sourceNode.path)
         this.branches.push(sourceNode)
         this.input.sources = sourceNode.getNodes()
             .reduce((acc, dep) => {
                 acc[dep.path] = { content: dep.content }
                 return acc
             }, this.input.sources || {})
-
-        //debug('sources: %o', this.input.sources)
     }
 
     hasSources() { return this.input.sources != null }
@@ -68,11 +58,9 @@ module.exports = class Worker {
             this._process.kill()            
     }
 
-    async compile(compilerOptions = DEFAULT_OPTIONS) {
-        //this._debug('compiling %o', Object.keys(this.input.sources))
+    async compile() {
         this._debug('compiling %o', this.input.sources)
         this._debug(`time ${new Date().toISOString()}`)
-        //require('fs').writeFileSync(`./newinput-${this.id}.json`, JSON.stringify(this.input))
 
         const result = await this._sendInputToProcess()
         this._debug('compile done')
@@ -81,25 +69,26 @@ module.exports = class Worker {
 
     _sendInputToProcess() {
         return new Promise(async (res, rej) => {    
+            this._debug('spawning compiler process')
             const compilerPath = await loadCompiler()
             const solc = spawn(compilerPath, ['--standard-json'])
-            let result
-            solc.stdin.setEncoding('utf-8')         
+            solc.stdin.setEncoding('utf-8')   
+            this._debug('compiler process ready')      
 
             solc.stdout
                 .pipe(JSONStream.parse())
                 .on('data', (data) => {
-                    //console.log('received data')
-                    result = data
+                    this._debug(`data received ${new Date().toISOString()}`)
+                    // Data could eventually be returned incrementally 
+                    res(data)
                 })
           
             solc.stderr.on('data', (data) => {
                 console.log(`stderr: ${data}`);
             });
             
-            solc.on('close', (code) => {
-                this._debug(`result received ${new Date().toISOString()}`)
-                res(result)
+            solc.on('close', () => {
+                this._debug(`process connexion closed ${new Date().toISOString()}`)
             }) 
             
             solc.stdin.write(JSON.stringify(this.input) + "\n")
