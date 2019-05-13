@@ -2,8 +2,7 @@ const { platform } = require('os')
 const { createWriteStream, exists, chmodSync } = require('fs-extra')
 const qconfig = require('../qconfig')
 const path = require('path')
-const request = require('request')
-const progress = require('request-progress')
+
 
 // TODO: Add checksum verification
 
@@ -81,48 +80,41 @@ function getCompilerFilename(version = LATEST_VERSION) {
 }
 
 
-function downloadCompiler(version = LATEST_VERSION) {
-    const filename = getCompilerFilename(version)
-    
-    return downloadFile(`${DOWNLOAD_URL}/${version}/${filename}`, qconfig.getSolcCachePath())
-}
-
-
-function downloadFile(from, to) {
+function downloadCompiler(version) {
     return new Promise((res, rej) => {
-        const fileName = path.basename(from)
-        const filePath = path.resolve(to, fileName)
-        const file = createWriteStream(filePath)
+        const fileName = getCompilerFilename(version)        
 
         console.log(`Downloading ${fileName}...`)
 
-        progress(request(from))
-        .pipe(file)
+        const request = require('request')
+        const progress = require('request-progress')
+        const { Bar, Presets } = require('cli-progress')
+
+        const url = `${DOWNLOAD_URL}/${version}/${fileName}`
+        const filePath = path.resolve(qconfig.getSolcCachePath(), fileName)
+        const fileStream = createWriteStream(filePath)
+        const progressBar = new Bar({}, Presets.shades_classic)
+
+        progressBar.start(100, 0)
+
+        progress(request(url), {
+            throttle: 500
+        })
         .on('progress', state => {
-            // The state is an object that looks like this:
-            // {
-            //     percent: 0.5,               // Overall percent (between 0 to 1)
-            //     speed: 554732,              // The download speed in bytes/sec
-            //     size: {
-            //         total: 90044871,        // The total payload size in bytes
-            //         transferred: 27610959   // The transferred payload size in bytes
-            //     },
-            //     time: {
-            //         elapsed: 36.235,        // The total elapsed seconds since the start (3 decimals)
-            //         remaining: 81.403       // The remaining seconds to finish (3 decimals)
-            //     }
-            // }
+            progressBar.update(parseInt(state.percent * 100))
         })
         .on('error', err => {
             
         })
         .on('end', () => {
-            
+            progressBar.update(100)
+            progressBar.stop()
         })
+        .pipe(fileStream)
          
 
-        file.on('finish', () => {
-            file.close(() => {
+        fileStream.on('finish', () => {
+            fileStream.close(() => {
                 res(filePath)
             })  
         }) 
@@ -130,4 +122,9 @@ function downloadFile(from, to) {
 }
 
 
-module.exports = { preloadCompiler, loadCompiler, downloadCompiler, getCompilerFilename, isCompilerInCache }
+function getFormattedVersion(version = LATEST_VERSION) {
+    return version
+}
+
+
+module.exports = { preloadCompiler, getFormattedVersion, loadCompiler, downloadCompiler, getCompilerFilename, isCompilerInCache }
