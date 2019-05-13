@@ -2,14 +2,11 @@ require('v8-compile-cache')
 require('./setup-debug')
 const debug = require("debug")("compile")
 const compiler = require('./compiler/multiprocess-compiler')
-const OS = require("os");
-const path = require("path");
-const Profiler = require("./profiler");
-const CompileError = require("./compileerror");
-const expect = require("truffle-expect");
+const OS = require("os")
+const Profiler = require("./profiler")
+const expect = require("truffle-expect")
 const find_contracts = require("truffle-contract-sources")
 const Config = require("truffle-config")
-const semver = require("semver")
 const detailedError = require('./detailederror')
 const { getFormattedVersion } = require('./compiler/load-compiler')
 
@@ -28,62 +25,63 @@ const { getFormattedVersion } = require('./compiler/load-compiler')
 // }
 const compile = function(sources, options, callback) {
   if (typeof options === "function") {
-    callback = options;
-    options = {};
+    callback = options
+    options = {}
   }
 
-  if (options.logger === undefined) options.logger = console;
+  if (!options.logger) 
+    options.logger = console
 
   const hasTargets =
-    options.compilationTargets && options.compilationTargets.length;
+    options.compilationTargets && options.compilationTargets.length
 
-  expect.options(options, ["contracts_directory", "compilers"]);
+  expect.options(options, ["contracts_directory", "compilers"])
 
-  expect.options(options.compilers, ["solc"]);
+  expect.options(options.compilers, ["solc"])
 
   options.compilers.solc.settings.evmVersion =
     options.compilers.solc.settings.evmVersion ||
     options.compilers.solc.evmVersion ||
-    {};
+    {}
   options.compilers.solc.settings.optimizer =
     options.compilers.solc.settings.optimizer ||
     options.compilers.solc.optimizer ||
-    {};
+    {}
 
   // Grandfather in old solc config
   if (options.solc) {
-    options.compilers.solc.settings.evmVersion = options.solc.evmVersion;
-    options.compilers.solc.settings.optimizer = options.solc.optimizer;
+    options.compilers.solc.settings.evmVersion = options.solc.evmVersion
+    options.compilers.solc.settings.optimizer = options.solc.optimizer
   }
 
   // Ensure sources have operating system independent paths
   // i.e., convert backslashes to forward slashes; things like C: are left intact.
-  const operatingSystemIndependentSources = {};
-  const operatingSystemIndependentTargets = {};
-  const originalPathMappings = {};
+  const operatingSystemIndependentSources = {}
+  const operatingSystemIndependentTargets = {}
+  const originalPathMappings = {}
 
   Object.keys(sources).forEach(function(source) {
     // Turn all backslashes into forward slashes
-    var replacement = source.replace(/\\/g, "/");
+    var replacement = source.replace(/\\/g, "/")
 
     // Turn G:/.../ into /G/.../ for Windows
     if (replacement.length >= 2 && replacement[1] === ":") {
       replacement = "/" + replacement;
-      replacement = replacement.replace(":", "");
+      replacement = replacement.replace(":", "")
     }
 
     // Save the result
-    operatingSystemIndependentSources[replacement] = sources[source];
+    operatingSystemIndependentSources[replacement] = sources[source]
 
     // Just substitute replacement for original in target case. It's
     // a disposable subset of `sources`
     if (hasTargets && options.compilationTargets.includes(source)) {
-      operatingSystemIndependentTargets[replacement] = sources[source];
+      operatingSystemIndependentTargets[replacement] = sources[source]
     }
 
     // Map the replacement back to the original source path.
     originalPathMappings[replacement] = source;
-  });
+  })
 
   const defaultSelectors = {
     "": ["legacyAST", "ast"],
@@ -97,17 +95,17 @@ const compile = function(sources, options, callback) {
       "userdoc",
       "devdoc"
     ]
-  };
+  }
 
   // Specify compilation targets
   // Each target uses defaultSelectors, defaulting to single target `*` if targets are unspecified
-  const outputSelection = {};
-  const targets = operatingSystemIndependentTargets;
-  const targetPaths = Object.keys(targets);
+  const outputSelection = {}
+  const targets = operatingSystemIndependentTargets
+  const targetPaths = Object.keys(targets)
 
   targetPaths.length
     ? targetPaths.forEach(key => (outputSelection[key] = defaultSelectors))
-    : (outputSelection["*"] = defaultSelectors);
+    : (outputSelection["*"] = defaultSelectors)
 
   const solcStandardInput = {
     language: "Solidity",
@@ -117,19 +115,13 @@ const compile = function(sources, options, callback) {
       optimizer: options.compilers.solc.settings.optimizer,
       outputSelection
     }
-  };
+  }
 
   // Nothing to compile? Bail.
   if (Object.keys(sources).length === 0) {
-    return callback(null, [], []);
+    return callback(null, [], [])
   }
 
-  /*
-  Object.keys(operatingSystemIndependentSources).forEach(file_path => {
-    solcStandardInput.sources[file_path] = {
-      content: operatingSystemIndependentSources[file_path]
-    };
-  });*/
   solcStandardInput.sources = operatingSystemIndependentSources
 
   // Load solc module only when compilation is actually required.
@@ -139,20 +131,15 @@ const compile = function(sources, options, callback) {
   
   const onCompiled = (standardOutput) => {
       debug('Compilation done')
-    //debug(`compiled ${JSON.stringify(standardOutput)}`)
-    //const result = solc.compile(JSON.stringify(solcStandardInput));
-      //debug('compiled')
 
-      //const standardOutput = JSON.parse(result);
+      let errors = standardOutput.errors || []
 
-      let errors = standardOutput.errors || [];
-
-      let warnings = [];
+      let warnings = []
 
       if (options.strict !== true) {
-        warnings = errors.filter(error => error.severity === "warning");
+        warnings = errors.filter(error => error.severity === "warning")
 
-        errors = errors.filter(error => error.severity !== "warning");
+        errors = errors.filter(error => error.severity !== "warning")
 
         if (options.quiet !== true && warnings.length > 0) {
           options.logger.log(
