@@ -9,6 +9,7 @@ const { dispatchWork } = require('./dispatch-work')
 const Multispinner = require('multispinner')
 const chalk = require('chalk')
 
+
 module.exports = function(solcStandardInput) {
 
     return new Promise((res, rej) => {

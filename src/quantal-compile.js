@@ -7,10 +7,11 @@ const path = require("path");
 const Profiler = require("./profiler");
 const CompileError = require("./compileerror");
 const expect = require("truffle-expect");
-const find_contracts = require("truffle-contract-sources");
-const Config = require("truffle-config");
-const semver = require("semver");
+const find_contracts = require("truffle-contract-sources")
+const Config = require("truffle-config")
+const semver = require("semver")
 const detailedError = require('./detailederror')
+const { getFormattedVersion } = require('./compiler/load-compiler')
 
 
 
@@ -214,8 +215,7 @@ const compile = function(sources, options, callback) {
             unlinked_binary: "0x" + contract.evm.bytecode.object, // deprecated
             compiler: {
               name: "solc",
-              //version: solc.version()
-              version: '0.5.0'
+              version: getFormattedVersion()
             },
             devdoc: contract.devdoc,
             userdoc: contract.userdoc
@@ -271,8 +271,7 @@ const compile = function(sources, options, callback) {
         });
       });
 
-      //const compilerInfo = { name: "solc", version: solc.version() };
-      const compilerInfo = { name: "solc", version: '0.5.0' };
+      const compilerInfo = { name: "solc", version: getFormattedVersion() };
 
       Promise.all(warnings.map(warn => detailedError(warn)))
         .then(warnings => callback(null, returnVal, files, compilerInfo, warnings))

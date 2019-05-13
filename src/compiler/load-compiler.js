@@ -80,30 +80,24 @@ function getCompilerFilename(version = LATEST_VERSION) {
 }
 
 
-function downloadCompiler(version = LATEST_VERSION) {
-    const filename = getCompilerFilename(version)
-    
-    return downloadFile(`${DOWNLOAD_URL}/${version}/${filename}`, qconfig.getSolcCachePath())
-}
-
-
-function downloadFile(from, to) {
+function downloadCompiler(version) {
     return new Promise((res, rej) => {
-        const fileName = path.basename(from)
+        const fileName = getCompilerFilename(version)        
 
         console.log(`Downloading ${fileName}...`)
 
         const request = require('request')
         const progress = require('request-progress')
-        const cliProgress = require('cli-progress')
-        const progressBar = new cliProgress.Bar({}, cliProgress.Presets.shades_classic)
+        const { Bar, Presets } = require('cli-progress')
+
+        const url = `${DOWNLOAD_URL}/${version}/${fileName}`
+        const filePath = path.resolve(qconfig.getSolcCachePath(), fileName)
+        const fileStream = createWriteStream(filePath)
+        const progressBar = new Bar({}, Presets.shades_classic)
+
         progressBar.start(100, 0)
 
-        const filePath = path.resolve(to, fileName)
-        const file = createWriteStream(filePath)
-
-
-        progress(request(from), {
+        progress(request(url), {
             throttle: 500
         })
         .on('progress', state => {
@@ -116,11 +110,11 @@ function downloadFile(from, to) {
             progressBar.update(100)
             progressBar.stop()
         })
-        .pipe(file)
+        .pipe(fileStream)
          
 
-        file.on('finish', () => {
-            file.close(() => {
+        fileStream.on('finish', () => {
+            fileStream.close(() => {
                 res(filePath)
             })  
         }) 
@@ -128,4 +122,9 @@ function downloadFile(from, to) {
 }
 
 
-module.exports = { preloadCompiler, loadCompiler, downloadCompiler, getCompilerFilename, isCompilerInCache }
+function getFormattedVersion(version = LATEST_VERSION) {
+    return version
+}
+
+
+module.exports = { preloadCompiler, getFormattedVersion, loadCompiler, downloadCompiler, getCompilerFilename, isCompilerInCache }
