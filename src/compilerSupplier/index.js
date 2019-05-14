@@ -1,14 +1,7 @@
-const path = require("path");
-const fs = require("fs");
-const semver = require("semver");
 const debug = require('debug')('compiler-supplier')
 
 const {
   Bundled,
-  Docker,
-  Local,
-  Native,
-  VersionRange
 } = require("./loadingStrategies");
 
 class CompilerSupplier {
@@ -16,7 +9,7 @@ class CompilerSupplier {
     _config = _config || {};
     const defaultConfig = { version: null };
     this.config = Object.assign({}, defaultConfig, _config);
-    this.strategyOptions = { version: this.config.version };
+    this.strategyOptions = { version: null };
   }
 
   badInputError(userSpecification) {
@@ -30,91 +23,24 @@ class CompilerSupplier {
     return new Error(message);
   }
 
-  async downloadAndCacheSolc(version) {
-    if (semver.validRange(version)) {
-      return await new VersionRange(this.strategyOptions).getSolcFromCacheOrUrl(
-        version
-      );
-    }
-
-    const message =
-      `You must specify a valid solc version to download` +
-      `Please ensure that the version you entered, ` +
-      `${version}, is valid.`;
-    throw new Error(message);
-  }
 
   load() {
     const userSpecification = this.config.version;
 
     return new Promise(async (resolve, reject) => {
-      let strategy;
-      const useDocker = this.config.docker;
-      const useNative = userSpecification === "native";
-      const useBundledSolc = !userSpecification;
-      const useSpecifiedLocal =
-        userSpecification && this.fileExists(userSpecification);
-      const isValidVersionRange = semver.validRange(userSpecification);
 
-      if (useDocker) {
-        strategy = new Docker(this.strategyOptions);
-        //debug(`compile strategy: Docker`)
-      } else if (useNative) {
-        strategy = new Native(this.strategyOptions);
-        //debug(`compile strategy: Native`)
-      } else if (useBundledSolc) {
-        strategy = new Bundled(this.strategyOptions);
-        //debug(`compile strategy: Bundled`)
-      } else if (useSpecifiedLocal) {
-        strategy = new Local(this.strategyOptions);
-        //debug(`compile strategy: Local`)
-      } else if (isValidVersionRange) {
-        if (this.config.compilerRoots) {
-          this.strategyOptions.compilerRoots = this.config.compilerRoots;
-        }
-        strategy = new VersionRange(this.strategyOptions);
-        //debug(`compile strategy: VersionRange`)
-      }
-      
+      const strategy = new Bundled(this.strategyOptions);
 
-      if (strategy) {
-        try {
+      try {
           const solc = await strategy.load(userSpecification);
           resolve(solc);
         } catch (error) {
           reject(error);
         }
-      } else {
-        reject(this.badInputError(userSpecification));
-      }
+
     });
   }
 
-  fileExists(localPath) {
-    return fs.existsSync(localPath) || path.isAbsolute(localPath);
-  }
-
-  getDockerTags() {
-    return new Docker(this.strategyOptions).getDockerTags();
-  }
-
-  getReleases() {
-    return new VersionRange(this.strategyOptions)
-      .getSolcVersions()
-      .then(list => {
-        const prereleases = list.builds
-          .filter(build => build["prerelease"])
-          .map(build => build["longVersion"]);
-
-        const releases = Object.keys(list.releases);
-
-        return {
-          prereleases: prereleases,
-          releases: releases,
-          latestRelease: list.latestRelease
-        };
-      });
-  }
 }
 
 module.exports = CompilerSupplier;
