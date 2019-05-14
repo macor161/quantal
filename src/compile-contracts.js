@@ -95,21 +95,16 @@ const SUPPORTED_COMPILERS = {
       //debug('prepared config: %o', config)
   
       const compilers = [DEFAULT_COMPILER]
-  
-      this.reportCompilationStarted(options);
-  
-      const compilations = await this.compileSources(config, compilers);
+   
+      const compilations = await this.compileSources(config, compilers)
   
       const numberOfCompiledContracts = compilations.reduce(
         (number, compilation) => {
-          return number + Object.keys(compilation.contracts).length;
+          return number + Object.keys(compilation.contracts).length
         },
         0
       );
   
-      if (numberOfCompiledContracts === 0) this.reportNothingToCompile(options);
-  
-      this.reportCompilationFinished(options, config);
       return await this.collectCompilations(compilations);
     }),
   
