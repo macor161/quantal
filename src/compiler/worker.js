@@ -35,7 +35,7 @@ module.exports = class Worker {
         this.branches = []
         this.input = {
             language: 'Solidity',
-            settings: DEFAULT_OPTIONS.settings,
+            settings: compilerOptions || DEFAULT_OPTIONS.settings,
             sources: null
         }
         this._debug = require('debug')(`worker-${id}`)
@@ -59,7 +59,7 @@ module.exports = class Worker {
     }
 
     async compile() {
-        this._debug('compiling %o', this.input.sources)
+        this._debug('compiling %o', this.input)
         this._debug(`time ${new Date().toISOString()}`)
 
         const result = await this._sendInputToProcess()

@@ -97,14 +97,7 @@ const SUPPORTED_COMPILERS = {
       const compilers = [DEFAULT_COMPILER]
    
       const compilations = await this.compileSources(config, compilers)
-  
-      const numberOfCompiledContracts = compilations.reduce(
-        (number, compilation) => {
-          return number + Object.keys(compilation.contracts).length
-        },
-        0
-      );
-  
+   
       return await this.collectCompilations(compilations);
     }),
   
@@ -122,7 +115,7 @@ const SUPPORTED_COMPILERS = {
           let [contracts, output, compilerUsed, warnings] = await multiPromisify(
             compileFunc
           )(config);
-          //console.log('compiled successful:', contracts)
+          
           if (compilerUsed) {
             config.compilersInfo[compilerUsed.name] = {
               version: compilerUsed.version
