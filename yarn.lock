@@ -5047,16 +5047,17 @@ truffle-blockchain-utils@^0.0.9:
   resolved "https://registry.yarnpkg.com/truffle-blockchain-utils/-/truffle-blockchain-utils-0.0.9.tgz#ac61d703878c36eeabaa770c5bdf553e2260877e"
   integrity sha512-UJlWLN53AYU108c2A7rY6ri2Ollj8ygRnpSyBD4MPq+MF15PFvqwNHa/4rnj6ajOo7JYV07nNQ4hmBwh0KSeoA==
 
-truffle-config@^1.1.7:
-  version "1.1.7"
-  resolved "https://registry.yarnpkg.com/truffle-config/-/truffle-config-1.1.7.tgz#dba089e6479cbe7bdb2a5d661624c61b4ffe67b1"
+truffle-config@^1.1.11:
+  version "1.1.11"
+  resolved "https://registry.yarnpkg.com/truffle-config/-/truffle-config-1.1.11.tgz#87fd50f55da1fc3dc7a77871c9836f6b210c94c6"
+  integrity sha512-t3btZJhTKhtb830f7hGRTbgdsVtjUxiSFuMKbEi+/f+oEFylZwPkBPyL0r1AQ7AbHTymyS1bqBEhpGZRt4chkg==
   dependencies:
     configstore "^4.0.0"
     find-up "^2.1.0"
     lodash "4.17.11"
     original-require "1.0.1"
     truffle-error "^0.0.4"
-    truffle-provider "^0.1.6"
+    truffle-provider "^0.1.9"
 
 truffle-contract-schema@^3.0.6:
   version "3.0.6"
@@ -5136,12 +5137,13 @@ truffle-interface-adapter@^0.1.5:
     bn.js "^4.11.8"
     web3 "1.0.0-beta.37"
 
-truffle-provider@^0.1.6:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/truffle-provider/-/truffle-provider-0.1.6.tgz#efbed3bb0fc3e34744e915cf1c60fc37cf628097"
+truffle-provider@^0.1.9:
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/truffle-provider/-/truffle-provider-0.1.9.tgz#efc8e826497c5d85183b482afd63605163fffd10"
+  integrity sha512-ps2GPjQdU6+cUWRfzErWO/KALlkJQE23ISMwCWu4uXT2j3uTRmn2gxk8Cut+nUtYruix7KIHMtdttguB22iDTg==
   dependencies:
     truffle-error "^0.0.4"
-    truffle-interface-adapter "^0.1.2"
+    truffle-interface-adapter "^0.1.5"
     web3 "1.0.0-beta.37"
 
 truffle-provisioner@^0.1.4:
