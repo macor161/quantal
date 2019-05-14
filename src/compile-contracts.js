@@ -1,11 +1,12 @@
-const solcCompile = require("./quantal-compile");
-const mkdirp = require("mkdirp");
-const { callbackify, promisify } = require("util");
-const Config = require("truffle-config");
-const expect = require("truffle-expect");
-const Resolver = require("truffle-resolver");
-const Artifactor = require("truffle-artifactor");
-const OS = require("os");
+const debug = require('debug')('compile-contracts')
+const solcCompile = require("./quantal-compile")
+const mkdirp = require("mkdirp")
+const { callbackify, promisify } = require("util")
+const Config = require("truffle-config")
+const expect = require("truffle-expect")
+const Resolver = require("truffle-resolver")
+const Artifactor = require("truffle-artifactor")
+const OS = require("os")
 const DEFAULT_COMPILER = 'solc'
 
 
@@ -90,7 +91,8 @@ const SUPPORTED_COMPILERS = {
     // quiet: Boolean. Suppress output. Defaults to false.
     // strict: Boolean. Return compiler warnings as errors. Defaults to false.
     compile: callbackify(async function(options) {
-      const config = prepareConfig(options);
+      const config = prepareConfig(options)
+      //debug('prepared config: %o', config)
   
       const compilers = [DEFAULT_COMPILER]
   
@@ -139,45 +141,6 @@ const SUPPORTED_COMPILERS = {
           return { compiler, contracts, output, warnings }
         })
       );
-    },
-  
-    reportCompilationStarted: options => {
-      const logger = options.logger || console;
-      if (!options.quiet) {
-        logger.log(OS.EOL + `Compiling your contracts...`);
-        logger.log(`===========================`);
-      }
-    },
-  
-    reportCompilationFinished: (options, config) => {
-      const logger = options.logger || console;
-      const { compilersInfo } = config;
-      if (!options.quiet) {
-        if (Object.keys(compilersInfo).length > 0) {
-          logger.log(
-            `> Artifacts written to ${options.contracts_build_directory}`
-          );
-          logger.log(`> Compiled successfully using:`);
-  
-          const maxLength = Object.keys(compilersInfo)
-            .map(name => name.length)
-            .reduce((max, length) => (length > max ? length : max), 0);
-  
-          for (const name in compilersInfo) {
-            const padding = " ".repeat(maxLength - name.length);
-  
-            logger.log(`   - ${name}:${padding} ${compilersInfo[name].version}`);
-          }
-        }
-        logger.log();
-      }
-    },
-  
-    reportNothingToCompile: options => {
-      const logger = options.logger || console;
-      if (!options.quiet) {
-        logger.log(`> Everything is up to date, there is nothing to compile.`);
-      }
     },
   
     writeContracts: async (contracts, options) => {
