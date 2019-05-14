@@ -107,27 +107,16 @@ const compile = function(sources, options, callback) {
     ? targetPaths.forEach(key => (outputSelection[key] = defaultSelectors))
     : (outputSelection["*"] = defaultSelectors)
 
-  const solcStandardInput = {
-    language: "Solidity",
-    sources: {},
-    settings: {
+  const compilerSettings = {
       evmVersion: options.compilers.solc.settings.evmVersion,
       optimizer: options.compilers.solc.settings.optimizer,
       outputSelection
-    }
   }
 
   // Nothing to compile? Bail.
   if (Object.keys(sources).length === 0) {
     return callback(null, [], [])
   }
-
-  solcStandardInput.sources = operatingSystemIndependentSources
-
-  // Load solc module only when compilation is actually required.
-
-  
-  
   
   const onCompiled = (standardOutput) => {
       debug('Compilation done')
@@ -267,7 +256,7 @@ const compile = function(sources, options, callback) {
 
 
   debug('Starting compilation')
-  compiler(solcStandardInput)
+  compiler(operatingSystemIndependentSources, compilerSettings)
     .then(onCompiled)
 
 }
@@ -392,7 +381,6 @@ compile.necessary = function(options, callback) {
 };
 
 compile.with_dependencies = function(options, callback) {
-  var self = this;
 
   options.logger = options.logger || console;
   options.contracts_directory = options.contracts_directory || process.cwd();

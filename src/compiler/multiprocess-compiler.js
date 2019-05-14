@@ -3,24 +3,25 @@ const os = require('os')
 const { DependencyTree } = require('../dependency-tree')
 const cpus = os.cpus()
 const Worker = require('./worker')
-const workers = initWorkers()
 const { basename } = require('path')
 const { dispatchWork } = require('./dispatch-work')
 const Multispinner = require('multispinner')
 const chalk = require('chalk')
 
 
-module.exports = function(solcStandardInput) {
-
+module.exports = function(sources, options) {
+    
     return new Promise((res, rej) => {
-                
+        
         debug('Generating dependency tree')
+
+        const workers = initWorkers(options)
 
         const dependencyTree = new DependencyTree()
         
-        for (const key in solcStandardInput.sources) {
+        for (const key in sources) {
             //debug(`adding ${key} to dep tree`)
-            dependencyTree.addFile(solcStandardInput.sources[key])
+            dependencyTree.addFile(sources[key])
             //debug(`leafs: %o`, dependencyTree.getLeafs().map(f => f.path))    
             //debug(`miss dep: %o`, dependencyTree._filesWithMissingDependencies.map(f => f.path))    
         }
@@ -97,12 +98,12 @@ module.exports = function(solcStandardInput) {
  * Returns as many workers as cpu available.
  * First worker is not creating a child process.
  */
-function initWorkers() {
+function initWorkers(options) {
     return cpus
         .map((cpu, index) => {
             return index === 0 
-                ? new Worker({ childProcess: false, id: index })
-                : new Worker({ childProcess: true, id: index })
+                ? new Worker({ childProcess: false, id: index, compilerOptions: options })
+                : new Worker({ childProcess: true, id: index, compilerOptions: options })
         })
 }
 
