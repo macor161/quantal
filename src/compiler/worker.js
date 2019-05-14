@@ -1,6 +1,7 @@
 const { spawn } = require('child_process')
 const JSONStream = require('JSONStream')
 const { loadCompiler } = require('./load-compiler')
+const { isEmpty } = require('lodash')
 
 const DEFAULT_OPTIONS = {
     settings: {
@@ -38,6 +39,11 @@ module.exports = class Worker {
             settings: compilerOptions || DEFAULT_OPTIONS.settings,
             sources: null
         }
+
+        // solc doesn't support empty brackets
+        if (isEmpty(this.input.settings.evmVersion))
+            this.input.settings.evmVersion = undefined
+
         this._debug = require('debug')(`worker-${id}`)
 
     }
