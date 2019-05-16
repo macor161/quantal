@@ -75,8 +75,8 @@ module.exports = class Worker {
 
     _sendInputToProcess() {
         return new Promise(async (res, rej) => {    
-            this._debug('spawning compiler process')
             const compilerPath = await loadCompiler(this.solcVersion)
+            this._debug('spawning compiler process %o', compilerPath)
             const solc = spawn(compilerPath, ['--standard-json'])
             solc.stdin.setEncoding('utf-8')   
             this._debug('compiler process ready')      

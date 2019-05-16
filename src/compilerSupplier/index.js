@@ -1,8 +1,6 @@
 const debug = require('debug')('compiler-supplier')
 
-const {
-  Bundled,
-} = require("./loadingStrategies");
+const { Bundled } = require("./loadingStrategies")
 
 class CompilerSupplier {
   constructor(_config) {

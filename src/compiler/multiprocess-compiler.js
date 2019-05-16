@@ -9,13 +9,13 @@ const Multispinner = require('multispinner')
 const chalk = require('chalk')
 
 
-module.exports = function(sources, options) {
+module.exports = function(sources, options, solcVersion) {
     
     return new Promise((res, rej) => {
         
         debug('Generating dependency tree')
 
-        const workers = initWorkers(options)
+        const workers = initWorkers(solcVersion, options)
 
         const dependencyTree = new DependencyTree()
         
@@ -98,13 +98,9 @@ module.exports = function(sources, options) {
  * Returns as many workers as cpu available.
  * First worker is not creating a child process.
  */
-function initWorkers(options) {
+function initWorkers(solcVersion, options) {
     return cpus
-        .map((cpu, index) => {
-            return index === 0 
-                ? new Worker({ childProcess: false, id: index, compilerOptions: options })
-                : new Worker({ childProcess: true, id: index, compilerOptions: options })
-        })
+        .map((cpu, index) =>  new Worker({ version: solcVersion, id: index, compilerOptions: options }))
 }
 
 function unique(items) {
