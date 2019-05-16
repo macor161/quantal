@@ -17,8 +17,10 @@ const { preloadCompiler } = require('./compiler/load-compiler')
  */
 module.exports = async function(options = {}) {
 
-    await preloadCompiler()
-        
+    const globalOptions = getOptions()
+    
+    await preloadCompiler(globalOptions.compiler.version)
+    
     const buildFn = preventConcurentCalls(build)
     
     if (options.watch) {

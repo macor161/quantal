@@ -92,7 +92,6 @@ const SUPPORTED_COMPILERS = {
     // strict: Boolean. Return compiler warnings as errors. Defaults to false.
     compile: callbackify(async function(options) {
       const config = prepareConfig(options)
-      //debug('prepared config: %o', config)
   
       const compilers = [DEFAULT_COMPILER]
    

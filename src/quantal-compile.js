@@ -42,17 +42,26 @@ const compile = function(sources, options, callback) {
   options.compilers.solc.settings.evmVersion =
     options.compilers.solc.settings.evmVersion ||
     options.compilers.solc.evmVersion ||
-    {}
+    undefined
+
   options.compilers.solc.settings.optimizer =
     options.compilers.solc.settings.optimizer ||
     options.compilers.solc.optimizer ||
     {}
+
+  options.compilers.solc.version =
+    options.solc.vesion ||
+    options.compilers.solc.settings.version ||
+    options.compilers.solc.version ||
+    undefined 
 
   // Grandfather in old solc config
   if (options.solc) {
     options.compilers.solc.settings.evmVersion = options.solc.evmVersion
     options.compilers.solc.settings.optimizer = options.solc.optimizer
   }
+
+  
 
   // Ensure sources have operating system independent paths
   // i.e., convert backslashes to forward slashes; things like C: are left intact.
@@ -256,7 +265,7 @@ const compile = function(sources, options, callback) {
 
 
   debug('Starting compilation')
-  compiler(operatingSystemIndependentSources, compilerSettings)
+  compiler(operatingSystemIndependentSources, compilerSettings, options.compilers.solc.version)
     .then(onCompiled)
 
 }
