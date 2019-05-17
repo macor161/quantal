@@ -1,6 +1,6 @@
 const { platform } = require('os')
 const { createWriteStream, exists, chmodSync } = require('fs-extra')
-const qconfig = require('../qconfig')
+const qconfig = require('../qconfig')()
 const path = require('path')
 
 
@@ -17,7 +17,6 @@ const LATEST_VERSION = '0.5.8'
  * @param {string} version 
  */
 async function preloadCompiler(version = LATEST_VERSION) {
-    await qconfig.init()
     const cachedCompilerPath = await getCachedCompilerPath(version)
 
     if (!(await exists(cachedCompilerPath)))
@@ -35,8 +34,6 @@ async function preloadCompiler(version = LATEST_VERSION) {
 async function loadCompiler(version = LATEST_VERSION) {
     if (!SUPPORTED_OS.includes(platform()))
         throw `Unsupported OS: ${platform()}`
-
-    await qconfig.init()
 
     return (await isCompilerInCache(version))
         ? await getCachedCompiler(version)
