@@ -20,7 +20,7 @@ module.exports = async function(options = {}) {
     const globalOptions = getOptions()
     
     await preloadCompiler(globalOptions.compiler.version)
-    
+
     const buildFn = preventConcurentCalls(build)
     
     if (options.watch) {
