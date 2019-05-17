@@ -12,22 +12,22 @@ const FOLDER_NAME = '.quantal'
 /**
  * Creates config folders if they don't exist
  */
-async function init() {
+function init() {
     const mainFolderPath = getFolderPath()
     const solcCachePath = getSolcCachePath()
 
-    if (!(await fs.exists(mainFolderPath)))
-        await fs.mkdir(mainFolderPath)
+    if (!fs.existsSync(mainFolderPath))
+        fs.mkdirSync(mainFolderPath)
 
-    if (!(await fs.exists(solcCachePath)))
-        await fs.mkdir(solcCachePath)
+    if (!fs.exists(solcCachePath))
+        fs.mkdirSync(solcCachePath)
 }
 
- /**
-  * Return the config folder path
-  */
+/**
+ * Return the config folder path
+ */
 function getFolderPath() {
-   return path.resolve(homedir(), FOLDER_NAME)
+    return path.resolve(homedir(), FOLDER_NAME)
 }
 
 /**
@@ -39,4 +39,11 @@ function getSolcCachePath() {
 
 
 
-module.exports = { init, getFolderPath, getSolcCachePath }
+module.exports = function() {
+  init()
+  
+  return {
+    getFolderPath, 
+    getSolcCachePath 
+  }
+}
