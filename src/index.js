@@ -1,33 +1,34 @@
 #!/usr/bin/env node
 require('v8-compile-cache')
-const debugMain = require('debug')('main')
 
-debugMain('quantal start')
+const debug = require('debug')('main')
+debug('quantal start')
+
 const package = require('../package.json')
+const { Logger } = require('./utils/logger')
+const logger = new Logger()
 
 
 main()
 
 async function main() {
     try {
-        const logger = console.log
-
         const argv = require('commander')
         .option('-w, --watch', 'Watch for changes')
         .option('-s, --serve', 'Start a ganache server')
         .version(package.version)
         .parse(process.argv)
 
-        debugMain('argv loaded')
+        debug('argv loaded')
 
         const command = loadCommand({ argv, logger })
-        debugMain('command loaded')
+        debug('command loaded')
 
         await command()
-        debugMain('command executed successfully')
+        debug('command executed successfully')
     } catch(e) {
-        console.log('Error: ', e.message)
-        debugMain('Error: ', e)
+        logger.error(e.message)
+        debug('Error: ', e)
     }
 
 }
@@ -54,8 +55,8 @@ function loadCommand({ argv, logger }) {
 
 
 process.on('uncaughtException', function (e) {
-    console.log('Error: ', e.message)
-    debugMain('Error: ', e)
+    logger.error(e.message)
+    debug('Error: %o', e)
 })
 
 process.on('unhandledRejection', error => {

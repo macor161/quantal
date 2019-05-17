@@ -92,16 +92,28 @@ function downloadCompiler(version) {
 
         const url = `${DOWNLOAD_URL}/${version}/${fileName}`
         const filePath = path.resolve(qconfig.getSolcCachePath(), fileName)
-        const fileStream = createWriteStream(filePath)
         const progressBar = new Bar({}, Presets.shades_classic)
 
         progressBar.start(100, 0)
-
-        progress(request(url), {
+        
+        const fileRequest = progress(request(url), {
             throttle: 500
         })
         .on('progress', state => {
             progressBar.update(parseInt(state.percent * 100))
+        })
+        .on('response', response => {
+            if (response.statusCode === 200) {
+                const fileStream = createWriteStream(filePath)
+                .on('finish', () => {
+                    fileStream.close(() => {
+                        res(filePath)
+                    })  
+                })
+                fileRequest.pipe(fileStream)
+            }
+            else 
+                rej(new Error(`Unable to find solc ${version}`))
         })
         .on('error', err => {
             
@@ -110,14 +122,7 @@ function downloadCompiler(version) {
             progressBar.update(100)
             progressBar.stop()
         })
-        .pipe(fileStream)
-         
 
-        fileStream.on('finish', () => {
-            fileStream.close(() => {
-                res(filePath)
-            })  
-        }) 
     })   
 }
 
