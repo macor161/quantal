@@ -129,4 +129,4 @@ function getFormattedVersion(version = LATEST_VERSION) {
 }
 
 
-module.exports = { preloadCompiler, getFormattedVersion, loadCompiler, downloadCompiler, getCompilerFilename, isCompilerInCache }
+module.exports = { preloadCompiler, getFormattedVersion, loadCompiler }
