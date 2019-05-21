@@ -3,9 +3,6 @@ const { createWriteStream, exists, chmodSync } = require('fs-extra')
 const qconfig = require('../qconfig')()
 const path = require('path')
 
-
-// TODO: Add checksum verification
-
 const SUPPORTED_OS = [ 'linux', /*'darwin', 'win32'*/ ]
 const DOWNLOAD_URL = 'http://solc.quantal.io'
 const LATEST_VERSION = '0.5.8'

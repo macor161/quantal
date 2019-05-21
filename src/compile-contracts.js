@@ -6,7 +6,6 @@ const Config = require("truffle-config")
 const expect = require("truffle-expect")
 const Resolver = require("truffle-resolver")
 const Artifactor = require("truffle-artifactor")
-const OS = require("os")
 const DEFAULT_COMPILER = 'solc'
 
 

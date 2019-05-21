@@ -8,7 +8,6 @@ const package = require('../package.json')
 const { Logger } = require('./utils/logger')
 const logger = new Logger()
 
-
 main()
 
 async function main() {

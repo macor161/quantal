@@ -9,6 +9,7 @@ const find_contracts = require("truffle-contract-sources")
 const Config = require("truffle-config")
 const detailedError = require('./detailederror')
 const { getFormattedVersion } = require('./compiler/load-compiler')
+const getOptions = require('./get-options')
 
 
 
@@ -28,6 +29,8 @@ const compile = function(sources, options, callback) {
     callback = options
     options = {}
   }
+
+  const solcVersion = getOptions().compiler.version
 
   if (!options.logger) 
     options.logger = console
@@ -200,7 +203,7 @@ const compile = function(sources, options, callback) {
             unlinked_binary: "0x" + contract.evm.bytecode.object, // deprecated
             compiler: {
               name: "solc",
-              version: getFormattedVersion()
+              version: getFormattedVersion(solcVersion)
             },
             devdoc: contract.devdoc,
             userdoc: contract.userdoc
@@ -256,7 +259,7 @@ const compile = function(sources, options, callback) {
         });
       });
 
-      const compilerInfo = { name: "solc", version: getFormattedVersion() };
+      const compilerInfo = { name: "solc", version: getFormattedVersion(solcVersion) };
 
       Promise.all(warnings.map(warn => detailedError(warn)))
         .then(warnings => callback(null, returnVal, files, compilerInfo, warnings))
