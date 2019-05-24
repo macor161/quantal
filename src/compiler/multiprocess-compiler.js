@@ -56,7 +56,6 @@ module.exports = function(sources, options, solcVersion) {
                     .substring(0,60) + '...'}]`)}`
             }), {})
 
-        console.log('')
         const multispinner = new Multispinner(spinners, {
             autoStart: true,
             indent: 1,
@@ -72,6 +71,10 @@ module.exports = function(sources, options, solcVersion) {
         Promise.all(compilers
                 .map((worker, i) => worker.compile().then(result => { multispinner.success(i); return result }))
             )
+            .then(results => new Promise(res => {
+                // Must wait 80ms to prevent a display bug in multispinner 
+                setTimeout(() => res(results), 80)
+            }))
             .then(results => {
                 debug('merging results')
                 let result = results[0]
