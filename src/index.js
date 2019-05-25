@@ -27,7 +27,7 @@ async function main() {
         debug('command executed successfully')
     } catch(e) {
         logger.error(e.message)
-        debug('Error: ', e)
+        debug('Error: %o', e.stack)
     }
 
 }
@@ -55,7 +55,7 @@ function loadCommand({ argv, logger }) {
 
 process.on('uncaughtException', function (e) {
     logger.error(e.message)
-    debug('Error: %o', e)
+    debug('Uncaught Error: %o', e.stack)
 })
 
 process.on('unhandledRejection', error => {

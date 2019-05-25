@@ -19,7 +19,7 @@ function init() {
     if (!fs.existsSync(mainFolderPath))
         fs.mkdirSync(mainFolderPath)
 
-    if (!fs.exists(solcCachePath))
+    if (!fs.existsSync(solcCachePath))
         fs.mkdirSync(solcCachePath)
 }
 

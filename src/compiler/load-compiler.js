@@ -3,7 +3,7 @@ const { createWriteStream, exists, chmodSync } = require('fs-extra')
 const qconfig = require('../qconfig')()
 const path = require('path')
 
-const SUPPORTED_OS = [ 'linux', /*'darwin', 'win32'*/ ]
+const SUPPORTED_OS = [ 'linux', 'darwin'/*, 'win32'*/ ]
 const DOWNLOAD_URL = 'http://solc.quantal.io'
 const LATEST_VERSION = '0.5.8'
 
@@ -14,6 +14,9 @@ const LATEST_VERSION = '0.5.8'
  * @param {string} version 
  */
 async function preloadCompiler(version = LATEST_VERSION) {
+    if (!SUPPORTED_OS.includes(platform()))
+        throw new Error(`Unsupported OS: ${platform()}`)
+
     const cachedCompilerPath = await getCachedCompilerPath(version)
 
     if (!(await exists(cachedCompilerPath)))
@@ -30,7 +33,7 @@ async function preloadCompiler(version = LATEST_VERSION) {
  */
 async function loadCompiler(version = LATEST_VERSION) {
     if (!SUPPORTED_OS.includes(platform()))
-        throw `Unsupported OS: ${platform()}`
+        throw new Error(`Unsupported OS: ${platform()}`)
 
     return (await isCompilerInCache(version))
         ? await getCachedCompiler(version)

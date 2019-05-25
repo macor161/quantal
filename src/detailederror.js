@@ -5,28 +5,32 @@ const { isAbsolute } = require('path')
 const fs = require('fs')
 const readFile = promisify(fs.readFile)
 
-const linesOfContext = 6
+const LINES_OF_CONTEXT = 6
 
 
 /**
  * Add details to a CompilerOutputError object
  */
 module.exports = async function detailedCompilerOutputError(compilerOutputError) {
-    if (!isAbsolute(compilerOutputError.sourceLocation.file))
-        return compilerOutputError
-        
-    const fileContent = await readFile(compilerOutputError.sourceLocation.file, 'utf-8')
-    //console.log(fileContent)
+    try {
+        if (!compilerOutputError.sourceLocation || !isAbsolute(compilerOutputError.sourceLocation.file))
+            return compilerOutputError
+            
+        const fileContent = await readFile(compilerOutputError.sourceLocation.file, 'utf-8')
+        //console.log(fileContent)
 
-    const error = {
-        ...compilerOutputError,
-        sourceLocation: {
-            ...compilerOutputError.sourceLocation,
-            ...lineColumn(fileContent, compilerOutputError.sourceLocation.start)
+        const error = {
+            ...compilerOutputError,
+            sourceLocation: {
+                ...compilerOutputError.sourceLocation,
+                ...lineColumn(fileContent, compilerOutputError.sourceLocation.start)
+            }
         }
-    }
 
-    return addSourceContext(error, fileContent)
+        return addSourceContext(error, fileContent)
+    } catch(e) {
+        console.log('Error creating detailed error: ', e)
+    }
 
 }
 
@@ -42,8 +46,8 @@ function addSourceContext(error, fileContent) {
         return error
 
     const index = error.sourceLocation.line - 1
-    const lineStart = Math.max(0, index - Math.ceil((linesOfContext - 1) / 2)) + 1
-    const lineEnd = Math.min(lines.length - 1, lineStart + linesOfContext - 1) + 1
+    const lineStart = Math.max(0, index - Math.ceil((LINES_OF_CONTEXT - 1) / 2)) + 1
+    const lineEnd = Math.min(lines.length - 1, lineStart + LINES_OF_CONTEXT - 1) + 1
 
     return {
         ...error,
