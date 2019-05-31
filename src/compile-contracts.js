@@ -91,9 +91,9 @@ const Contracts = {
 
     const compilers = [DEFAULT_COMPILER]
 
-    const compilations = await compileSources(config, compilers)
+    const compilations = await this.compileSources(config, compilers)
 
-    return await collectCompilations(compilations);
+    return await this.collectCompilations(compilations);
   }),
 
   compileSources: async function(config, compilers) {

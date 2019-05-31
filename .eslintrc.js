@@ -18,6 +18,7 @@ module.exports = {
     'camelcase': 0,
     'semi': 0,
     'valid-jsdoc': 0,
-    'guard-for-in': 0
+    'guard-for-in': 0,
+    'no-invalid-this': 0
   },
 };
