@@ -3,5 +3,5 @@
  * TODO: Extract in its own package
  */
 const debug = require('debug')
-debug.humanize = t => `${t}ms`
-//debug.humanize = t => `${new Date().toISOString()}`
+debug.humanize = (t) => `${t}ms`
+// debug.humanize = t => `${new Date().toISOString()}`

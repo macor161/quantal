@@ -1,8 +1,6 @@
-module.exports = function({ argv, logger }) {
-
-    return () => {
-        const package = require('../../package.json')
-
-        logger(`${package.name} v${package.version}`)
-    }
+module.exports = function({logger}) {
+  return () => {
+    const jsonPackage = require('../../package.json')
+    logger(`${jsonPackage.name} v${jsonPackage.version}`)
+  }
 }

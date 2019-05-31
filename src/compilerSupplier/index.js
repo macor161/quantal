@@ -1,13 +1,11 @@
-const debug = require('debug')('compiler-supplier')
-
-const { Bundled } = require("./loadingStrategies")
+const {Bundled} = require('./loadingStrategies')
 
 class CompilerSupplier {
   constructor(_config) {
     _config = _config || {};
-    const defaultConfig = { version: null };
+    const defaultConfig = {version: null};
     this.config = Object.assign({}, defaultConfig, _config);
-    this.strategyOptions = { version: null };
+    this.strategyOptions = {version: null};
   }
 
   badInputError(userSpecification) {
@@ -21,24 +19,20 @@ class CompilerSupplier {
     return new Error(message);
   }
 
-
   load() {
     const userSpecification = this.config.version;
 
     return new Promise(async (resolve, reject) => {
-
       const strategy = new Bundled(this.strategyOptions);
 
       try {
-          const solc = await strategy.load(userSpecification);
-          resolve(solc);
-        } catch (error) {
-          reject(error);
-        }
-
+        const solc = await strategy.load(userSpecification);
+        resolve(solc);
+      } catch (error) {
+        reject(error);
+      }
     });
   }
-
 }
 
 module.exports = CompilerSupplier;

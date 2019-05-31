@@ -1,18 +1,15 @@
 require('v8-compile-cache')
 require('./setup-debug')
-const debug = require("debug")("compile")
+const debug = require('debug')('compile')
 const compiler = require('./compiler/multiprocess-compiler')
-const OS = require("os")
-const Profiler = require("./profiler")
-const expect = require("truffle-expect")
-const find_contracts = require("truffle-contract-sources")
-const Config = require("truffle-config")
+const OS = require('os')
+const Profiler = require('./profiler')
+const expect = require('truffle-expect')
+const find_contracts = require('truffle-contract-sources')
+const Config = require('truffle-config')
 const detailedError = require('./detailederror')
-const { getFormattedVersion } = require('./compiler/load-compiler')
+const {getFormattedVersion} = require('./compiler/load-compiler')
 const getOptions = require('./get-options')
-
-
-
 
 // Most basic of the compile commands. Takes a hash of sources, where
 // the keys are file or module paths and the values are the bodies of
@@ -25,22 +22,23 @@ const getOptions = require('./get-options')
 //   logger: console
 // }
 const compile = function(sources, options, callback) {
-  if (typeof options === "function") {
+  if (typeof options === 'function') {
     callback = options
     options = {}
   }
 
   const solcVersion = getOptions().compiler.version
 
-  if (!options.logger) 
+  if (!options.logger) {
     options.logger = console
+  }
 
   const hasTargets =
     options.compilationTargets && options.compilationTargets.length
 
-  expect.options(options, ["contracts_directory", "compilers"])
+  expect.options(options, ['contracts_directory', 'compilers'])
 
-  expect.options(options.compilers, ["solc"])
+  expect.options(options.compilers, ['solc'])
 
   options.compilers.solc.settings.evmVersion =
     options.compilers.solc.settings.evmVersion ||
@@ -56,15 +54,13 @@ const compile = function(sources, options, callback) {
     options.solc.vesion ||
     options.compilers.solc.settings.version ||
     options.compilers.solc.version ||
-    undefined 
+    undefined
 
   // Grandfather in old solc config
   if (options.solc) {
     options.compilers.solc.settings.evmVersion = options.solc.evmVersion
     options.compilers.solc.settings.optimizer = options.solc.optimizer
   }
-
-  
 
   // Ensure sources have operating system independent paths
   // i.e., convert backslashes to forward slashes; things like C: are left intact.
@@ -74,12 +70,12 @@ const compile = function(sources, options, callback) {
 
   Object.keys(sources).forEach(function(source) {
     // Turn all backslashes into forward slashes
-    var replacement = source.replace(/\\/g, "/")
+    let replacement = source.replace(/\\/g, '/')
 
     // Turn G:/.../ into /G/.../ for Windows
-    if (replacement.length >= 2 && replacement[1] === ":") {
-      replacement = "/" + replacement;
-      replacement = replacement.replace(":", "")
+    if (replacement.length >= 2 && replacement[1] === ':') {
+      replacement = '/' + replacement;
+      replacement = replacement.replace(':', '')
     }
 
     // Save the result
@@ -96,17 +92,17 @@ const compile = function(sources, options, callback) {
   })
 
   const defaultSelectors = {
-    "": ["legacyAST", "ast"],
-    "*": [
-      "abi",
-      "metadata",
-      "evm.bytecode.object",
-      "evm.bytecode.sourceMap",
-      "evm.deployedBytecode.object",
-      "evm.deployedBytecode.sourceMap",
-      "userdoc",
-      "devdoc"
-    ]
+    '': ['legacyAST', 'ast'],
+    '*': [
+      'abi',
+      'metadata',
+      'evm.bytecode.object',
+      'evm.bytecode.sourceMap',
+      'evm.deployedBytecode.object',
+      'evm.deployedBytecode.sourceMap',
+      'userdoc',
+      'devdoc',
+    ],
   }
 
   // Specify compilation targets
@@ -116,173 +112,171 @@ const compile = function(sources, options, callback) {
   const targetPaths = Object.keys(targets)
 
   targetPaths.length
-    ? targetPaths.forEach(key => (outputSelection[key] = defaultSelectors))
-    : (outputSelection["*"] = defaultSelectors)
+    ? targetPaths.forEach((key) => (outputSelection[key] = defaultSelectors))
+    : (outputSelection['*'] = defaultSelectors)
 
   const compilerSettings = {
-      evmVersion: options.compilers.solc.settings.evmVersion,
-      optimizer: options.compilers.solc.settings.optimizer,
-      outputSelection
+    evmVersion: options.compilers.solc.settings.evmVersion,
+    optimizer: options.compilers.solc.settings.optimizer,
+    outputSelection,
   }
 
   // Nothing to compile? Bail.
   if (Object.keys(sources).length === 0) {
     return callback(null, [], [])
   }
-  
+
   const onCompiled = (standardOutput) => {
-      debug('Compilation done')
+    debug('Compilation done')
 
-      let errors = standardOutput.errors || []
+    let errors = standardOutput.errors || []
 
-      let warnings = []
+    let warnings = []
 
-      if (options.strict !== true) {
-        warnings = errors.filter(error => error.severity === "warning")
+    if (options.strict !== true) {
+      warnings = errors.filter((error) => error.severity === 'warning')
 
-        errors = errors.filter(error => error.severity !== "warning")
+      errors = errors.filter((error) => error.severity !== 'warning')
 
-        if (options.quiet !== true && warnings.length > 0) {
-          options.logger.log(
-            OS.EOL + "    > compilation warnings encountered:" + OS.EOL
-          );
-          options.logger.log(
-            warnings.map(warning => warning.formattedMessage).join()
-          );
-        }
+      if (options.quiet !== true && warnings.length > 0) {
+        options.logger.log(
+            OS.EOL + '    > compilation warnings encountered:' + OS.EOL
+        );
+        options.logger.log(
+            warnings.map((warning) => warning.formattedMessage).join()
+        );
       }
+    }
 
-      if (errors.length > 0) {
-        options.logger.log("");
-        // TODO: Add back the truffle error
-        // errors = errors.map(error => error.formattedMessage).join();
-        // if (errors.includes("requires different compiler version")) {
-        //   const contractSolcVer = errors.match(/pragma solidity[^;]*/gm)[0];
-        //   const configSolcVer =
-        //     options.compilers.solc.version || semver.valid(solc.version());
-        //   errors = errors.concat(
-        //     `\nError: Truffle is currently using solc ${configSolcVer}, but one or more of your contracts specify "${contractSolcVer}".\nPlease update your truffle config or pragma statement(s).\n(See https://truffleframework.com/docs/truffle/reference/configuration#compiler-configuration for information on\nconfiguring Truffle to use a specific solc compiler version.)`
-        //   );
-        // }
-        return Promise.all(errors.map(err => detailedError(err))).then(callback)
-      }
+    if (errors.length > 0) {
+      options.logger.log('');
+      // TODO: Add back the truffle error
+      // errors = errors.map(error => error.formattedMessage).join();
+      // if (errors.includes("requires different compiler version")) {
+      //   const contractSolcVer = errors.match(/pragma solidity[^;]*/gm)[0];
+      //   const configSolcVer =
+      //     options.compilers.solc.version || semver.valid(solc.version());
+      //   errors = errors.concat(
+      //     `\nError: Truffle is currently using solc ${configSolcVer}, but one or more of your contracts specify "${contractSolcVer}".\nPlease update your truffle config or pragma statement(s).\n(See https://truffleframework.com/docs/truffle/reference/configuration#compiler-configuration for information on\nconfiguring Truffle to use a specific solc compiler version.)`
+      //   );
+      // }
+      return Promise.all(errors.map((err) => detailedError(err))).then(callback)
+    }
 
-      var contracts = standardOutput.contracts;
+    const contracts = standardOutput.contracts;
 
-      var files = [];
-      Object.keys(standardOutput.sources).forEach(filename => {
-        var source = standardOutput.sources[filename];
-        files[source.id] = originalPathMappings[filename];
-      });
+    const files = [];
+    Object.keys(standardOutput.sources).forEach((filename) => {
+      const source = standardOutput.sources[filename];
+      files[source.id] = originalPathMappings[filename];
+    });
 
-      var returnVal = { };
+    const returnVal = { };
 
-      // This block has comments in it as it's being prepared for solc > 0.4.10
-      Object.keys(contracts).forEach(source_path => {
-        var files_contracts = contracts[source_path];
+    // This block has comments in it as it's being prepared for solc > 0.4.10
+    Object.keys(contracts).forEach((source_path) => {
+      const files_contracts = contracts[source_path];
 
-        Object.keys(files_contracts).forEach(contract_name => {
-          var contract = files_contracts[contract_name];
+      Object.keys(files_contracts).forEach((contract_name) => {
+        const contract = files_contracts[contract_name];
 
-          // All source will have a key, but only the compiled source will have
-          // the evm output.
-          if (!Object.keys(contract.evm).length) return;
+        // All source will have a key, but only the compiled source will have
+        // the evm output.
+        if (!Object.keys(contract.evm).length) return;
 
-          var contract_definition = {
-            contract_name: contract_name,
-            sourcePath: originalPathMappings[source_path], // Save original source path, not modified ones
-            source: operatingSystemIndependentSources[source_path],
-            sourceMap: contract.evm.bytecode.sourceMap,
-            deployedSourceMap: contract.evm.deployedBytecode.sourceMap,
-            legacyAST: standardOutput.sources[source_path].legacyAST,
-            ast: standardOutput.sources[source_path].ast,
-            abi: contract.abi,
-            metadata: contract.metadata,
-            bytecode: "0x" + contract.evm.bytecode.object,
-            deployedBytecode: "0x" + contract.evm.deployedBytecode.object,
-            unlinked_binary: "0x" + contract.evm.bytecode.object, // deprecated
-            compiler: {
-              name: "solc",
-              version: getFormattedVersion(solcVersion)
-            },
-            devdoc: contract.devdoc,
-            userdoc: contract.userdoc
-          };
+        const contract_definition = {
+          contract_name: contract_name,
+          sourcePath: originalPathMappings[source_path], // Save original source path, not modified ones
+          source: operatingSystemIndependentSources[source_path],
+          sourceMap: contract.evm.bytecode.sourceMap,
+          deployedSourceMap: contract.evm.deployedBytecode.sourceMap,
+          legacyAST: standardOutput.sources[source_path].legacyAST,
+          ast: standardOutput.sources[source_path].ast,
+          abi: contract.abi,
+          metadata: contract.metadata,
+          bytecode: '0x' + contract.evm.bytecode.object,
+          deployedBytecode: '0x' + contract.evm.deployedBytecode.object,
+          unlinked_binary: '0x' + contract.evm.bytecode.object, // deprecated
+          compiler: {
+            name: 'solc',
+            version: getFormattedVersion(solcVersion),
+          },
+          devdoc: contract.devdoc,
+          userdoc: contract.userdoc,
+        };
 
-          // Reorder ABI so functions are listed in the order they appear
-          // in the source file. Solidity tests need to execute in their expected sequence.
-          contract_definition.abi = orderABI(contract_definition);
+        // Reorder ABI so functions are listed in the order they appear
+        // in the source file. Solidity tests need to execute in their expected sequence.
+        contract_definition.abi = orderABI(contract_definition);
 
-          // Go through the link references and replace them with older-style
-          // identifiers. We'll do this until we're ready to making a breaking
-          // change to this code.
-          Object.keys(contract.evm.bytecode.linkReferences).forEach(function(
+        // Go through the link references and replace them with older-style
+        // identifiers. We'll do this until we're ready to making a breaking
+        // change to this code.
+        Object.keys(contract.evm.bytecode.linkReferences).forEach(function(
             file_name
-          ) {
-            var fileLinks = contract.evm.bytecode.linkReferences[file_name];
+        ) {
+          const fileLinks = contract.evm.bytecode.linkReferences[file_name];
 
-            Object.keys(fileLinks).forEach(function(library_name) {
-              var linkReferences = fileLinks[library_name] || [];
+          Object.keys(fileLinks).forEach(function(library_name) {
+            const linkReferences = fileLinks[library_name] || [];
 
-              contract_definition.bytecode = replaceLinkReferences(
+            contract_definition.bytecode = replaceLinkReferences(
                 contract_definition.bytecode,
                 linkReferences,
                 library_name
-              );
-              contract_definition.unlinked_binary = replaceLinkReferences(
+            );
+            contract_definition.unlinked_binary = replaceLinkReferences(
                 contract_definition.unlinked_binary,
                 linkReferences,
                 library_name
-              );
-            });
+            );
           });
+        });
 
-          // Now for the deployed bytecode
-          Object.keys(contract.evm.deployedBytecode.linkReferences).forEach(
+        // Now for the deployed bytecode
+        Object.keys(contract.evm.deployedBytecode.linkReferences).forEach(
             function(file_name) {
-              var fileLinks =
+              const fileLinks =
                 contract.evm.deployedBytecode.linkReferences[file_name];
 
               Object.keys(fileLinks).forEach(function(library_name) {
-                var linkReferences = fileLinks[library_name] || [];
+                const linkReferences = fileLinks[library_name] || [];
 
                 contract_definition.deployedBytecode = replaceLinkReferences(
-                  contract_definition.deployedBytecode,
-                  linkReferences,
-                  library_name
+                    contract_definition.deployedBytecode,
+                    linkReferences,
+                    library_name
                 );
               });
             }
-          );
+        );
 
-          returnVal[contract_name] = contract_definition;
-        });
+        returnVal[contract_name] = contract_definition;
       });
+    });
 
-      const compilerInfo = { name: "solc", version: getFormattedVersion(solcVersion) };
+    const compilerInfo = {name: 'solc', version: getFormattedVersion(solcVersion)};
 
-      Promise.all(warnings.map(warn => detailedError(warn)))
-        .then(warnings => callback(null, returnVal, files, compilerInfo, warnings))
-      
+    Promise.all(warnings.map((warn) => detailedError(warn)))
+        .then((warnings) => callback(null, returnVal, files, compilerInfo, warnings))
   }
 
 
   debug('Starting compilation')
   compiler(operatingSystemIndependentSources, compilerSettings, options.compilers.solc.version)
-    .then(onCompiled)
-
+      .then(onCompiled)
 }
 
 function replaceLinkReferences(bytecode, linkReferences, libraryName) {
-  var linkId = "__" + libraryName;
+  let linkId = '__' + libraryName;
 
   while (linkId.length < 40) {
-    linkId += "_";
+    linkId += '_';
   }
 
   linkReferences.forEach(function(ref) {
     // ref.start is a byte offset. Convert it to character offset.
-    var start = ref.start * 2 + 2;
+    const start = ref.start * 2 + 2;
 
     bytecode =
       bytecode.substring(0, start) + linkId + bytecode.substring(start + 40);
@@ -292,16 +286,16 @@ function replaceLinkReferences(bytecode, linkReferences, libraryName) {
 }
 
 function orderABI(contract) {
-  var contract_definition;
-  var ordered_function_names = [];
+  let contract_definition;
+  const ordered_function_names = [];
 
-  for (var i = 0; i < contract.legacyAST.children.length; i++) {
-    var definition = contract.legacyAST.children[i];
+  for (let i = 0; i < contract.legacyAST.children.length; i++) {
+    const definition = contract.legacyAST.children[i];
 
     // AST can have multiple contract definitions, make sure we have the
     // one that matches our contract
     if (
-      definition.name !== "ContractDefinition" ||
+      definition.name !== 'ContractDefinition' ||
       definition.attributes.name !== contract.contract_name
     ) {
       continue;
@@ -315,16 +309,16 @@ function orderABI(contract) {
   if (!contract_definition.children) return contract.abi;
 
   contract_definition.children.forEach(function(child) {
-    if (child.name === "FunctionDefinition") {
+    if (child.name === 'FunctionDefinition') {
       ordered_function_names.push(child.attributes.name);
     }
   });
 
   // Put function names in a hash with their order, lowest first, for speed.
-  var functions_to_remove = ordered_function_names.reduce(function(
-    obj,
-    value,
-    index
+  const functions_to_remove = ordered_function_names.reduce(function(
+      obj,
+      value,
+      index
   ) {
     obj[value] = index;
     return obj;
@@ -332,14 +326,14 @@ function orderABI(contract) {
   {});
 
   // Filter out functions from the abi
-  var function_definitions = contract.abi.filter(function(item) {
+  let function_definitions = contract.abi.filter(function(item) {
     return functions_to_remove[item.name] !== undefined;
   });
 
   // Sort removed function defintions
   function_definitions = function_definitions.sort(function(item_a, item_b) {
-    var a = functions_to_remove[item_a.name];
-    var b = functions_to_remove[item_b.name];
+    const a = functions_to_remove[item_a.name];
+    const b = functions_to_remove[item_b.name];
 
     if (a > b) return 1;
     if (a < b) return -1;
@@ -347,7 +341,7 @@ function orderABI(contract) {
   });
 
   // Create a new ABI, placing ordered functions at the end.
-  var newABI = [];
+  const newABI = [];
   contract.abi.forEach(function(item) {
     if (functions_to_remove[item.name] !== undefined) return;
     newABI.push(item);
@@ -393,34 +387,31 @@ compile.necessary = function(options, callback) {
 };
 
 compile.with_dependencies = function(options, callback) {
-
   options.logger = options.logger || console;
   options.contracts_directory = options.contracts_directory || process.cwd();
 
   expect.options(options, [
-    "paths",
-    "working_directory",
-    "contracts_directory",
-    "resolver"
+    'paths',
+    'working_directory',
+    'contracts_directory',
+    'resolver',
   ]);
 
-  var config = Config.default().merge(options);
+  const config = Config.default().merge(options);
 
   Profiler.required_sources(
-    config.with({
-      paths: options.paths,
-      base_path: options.contracts_directory,
-      resolver: options.resolver
-    }),
-    (err, allSources, required) => {
-      if (err) return callback(err);
+      config.with({
+        paths: options.paths,
+        base_path: options.contracts_directory,
+        resolver: options.resolver,
+      }),
+      (err, allSources, required) => {
+        if (err) return callback(err);
 
-      options.compilationTargets = required;
-      compile(allSources, options, callback);
-    }
+        options.compilationTargets = required;
+        compile(allSources, options, callback);
+      }
   );
 };
-
-
 
 module.exports = compile

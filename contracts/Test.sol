@@ -2,7 +2,6 @@ pragma solidity ^0.5.0;
 import "./ERC20.sol";
 
 contract Test {
-
   uint256 public value;
   ERC20 public token;
   address public tokenAddress;
@@ -18,8 +17,4 @@ contract Test {
   function getToken() public view returns(ERC20) {
     return token;
   }
-
-
 }
-
-

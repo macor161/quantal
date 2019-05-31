@@ -1,8 +1,8 @@
 module.exports = {
-  Bundled: require("./Bundled"),
+  Bundled: require('./Bundled'),
   Docker: {},
-  LoadingStrategy: require("./LoadingStrategy"),
+  LoadingStrategy: require('./LoadingStrategy'),
   Local: {},
   Native: {},
-  VersionRange: {}
+  VersionRange: {},
 };
