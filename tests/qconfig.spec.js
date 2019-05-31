@@ -1,8 +1,7 @@
-const qconfig = require('../src/qconfig')
-
+// const qconfig = require('../src/qconfig')
 
 xdescribe('init()', () => {
-    test('', async () => {
-        // TODO
-    })
+  test('', async () => {
+    // TODO
+  })
 })

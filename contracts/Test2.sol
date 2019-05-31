@@ -1,8 +1,6 @@
 pragma solidity ^0.5.0;
 
-
 contract Test2 {
-
   uint256 public s;
 
   constructor() public {
@@ -28,5 +26,4 @@ contract Test2 {
     num = 6;
   }*/
 }
-
  
