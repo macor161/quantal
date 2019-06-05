@@ -1,7 +1,10 @@
 const debug = require('debug')('dependency-management')
 
 module.exports = function({ logger = console } = {}) {
-    return async function() {    
+    return { dependencyCheck }
+    
+    
+    async function dependencyCheck() {    
         const { platform } = require('os')
         
         if (platform() === 'darwin') {
@@ -31,9 +34,12 @@ module.exports = function({ logger = console } = {}) {
                 }
             }) 
 
-            brew.stdout.on('data', data => {
+            brew.on('message', message => debug('message: %o', message))
+
+            /*brew.stdout.on('data', data => {
                 debug(`data: ${data}`)
-            })
+            })*/
+            brew.stdout.pipe(process.stdout)
                 
             
         })
