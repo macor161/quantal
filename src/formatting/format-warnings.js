@@ -6,9 +6,9 @@ const {relative} = require('path')
 const {map} = require('../template-literals')
 
 function formatWarnings(warnings) {
-  return outdent`
-        ${map(warnings, (err) => `${formatWarning(err)}`)}    
-        ${chalk.bold.yellow(`Compiled with ${warnings.length} warnings`)}
+  return outdent` 
+        ${map(warnings, (err) => `${formatWarning(err)}`)}   
+        ${chalk.bold.yellow(`Compiled with ${warnings.length} warning(s)`)}
 
     `
 }
@@ -20,12 +20,14 @@ function formatWarning(warning) {
 
   const relativePath = relative(cwd(), warning.sourceLocation.file)
 
-  return outdent`    
+  return outdent`
+
     ${chalk.bgWhite.black(relativePath)}
        ${chalk.bold(`Line ${warning.sourceLocation.line}:`)} ${warning.message}
 
     ${formatSource(warning.sourceContext, {postLineParse: postLineParse(warning)})}
-    `
+
+  `
 }
 
 function postLineParse(error) {

@@ -8,7 +8,8 @@ const {map} = require('../template-literals')
 function formatErrors(errors) {
   return outdent`
         ${map(errors, (err) => `${formatError(err)}`)}
-        ${chalk.bold.red('Failed to compile.')}
+        ${chalk.bold.red(`Failed to compile: ${errors.length} error(s) found.`)}
+
     `
 }
 
@@ -24,6 +25,7 @@ function formatError(error) {
        ${chalk.bold(`Line ${error.sourceLocation.line}:`)} ${error.message}
 
     ${formatSource(error.sourceContext, {postLineParse: postLineParse(error)})}
+
     `
 }
 
