@@ -6,7 +6,8 @@ const path = require('path')
 const {formatErrors} = require('./formatting/format-error')
 const {formatWarnings} = require('./formatting/format-warnings')
 const chalk = require('chalk')
-const {preloadCompiler} = require('./compiler/load-compiler')
+const { preloadCompiler} = require('./compiler/load-compiler')
+const { dependencyCheck } = require('./dependency-management')()
 
 /**
  *
@@ -15,7 +16,9 @@ const {preloadCompiler} = require('./compiler/load-compiler')
  */
 module.exports = async function(options = {}) {
   const globalOptions = getOptions()
+  console.log('Starting build task')
 
+  await dependencyCheck()
   await preloadCompiler(globalOptions.compiler.version)
 
   const buildFn = preventConcurentCalls(build)
@@ -39,7 +42,6 @@ module.exports = async function(options = {}) {
  */
 async function build(opts) {
   try {
-    console.log('Starting build task')
     const options = getOptions()
     const result = await compileContracts(options)
     // await generateJsFiles(options)
