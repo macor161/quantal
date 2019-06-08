@@ -1,3 +1,4 @@
-node_modules
+test
+.eslintrc
 yarn-error.log
 .vscode
