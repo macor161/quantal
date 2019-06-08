@@ -4,11 +4,11 @@ Quantal is a fast and lightweight build tool for Solidity.
 
 ## Fast, lightweight
 
+
 ![output](https://user-images.githubusercontent.com/642515/59142187-1e64f080-8988-11e9-9535-152db92b672b.gif)
-<p style="text-align: center;"><sub>Open Zeppelin compilation with no cache</sub></p>
+<p align="center"><sub>Open Zeppelin compilation with no cache</sub></p>
 
 By using multiple binary compilers in parallel, V8 caching and other optimizations, Quantal is on average 2-3x faster than truffle-compile. It follows the Unix principle of doing one thing but do it well, focusing exclusively on compilation related tasks.
-
 
 
 ## Pretty errors and warnings
