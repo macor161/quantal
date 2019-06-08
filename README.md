@@ -2,7 +2,7 @@
 
 Quantal is a fast and lightweight build tool for Solidity. 
 
-## Fast, lightweight tool
+## Fast, lightweight
 
 By using multiple binary compilers in parallel, V8 caching and other optimizations, Quantal is on average 2-3x faster than truffle-compile. It follows the Unix principle of doing one thing but do it well, focusing exclusively on compilation related tasks.
 
@@ -15,7 +15,7 @@ By using multiple binary compilers in parallel, V8 caching and other optimizatio
 
 ## Watch mode
 
-Launch a new build each time a smart contract is modified.
+Launch a new build each time a smart contract is modified. 
 
 
 ## Installation
