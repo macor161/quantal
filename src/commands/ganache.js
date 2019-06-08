@@ -1,3 +1,4 @@
+// This command is currently disabled
 const {ganacheServer} = require('../ganache-server')
 
 module.exports = function(dep) {

@@ -9,6 +9,7 @@ const ACCOUNT_PADDING = 3
 
 exports.ganacheServer = async function ganacheServer(options) {
   return new Promise((res, rej) => {
+    /* Disabled for now
     const ganache = require('ganache-cli')
     const server = ganache.server(options)
 
@@ -18,7 +19,7 @@ exports.ganacheServer = async function ganacheServer(options) {
       }
 
       res(getServerInfo(ganacheInfo, PORT))
-    })
+    })*/
   })
 }
 

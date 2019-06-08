@@ -1,3 +1,4 @@
+// This command is currently disabled
 module.exports = ({argv, logger, getOptions}) => {
   return async () => {
     const build = require('../build')

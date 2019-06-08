@@ -14,7 +14,8 @@ async function main() {
   try {
     const argv = require('commander')
         .option('-w, --watch', 'Watch for changes')
-        .option('-s, --serve', 'Start a ganache server')
+        // Ganache (serve) command is currently disabled
+        //.option('-s, --serve', 'Start a ganache server')
         .version(jsonPackage.version)
         .parse(process.argv)
 
