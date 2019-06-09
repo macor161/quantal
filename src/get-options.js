@@ -75,21 +75,21 @@ function getTruffleConfig() {
   const config = TruffleConfig.default().merge(truffleConfig)
 
   const evmVersion =
-        config.solc.evmVersion ||
-        config.compilers.solc.settings.evmVersion ||
-        config.compilers.solc.evmVersion ||
+        _.get(config, [ 'solc', 'evmVersion' ]) ||
+        _.get(config, [ 'compilers', 'solc', 'evmVersion']) ||
+        _.get(config, ['compilers', 'solc', 'settings', 'evmVersion']) ||
         undefined
 
   const optimizer =
-        config.solc.optimizer ||
-        config.compilers.solc.settings.optimizer ||
-        config.compilers.solc.optimizer ||
+        _.get(config, ['solc', 'optimizer']) ||
+        _.get(config, ['compilers', 'solc', 'settings', 'optimizer']) ||
+        _.get(config, ['compilers', 'solc', 'optimizer']) ||
         undefined
 
   const version =
-        config.solc.vesion ||
-        config.compilers.solc.settings.version ||
-        config.compilers.solc.version ||
+        _.get(config, ['solc', 'vesion']) ||
+        _.get(config, ['compilers', 'solc', 'settings', 'version']) ||
+        _.get(config, ['compilers', 'solc', 'version']) ||
         undefined
 
   // TODO: artifactContent

@@ -10,6 +10,7 @@ const Config = require('truffle-config')
 const detailedError = require('./detailederror')
 const {getFormattedVersion} = require('./compiler/load-compiler')
 const getOptions = require('./get-options')
+const _ = require('lodash')
 
 // Most basic of the compile commands. Takes a hash of sources, where
 // the keys are file or module paths and the values are the bodies of
@@ -41,19 +42,19 @@ const compile = function(sources, options, callback) {
   expect.options(options.compilers, ['solc'])
 
   options.compilers.solc.settings.evmVersion =
-    options.compilers.solc.settings.evmVersion ||
-    options.compilers.solc.evmVersion ||
+    _.get(options, ['compilers', 'solc', 'settings', 'evmVersion']) ||
+    _.get(options, ['compilers', 'solc', 'evmVersion']) ||
     undefined
 
   options.compilers.solc.settings.optimizer =
-    options.compilers.solc.settings.optimizer ||
-    options.compilers.solc.optimizer ||
+    _.get(options, ['compilers', 'solc', 'settings', 'optimizer']) ||
+    _.get(options, ['compilers', 'solc', 'optimizer']) ||
     {}
 
   options.compilers.solc.version =
-    options.solc.vesion ||
-    options.compilers.solc.settings.version ||
-    options.compilers.solc.version ||
+    _.get(options, ['solc', 'vesion']) ||
+    _.get(options, ['compilers', 'solc', 'settings', 'version']) ||
+    _.get(options, ['compilers', 'solc', 'version']) ||
     undefined
 
   // Grandfather in old solc config
