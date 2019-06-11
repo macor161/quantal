@@ -61,21 +61,20 @@ function multiPromisify(func) {
 }
 
 const Contracts = {
-  collectCompilations: async (compilations) => {
+  collectCompilations: async (compilation) => {
     const result = {outputs: {}, contracts: {}, warnings: []};
 
-    for (const compilation of await Promise.all(compilations)) {
-      const {compiler, output, contracts, warnings = []} = compilation;
+    const {compiler, output, contracts, warnings = []} = compilation;
 
-      result.outputs[compiler] = output
+    result.outputs[compiler] = output
 
-      result.warnings = result.warnings.concat(warnings)
+    result.warnings = result.warnings.concat(warnings)
 
 
-      for (const [name, abstraction] of Object.entries(contracts)) {
-        result.contracts[name] = abstraction;
-      }
+    for (const [name, abstraction] of Object.entries(contracts)) {
+      result.contracts[name] = abstraction;
     }
+    
     return result;
   },
 
@@ -89,41 +88,36 @@ const Contracts = {
   compile: callbackify(async function(options) {
     const config = prepareConfig(options)
 
-    const compilers = [DEFAULT_COMPILER]
-
-    const compilations = await this.compileSources(config, compilers)
+    const compilations = await this.compileSources(config)
 
     return await this.collectCompilations(compilations);
   }),
 
   compileSources: async function(config, compilers) {
-    return Promise.all(
-        compilers.map(async (compiler) => {
-          const compile = SUPPORTED_COMPILERS[compiler];
-          if (!compile) throw new Error('Unsupported compiler: ' + compiler);
+    const compile = SUPPORTED_COMPILERS[DEFAULT_COMPILER];
+    if (!compile) throw new Error('Unsupported compiler: ' + compiler);
 
-          const compileFunc =
-            config.all === true || config.compileAll === true
-              ? compile.all
-              : compile.necessary;
+    const compileFunc =
+      config.all === true || config.compileAll === true
+        ? compile.all
+        : compile.necessary;
 
-          const [contracts, output, compilerUsed, warnings] = await multiPromisify(
-              compileFunc
-          )(config);
+    const [contracts, output, compilerUsed, warnings] = await multiPromisify(
+        compileFunc
+    )(config);
 
-          if (compilerUsed) {
-            config.compilersInfo[compilerUsed.name] = {
-              version: compilerUsed.version,
-            };
-          }
+    if (compilerUsed) {
+      config.compilersInfo[compilerUsed.name] = {
+        version: compilerUsed.version,
+      };
+    }
 
-          if (contracts && Object.keys(contracts).length > 0) {
-            await this.writeContracts(contracts, config)
-          }
+    if (contracts && Object.keys(contracts).length > 0) {
+      await this.writeContracts(contracts, config)
+    }
 
-          return {compiler, contracts, output, warnings}
-        })
-    );
+    return {DEFAULT_COMPILER, contracts, output, warnings}
+    
   },
 
   writeContracts: async (contracts, options) => {
