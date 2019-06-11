@@ -29,6 +29,7 @@ const compile = function(sources, options, callback) {
   }
 
   const solcVersion = getOptions().compiler.version
+  options.compilers.solc.version = solcVersion
 
   if (!options.logger) {
     options.logger = console
@@ -262,7 +263,7 @@ const compile = function(sources, options, callback) {
         .then((warnings) => callback(null, returnVal, files, compilerInfo, warnings))
   }
 
-
+  
   debug('Starting compilation')
   compiler(operatingSystemIndependentSources, compilerSettings, options.compilers.solc.version)
       .then(onCompiled)

@@ -125,7 +125,6 @@ function downloadCompiler(version) {
 }
 
 function getFormattedVersion(version = LATEST_VERSION) {
-  console.log(`version: ${version}`)
   return minVersion(version).version
 }
 
