@@ -10,7 +10,7 @@ const chalk = require('chalk')
 
 module.exports = function(sources, options, solcVersion) {
   return new Promise((res, rej) => {
-    debug('Generating dependency tree')
+    debug(`Generating dependency tree for ${cpus.length} workers`)
 
     const workers = initWorkers(solcVersion, options)
 

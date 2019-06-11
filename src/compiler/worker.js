@@ -3,30 +3,6 @@ const JSONStream = require('JSONStream')
 const {loadCompiler} = require('./load-compiler')
 const {isEmpty} = require('lodash')
 
-const DEFAULT_OPTIONS = {
-  settings: {
-    evmVersion: undefined,
-    outputSelection: {
-      '*': {
-        '': [
-          'legacyAST',
-          'ast',
-        ],
-        '*': [
-          'abi',
-          'metadata',
-          'evm.bytecode.object',
-          'evm.bytecode.sourceMap',
-          'evm.deployedBytecode.object',
-          'evm.deployedBytecode.sourceMap',
-          'userdoc',
-          'devdoc',
-        ],
-      },
-    },
-  },
-}
-
 module.exports = class Worker {
   constructor({version, compilerOptions, id} = {}) {
     this.solcVersion = version
@@ -35,7 +11,7 @@ module.exports = class Worker {
     this.branches = []
     this.input = {
       language: 'Solidity',
-      settings: compilerOptions || DEFAULT_OPTIONS.settings,
+      settings: compilerOptions,
       sources: null,
     }
 

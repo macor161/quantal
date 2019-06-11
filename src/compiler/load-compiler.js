@@ -2,6 +2,7 @@ const {platform} = require('os')
 const {createWriteStream, exists, chmodSync} = require('fs-extra')
 const qconfig = require('../qconfig')()
 const path = require('path')
+const { minVersion } = require('semver')
 
 const SUPPORTED_OS = ['linux', 'darwin']
 const DOWNLOAD_URL = 'http://solc.quantal.io'
@@ -14,6 +15,7 @@ const LATEST_VERSION = '0.5.8'
  * @param {string} version
  */
 async function preloadCompiler(version = LATEST_VERSION) {
+  version = getFormattedVersion(version)
   if (!SUPPORTED_OS.includes(platform())) {
     throw new Error(`Unsupported OS: ${platform()}`)
   }
@@ -34,6 +36,7 @@ async function preloadCompiler(version = LATEST_VERSION) {
  * @return {string} Compiler's path
  */
 async function loadCompiler(version = LATEST_VERSION) {
+  version = getFormattedVersion(version)
   if (!SUPPORTED_OS.includes(platform())) {
     throw new Error(`Unsupported OS: ${platform()}`)
   }
@@ -43,7 +46,7 @@ async function loadCompiler(version = LATEST_VERSION) {
         : downloadCompiler(version)
 }
 
-async function getCachedCompilerPath(version = LATEST_VERSION) {
+async function getCachedCompilerPath(version) {
   const filename = getCompilerFilename(version)
   return path.resolve(qconfig.getSolcCachePath(), filename)
 }
@@ -122,7 +125,7 @@ function downloadCompiler(version) {
 }
 
 function getFormattedVersion(version = LATEST_VERSION) {
-  return version
+  return minVersion(version).version
 }
 
 module.exports = {preloadCompiler, getFormattedVersion, loadCompiler}

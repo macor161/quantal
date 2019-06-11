@@ -6,6 +6,7 @@ const importFresh = require('import-fresh')
 const getPath = require('./get-path')
 const TruffleConfig = require('truffle-config')
 const _ = require('lodash')
+const semver = require('semver')
 
 const CONFIG_PATH = './quantal.json'
 
@@ -98,7 +99,8 @@ function getTruffleConfig() {
     contractsDir: config.contracts_directory,
     builtContractsDir: config.contracts_build_directory,
     compiler: {
-      version,
+      //version: semver.valid(version) && semver.minVersion(version).version ,
+      ...(semver.valid(version) && { version: semver.minVersion(version).version }),
       evmVersion,
       optimizer,
     },
