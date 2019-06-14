@@ -9,6 +9,7 @@ const _ = require('lodash')
 const semver = require('semver')
 
 const CONFIG_PATH = './quantal.json'
+const DEFAULT_SOLC_VERSION = '0.5.8'
 
 const DEFAULT_OPTIONS = {
   contractsDir: './contracts',
@@ -19,7 +20,6 @@ const DEFAULT_OPTIONS = {
   },
   compiler: {
     name: 'solc',
-    version: '0.5.8',
     evmVersion: undefined,
     optimizer: {
       enabled: false,
@@ -55,11 +55,17 @@ const PATHS = [
 ]
 
 module.exports = function getOptions(configFile = CONFIG_PATH) {
-  return _(DEFAULT_OPTIONS)
+  const options = _(DEFAULT_OPTIONS)
       .merge(getTruffleConfig())
       .merge(getQuantalConfig(getPath(configFile)))
       .mapValues((value, key) => PATHS.includes(key) ? getPath(value) : value)
       .value()
+
+  if (!options.compiler.version) {
+    options.compiler.version = getSolcVersionFromTruffle() || DEFAULT_SOLC_VERSION
+  }
+
+  return options
 }
 
 function getQuantalConfig(configFile) {
@@ -68,6 +74,20 @@ function getQuantalConfig(configFile) {
   } catch (err) {
     // TODO: Validate error
     return {}
+  }
+}
+
+function getSolcVersionFromTruffle() {
+  try {
+    const truffleVersionMapping = require('./truffle-solc-versions')
+    const package = importFresh(getPath('package.json'))
+    const truffleVersion = _.get(package, ['dependencies', 'truffle']) || _.get(package, ['devDependencies', 'truffle'])
+
+    if (truffleVersion && truffleVersionMapping[truffleVersion])
+      return truffleVersionMapping[truffleVersion]
+      
+  } catch(err) {
+    return undefined
   }
 }
 
