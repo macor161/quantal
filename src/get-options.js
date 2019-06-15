@@ -62,7 +62,7 @@ module.exports = function getOptions(configFile = CONFIG_PATH) {
       .value()
 
   if (!options.compiler.version) {
-    options.compiler.version = getSolcVersionFromTruffle() || DEFAULT_SOLC_VERSION
+    options.compiler.version = getSolcVersionFromPackageJson() || DEFAULT_SOLC_VERSION
   }
 
   return options
@@ -77,19 +77,34 @@ function getQuantalConfig(configFile) {
   }
 }
 
-function getSolcVersionFromTruffle() {
+/**
+ * Tries to get the solc version from the project's 
+ * package.json file. Looking for the "solc" or "truffle"
+ * dependencies.
+ * 
+ * @return {string | undefined} solc version or `undefined`
+ */
+function getSolcVersionFromPackageJson() {
   try {
-    const truffleVersionMapping = require('./truffle-solc-versions')
     const package = importFresh(getPath('package.json'))
+    const truffleVersionMapping = require('./truffle-solc-versions')
     const truffleVersion = _.get(package, ['dependencies', 'truffle']) || _.get(package, ['devDependencies', 'truffle'])
+    const solcVersion = _.get(package, ['dependencies', 'solc']) || _.get(package, ['devDependencies', 'solc'])
 
     if (truffleVersion && truffleVersionMapping[truffleVersion])
       return truffleVersionMapping[truffleVersion]
+    
+    if (solcVersion)
+      return solcVersion
+
+    return undefined
       
   } catch(err) {
     return undefined
   }
 }
+
+
 
 function getTruffleConfig() {
   const truffleConfig = TruffleConfig.detect({all: true})
