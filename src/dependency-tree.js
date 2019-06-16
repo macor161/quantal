@@ -98,9 +98,14 @@ class DependencyTreeNode {
     return this.imports.length > this.dependencies.length
   }
 
-  getAllDependencies() {
+  /**
+   * Returns the node dependencies
+   * @param {DependencyTreeNode[]=} ignoredNodes 
+   */
+  getAllDependencies(ignoredNodes = []) {
     const dependencies = this.dependencies
-        .map((node) => node.getAllDependencies())
+        .filter(dep => !ignoredNodes.includes(dep))
+        .map((node) => node.getAllDependencies(ignoredNodes.concat([this])))
         .reduce((acc, dep) => acc.concat(dep), []) // Flatten nested dependencies
         .concat(this.dependencies) // Add current node dependencies
 
@@ -132,9 +137,9 @@ class DependencyTreeNode {
 
 class Branch {
   /**
-     *
-     * @param {DependencyTreeNode} node
-     */
+   * @param options
+   * @param {DependencyTreeNode} options.node
+   */
   constructor({node, id}) {
     this._node = node
     this._id = id
