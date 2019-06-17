@@ -40,7 +40,7 @@ npm install -g quantal
 quantal [options]
 
 -w, --watch     Watch for changes
--v, --version   Display version
+-V, --version   Display version
 -h, --help      Display help
 ```
 
