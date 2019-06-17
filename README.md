@@ -22,7 +22,7 @@ By using multiple binary compilers in parallel, V8 caching and other optimizatio
 Launch a new build each time a smart contract is modified. 
 
 
-## Installation
+## Install
 
 ```bash
 yarn global add quantal
@@ -74,6 +74,8 @@ The following truffle config options are currently supported:
 ## Supported solc versions
 
 **MacOS**
+
+Mojave (10.14) and High Sierra (10.13) currently supported for the following solc versions:
 
 - 0.5.9
 - 0.5.8
