@@ -47,6 +47,11 @@ module.exports = class Worker {
     this._debug(`time ${new Date().toISOString()}`)
 
     const result = await this._sendInputToProcess()
+
+    for (const path in result.sources) {
+      result.sources[path].source = this.input.sources[path] && this.input.sources[path].content
+    }
+
     this._debug('compile done')
     return result
   }

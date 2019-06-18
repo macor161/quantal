@@ -1,5 +1,5 @@
 const lineColumn = require('line-column')
-const {isObject, range} = require('lodash')
+const {isObject, range, get} = require('lodash')
 const {promisify} = require('util')
 const {isAbsolute} = require('path')
 const fs = require('fs')
@@ -10,14 +10,15 @@ const LINES_OF_CONTEXT = 6
 /**
  * Add details to a CompilerOutputError object
  */
-module.exports = async function detailedCompilerOutputError(compilerOutputError) {
+module.exports = async function detailedCompilerOutputError(compilerOutputError, compileResult) {
   try {
-    if (!compilerOutputError.sourceLocation || !isAbsolute(compilerOutputError.sourceLocation.file)) {
-      return compilerOutputError
-    }
+    
+    const fileContent = get(compileResult, 'source')
+      ? compileResult.source
+      : await getSource(compilerOutputError)
 
-    const fileContent = await readFile(compilerOutputError.sourceLocation.file, 'utf-8')
-    // console.log(fileContent)
+    if (!fileContent)
+      return compilerOutputError
 
     const error = {
       ...compilerOutputError,
@@ -54,5 +55,12 @@ function addSourceContext(error, fileContent) {
     ...error,
     sourceContext: range(lineStart, lineEnd)
         .reduce((acc, line) => ({...acc, [line]: lines[line - 1]}), {}),
+  }
+}
+
+
+function getSource(compilerOutputError) {
+  if (compilerOutputError.sourceLocation && isAbsolute(compilerOutputError.sourceLocation.file)) {
+    return readFile(compilerOutputError.sourceLocation.file, 'utf-8')
   }
 }
