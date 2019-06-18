@@ -259,7 +259,7 @@ const compile = function(sources, options, callback) {
 
     const compilerInfo = {name: 'solc', version: getFormattedVersion(solcVersion)};
 
-    Promise.all(warnings.map((warn) => detailedError(warn)))
+    Promise.all(warnings.map((warn) => detailedError(warn, standardOutput.sources[_.get(warn, ['sourceLocation', 'file'])])))
         .then((warnings) => callback(null, returnVal, files, compilerInfo, warnings))
   }
 
