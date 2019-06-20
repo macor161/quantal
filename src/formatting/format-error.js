@@ -21,6 +21,7 @@ function formatError(error) {
   const relativePath = relative(cwd(), error.sourceLocation.file)
 
   return outdent`    
+  
     ${chalk.bgWhite.black(relativePath)}
        ${chalk.bold(`Line ${error.sourceLocation.line}:`)} ${error.message}
 
