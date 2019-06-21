@@ -348,32 +348,53 @@ Config.search = (options = {}, filename) => {
     const backupConfig = findUp.sync(BACKUP_CONFIG_FILENAME, searchOptions);
     if (defaultConfig && backupConfig) {
       console.warn(
-        `Warning: Both ${DEFAULT_CONFIG_FILENAME} and ${BACKUP_CONFIG_FILENAME} were found. Using ${DEFAULT_CONFIG_FILENAME}.`
+        `Warning: Both ${DEFAULT_CONFIG_FILENAME} and ${BACKUP_CONFIG_FILENAME} were found. Merging both with priority to ${DEFAULT_CONFIG_FILENAME}.`
       );
-      return defaultConfig;
+      return [backupConfig, defaultConfig];
     } else if (backupConfig && !defaultConfig) {
       if (isWin)
         console.warn(
           `Warning: Please rename ${BACKUP_CONFIG_FILENAME} to ${DEFAULT_CONFIG_FILENAME} to ensure Windows compatibility.`
         );
-      return backupConfig;
+      return [backupConfig];
     } else {
-      return defaultConfig;
+      return [defaultConfig];
     }
   }
 
-  return findUp.sync(filename, searchOptions);
+  return [findUp.sync(filename, searchOptions)];
 };
 
 Config.detect = (options = {}, filename) => {
-  const configFile = Config.search(options, filename);
+  const configFiles = Config.search(options, filename);
 
-  if (!configFile) {
+  if (configFiles.length < 1) {
     throw new TruffleError("Could not find suitable configuration file.");
   }
 
-  return Config.load(configFile, options);
+  return Config.multiLoad(configFiles, options);
 };
+
+Config.multiLoad = (filePaths, options) => {
+  return Config.loadObject(
+    filePaths
+      .map(filePath => ({
+        working_directory: path.dirname(path.resolve(filePath)),
+        ...originalrequire(filePath)
+      }))
+      .reduce((mergedConfig, config) => _.merge(mergedConfig, config), {}),
+    options
+  )     
+}
+
+Config.loadObject = (configObj, options) => {
+  const config = new Config();
+
+  config.merge(configObj);
+  config.merge(options);
+
+  return config;
+}
 
 Config.load = (file, options) => {
   const config = new Config();
