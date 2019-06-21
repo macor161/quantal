@@ -4,7 +4,7 @@
 
 const importFresh = require('import-fresh')
 const getPath = require('./get-path')
-const TruffleConfig = require('truffle-config')
+const TruffleConfig = require('./truffle-config')
 const _ = require('lodash')
 const semver = require('semver')
 
