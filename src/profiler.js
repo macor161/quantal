@@ -10,10 +10,7 @@ const expect = require('truffle-expect');
 const find_contracts = require('truffle-contract-sources');
 const semver = require('semver');
 const debug = require('debug')('compile:profiler'); // eslint-disable-line no-unused-vars
-
-// Preparser for the getImports function
-// Remove every line that doesn't begin with 'import' or 'pragma'
-const preParser = (body) => body.replace(/(^(?!(\s*)import)(?!(\s*)pragma)[^\n]*)/gm, '')
+const { preParse } = require('./solidity-preparser')
 
 module.exports = {
   updated(options, callback) {
@@ -399,7 +396,7 @@ module.exports = {
     // No imports in vyper!
     if (path.extname(file) === '.vy') return [];
 
-    const imports = Parser.parseImports(body, solc, preParser);
+    const imports = Parser.parseImports(body, solc, preParse);
     // debug(`imports for ${file}: ${imports}`)
     // Convert explicitly relative dependencies of modules back into module paths.
     return imports.map(
