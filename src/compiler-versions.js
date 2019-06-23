@@ -1,4 +1,12 @@
 /**
+ * Returns true if the operating system is supported by Quantal.
+ * @param {string} os 
+ */
+function isOsSupported(os) {
+    return supportedSolcVersions[os] && supportedSolcVersions[os].length
+}
+
+/**
  * Supported solc versions for each operating system
  */
 const supportedSolcVersions = {
@@ -60,4 +68,4 @@ const truffleSolcMapping = {
     "5.0.22": "^0.5.0"
 }
 
-module.exports = { truffleSolcMappin, supportedSolcVersions }
+module.exports = { truffleSolcMapping, supportedSolcVersions, isOsSupported }
