@@ -1,12 +1,12 @@
-const {platform} = require('os')
-const {createWriteStream, exists, chmodSync} = require('fs-extra')
+const getOs = require('../utils/get-os')
+const { createWriteStream, exists, chmodSync } = require('fs-extra')
 const qconfig = require('../qconfig')()
 const path = require('path')
-const { minVersion } = require('semver')
+const { maxSatisfying } = require('semver')
+const { supportedSolcVersions, isOsSupported } = require('../compiler-versions')
 
-const SUPPORTED_OS = ['linux', 'darwin']
 const DOWNLOAD_URL = 'http://solc.quantal.io'
-const LATEST_VERSION = '0.5.8'
+const LATEST_VERSION = '0.5.9'
 
 /**
  * Download compiler if not already in cache.
@@ -16,8 +16,8 @@ const LATEST_VERSION = '0.5.8'
  */
 async function preloadCompiler(version = LATEST_VERSION) {
   version = getFormattedVersion(version)
-  if (!SUPPORTED_OS.includes(platform())) {
-    throw new Error(`Unsupported OS: ${platform()}`)
+  if (!isOsSupported(getOs())) {
+    throw new Error(`Unsupported OS: ${getOs()}`)
   }
 
   const cachedCompilerPath = await getCachedCompilerPath(version)
@@ -37,13 +37,13 @@ async function preloadCompiler(version = LATEST_VERSION) {
  */
 async function loadCompiler(version = LATEST_VERSION) {
   version = getFormattedVersion(version)
-  if (!SUPPORTED_OS.includes(platform())) {
-    throw new Error(`Unsupported OS: ${platform()}`)
+  if (!isOsSupported(getOs())) {
+    throw new Error(`Unsupported OS: ${getOs()}`)
   }
 
   return (await isCompilerInCache(version))
-        ? await getCachedCompiler(version)
-        : downloadCompiler(version)
+    ? await getCachedCompiler(version)
+    : downloadCompiler(version)
 }
 
 async function getCachedCompilerPath(version) {
@@ -63,8 +63,8 @@ async function getCachedCompiler(version = LATEST_VERSION) {
   const filePath = path.resolve(qconfig.getSolcCachePath(), filename)
 
   return (await exists(filePath))
-        ? filePath
-        : null
+    ? filePath
+    : null
 }
 
 async function isCompilerInCache(version = LATEST_VERSION) {
@@ -72,11 +72,11 @@ async function isCompilerInCache(version = LATEST_VERSION) {
 }
 
 function getCompilerFilename(version = LATEST_VERSION) {
-  const os = platform().replace('darwin', 'mac')
+  const os = getOs()
 
   return os === 'win32'
-        ? `solc-${os}-${version}.exe`
-        : `solc-${os}-${version}`
+    ? `solc-${os}-${version}.exe`
+    : `solc-${os}-${version}`
 }
 
 function downloadCompiler(version) {
@@ -87,7 +87,7 @@ function downloadCompiler(version) {
 
     const request = require('request')
     const progress = require('request-progress')
-    const {Bar, Presets} = require('cli-progress')
+    const { Bar, Presets } = require('cli-progress')
 
     const url = `${DOWNLOAD_URL}/${version}/${fileName}`
     const filePath = path.resolve(qconfig.getSolcCachePath(), fileName)
@@ -98,34 +98,34 @@ function downloadCompiler(version) {
     const fileRequest = progress(request(url), {
       throttle: 500,
     })
-        .on('progress', (state) => {
-          progressBar.update(parseInt(state.percent * 100))
-        })
-        .on('response', (response) => {
-          if (response.statusCode === 200) {
-            const fileStream = createWriteStream(filePath)
-                .on('finish', () => {
-                  fileStream.close(() => {
-                    res(filePath)
-                  })
-                })
-            fileRequest.pipe(fileStream)
-          } else {
-            rej(new Error(`Unable to find solc ${version}`))
-          }
-        })
-        .on('error', (err) => {
+      .on('progress', (state) => {
+        progressBar.update(parseInt(state.percent * 100))
+      })
+      .on('response', (response) => {
+        if (response.statusCode === 200) {
+          const fileStream = createWriteStream(filePath)
+            .on('finish', () => {
+              fileStream.close(() => {
+                res(filePath)
+              })
+            })
+          fileRequest.pipe(fileStream)
+        } else {
+          rej(new Error(`Unable to find solc ${version}`))
+        }
+      })
+      .on('error', (err) => {
 
-        })
-        .on('end', () => {
-          progressBar.update(100)
-          progressBar.stop()
-        })
+      })
+      .on('end', () => {
+        progressBar.update(100)
+        progressBar.stop()
+      })
   })
 }
 
 function getFormattedVersion(version = LATEST_VERSION) {
-  return minVersion(version).version
+  return maxSatisfying(supportedSolcVersions[getOs()], version)
 }
 
-module.exports = {preloadCompiler, getFormattedVersion, loadCompiler}
+module.exports = { preloadCompiler, getFormattedVersion, loadCompiler }
