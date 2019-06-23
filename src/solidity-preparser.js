@@ -1,10 +1,13 @@
-module.exports = { preParse }
+const regex = /(^import\s+.*(\'|\").+(\'|\");$)|(^pragma\s+solidity\s*(.+);$)/gm
 
 /**
- * Remove every line that doesn't begin with 'import' or 'pragma'
- * from a Solidity file content
- * @param {string} body 
+ * Extract import and pragma statements from Solidity code
+ * @param {string} body Solidity source code
  */
 function preParse(body) {
-    return body.replace(/(^(?!(\s*)import)(?!(\s*)pragma)[^\n]*)/gm, '')
+    return body
+        .match(regex)
+        .join('\n')
 }
+
+module.exports = { preParse }
