@@ -1,4 +1,4 @@
-const regex = /(^\s*import\s+.*(\'|\").+(\'|\");$)|(^\s*pragma\s+solidity\s*(.+);$)/gm
+const regex = /(import\s+.*(\'|\").+(\'|\");)|(pragma\s+solidity\s*(.+);)/gm
 
 /**
  * Extract import and pragma statements from Solidity code
