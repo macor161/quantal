@@ -7,7 +7,6 @@ const {formatErrors} = require('./formatting/format-error')
 const {formatWarnings} = require('./formatting/format-warnings')
 const chalk = require('chalk')
 const { preloadCompiler} = require('./compiler/load-compiler')
-const { dependencyCheck } = require('./dependency-management')()
 
 /**
  *
@@ -18,7 +17,6 @@ module.exports = async function(options = {}) {
   const globalOptions = getOptions()
   console.log('Starting build task')
 
-  await dependencyCheck()
   await preloadCompiler(globalOptions.compiler.version)
 
   const buildFn = preventConcurentCalls(build)
