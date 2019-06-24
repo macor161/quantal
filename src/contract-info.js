@@ -45,7 +45,6 @@ function getFunctions(contractName, abi, astInfo, devdoc) {
               const astOutput = astMethod.returnParameters.parameters[i]
 
               if (abiOutput.type === 'address' && astOutput.typeName.name !== 'address') {
-                console.log('good: ', astMethod.name)
                 abiOutput.contractName = astOutput.typeName.name
               }
             }

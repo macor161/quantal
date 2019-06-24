@@ -87,13 +87,13 @@ function getQuantalConfig(configFile) {
 function getSolcVersionFromPackageJson() {
   try {
     const package = importFresh(getPath('package.json'))
-    const truffleVersionMapping = require('./truffle-solc-versions')
+    const { truffleSolcMapping } = require('./compiler-versions')
     const truffleVersionRange = _.get(package, ['dependencies', 'truffle']) || _.get(package, ['devDependencies', 'truffle'])
     const truffleVersion = truffleVersionRange && semver.minVersion(truffleVersionRange)
     const solcVersion = _.get(package, ['dependencies', 'solc']) || _.get(package, ['devDependencies', 'solc'])
 
-    if (truffleVersion && truffleVersionMapping[truffleVersion])
-      return truffleVersionMapping[truffleVersion]
+    if (truffleVersion && truffleSolcMapping[truffleVersion])
+      return truffleSolcMapping[truffleVersion]
     
     if (solcVersion)
       return solcVersion
@@ -128,6 +128,7 @@ function getTruffleConfig() {
         _.get(config, ['compilers', 'solc', 'settings', 'version']) ||
         _.get(config, ['compilers', 'solc', 'version']) ||
         undefined
+      
 
   // TODO: artifactContent
 
@@ -135,8 +136,7 @@ function getTruffleConfig() {
     contractsDir: config.contracts_directory,
     builtContractsDir: config.contracts_build_directory,
     compiler: {
-      //version: semver.valid(version) && semver.minVersion(version).version ,
-      ...(semver.valid(version) && { version: semver.minVersion(version).version }),
+      ...(version && { version }),
       evmVersion,
       optimizer,
     },
