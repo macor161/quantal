@@ -65,7 +65,8 @@ const truffleSolcMapping = {
     "5.0.19": "0.5.0",
     "5.0.20": "^0.5.0",
     "5.0.21": "^0.5.0",
-    "5.0.22": "^0.5.0"
+    "5.0.22": "^0.5.0",
+    "5.0.24": "^0.5.0"
 }
 
 module.exports = { truffleSolcMapping, supportedSolcVersions, isOsSupported }
