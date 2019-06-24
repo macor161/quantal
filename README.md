@@ -32,7 +32,6 @@ or
 npm install -g quantal
 ```
 
-**Homebrew is currently required on MacOS.**
 
 ## Usage
 
