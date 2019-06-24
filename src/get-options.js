@@ -128,6 +128,7 @@ function getTruffleConfig() {
         _.get(config, ['compilers', 'solc', 'settings', 'version']) ||
         _.get(config, ['compilers', 'solc', 'version']) ||
         undefined
+      
 
   // TODO: artifactContent
 
@@ -135,8 +136,7 @@ function getTruffleConfig() {
     contractsDir: config.contracts_directory,
     builtContractsDir: config.contracts_build_directory,
     compiler: {
-      //version: semver.valid(version) && semver.minVersion(version).version ,
-      ...(semver.valid(version) && { version: semver.minVersion(version).version }),
+      ...(version && { version }),
       evmVersion,
       optimizer,
     },
