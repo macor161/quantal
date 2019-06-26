@@ -63,5 +63,6 @@
   },
   "files": [
     "src"
-  ]
+  ],
+  "keywords": ["ethereumn", "solidity"]
 }
