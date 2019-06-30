@@ -1,4 +1,4 @@
-const solcCompile = require('./quantal-compile')
+const solcCompile = require('./compiler')
 const mkdirp = require('mkdirp')
 const {callbackify, promisify} = require('util')
 const Config = require('./truffle-config')
