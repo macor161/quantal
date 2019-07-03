@@ -4,6 +4,7 @@ const fs = require('fs-extra')
 const path = require('path')
 const { red, green } = require('chalk')
 const importFresh = require('import-fresh')
+const ora = require('ora')
 
 async function main() {
     try {
@@ -12,7 +13,7 @@ async function main() {
         if (!folderArg1 || !folderArg2)
             throw new Error('You must specify two folders to compare.')
 
-        console.log(`Comparing ${folderArg1} and ${folderArg2}`)
+        console.log(`Comparing ${folderArg1} and ${folderArg2} artifact bytecodes`)
 
         const folder1 = getPath(folderArg1)
         const folder2 = getPath(folderArg2)
@@ -22,16 +23,15 @@ async function main() {
 
         for (const file of folder1Files) {
             const fileName = file.name
-
-            console.log(`${fileName}...`)
+            const spinner = ora(fileName).start()
             const file1Path = path.join(folder1, fileName) 
             const file2Path = path.join(folder2, fileName)
 
             if (await fs.exists(file2Path) && await isFile(file2Path)) {
                 if (await compare(file1Path, file2Path))
-                    console.log(green('ok'))
+                    spinner.succeed()
                 else
-                    console.log(red('wrong'))
+                    spinner.fail()
             }
         }
 
