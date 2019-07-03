@@ -3,6 +3,7 @@
 const fs = require('fs-extra')
 const path = require('path')
 const { red, green } = require('chalk')
+const importFresh = require('import-fresh')
 
 async function main() {
     try {
@@ -30,17 +31,20 @@ async function main() {
                 if (await compare(file1Path, file2Path))
                     console.log(green('ok'))
                 else
-                    console.log(red('different'))
+                    console.log(red('wrong'))
             }
         }
 
     } catch (err) {
-        console.error(`${red.bold('Error')}: ${err}`)
+        console.log(`${red.bold('Error')}: ${err}`)
     }
 }
 
-async function compare(file1, file2) {
+async function compare(filePath1, filePath2) {
+    const artifact1 = importFresh(filePath1)
+    const artifact2 = importFresh(filePath2)
 
+    return artifact1.bytecode === artifact2.bytecode
 }
 
 async function isFile(file) {
