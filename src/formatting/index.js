@@ -21,6 +21,12 @@ const defaultOptions = {
   postParse: (content) => content,
 }
 
+/**
+ * Highlight syntax of Solidity code
+ * @param {Object} lines Properties are line numbers and values are lines content
+ * @param {Object} options 
+ * @return {string}
+ */
 function formatSource(lines, options = {}) {
   const opts = {...defaultOptions, ...options}
 
@@ -31,6 +37,14 @@ function formatSource(lines, options = {}) {
   return opts.postParse(result)
 }
 
+/**
+ * Highlight syntax of a single line of Solidity code
+ * @param {string} lineValue 
+ * @param {number} lineNb 
+ * @param {function} preParse 
+ * @param {function} postParse 
+ * @returns {string}
+ */
 function formatLine(lineValue, lineNb, preParse = defaultOptions.preLineParse, postParse = defaultOptions.postLineParse) {
   let parsedLineValue = preParse(lineValue, lineNb)
   KEYWORDS_COLORS.forEach(({regex, color}) => parsedLineValue = parsedLineValue.replace(regex, `$1${chalk[color]('$2')}$3`))
