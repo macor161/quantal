@@ -6,15 +6,15 @@ const pad = require('pad-left')
 
 const syntax = [
   {
-    regex: /(^|\(|\s+)(pragma|import|using|for|return|returns|require|emit)(\s+|\)|\;|$)/g,
+    regex: /(^|\(|\s+)(pragma|import|using|for|returns?|require|emit)(\s+|\(|\)|\;|$)/g,
     replacer: (match, p1, p2, p3) => p1 + magenta(p2) + p3
   }, 
   {
-    regex: /(^|\(|\s+)(solidity|contract|is|memory|storage|mapping|function|private|public|internal|external|view|true|false)(\s+|\)|\;|$)/g,
+    regex: /(^|\(|\s+)(solidity|contract|is|memory|storage|mapping|view|function|private|public|internal|external|view|true|false)(\s+|\)|\;|$)/g,
     replacer: (match, p1, p2, p3) => p1 + blue(p2) + p3
   }, 
   { // Types
-    regex: /(^|\(|\s+)(address|uint256|bytes32)(\s+|\)|\;|$)/g,
+    regex: /(^|\(|\s+)(address|string|u?int\d*|bytes\d*)(\s+|\)|\;|$)/g,
     replacer: (match, p1, p2, p3) => p1 + cyan(p2) + p3
   }, 
   { // Single line comments
