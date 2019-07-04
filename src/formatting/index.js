@@ -3,16 +3,16 @@ const { magenta, blue, cyan, gray } = require('chalk')
 const pad = require('pad-left')
 
 
-const KEYWORDS_COLORS = [{
-  regex: /(^|\(|\s+)(pragma|import|using|for|return|returns|require|emit)(\s+|\)|\;|$)/g,
-  replacer: (match, p1, p2, p3) => `${p1}${magenta(p2)}${p3}`
-}, {
-  regex: /(^|\(|\s+)(solidity|contract|is|mapping|function|private|public|internal|external|view|true|false)(\s+|\)|\;|$)/g,
-  replacer: (match, p1, p2, p3) => `${p1}${blue(p2)}${p3}` 
-}, {
-  regex: /(^|\(|\s+)(address|uint256|bytes32)(\s+|\)|\;|$)/g,
-  replacer: (match, p1, p2, p3) => `${p1}${cyan(p2)}${p3}`
-}
+const syntax = [{
+    regex: /(^|\(|\s+)(pragma|import|using|for|return|returns|require|emit)(\s+|\)|\;|$)/g,
+    replacer: (match, p1, p2, p3) => p1 + magenta(p2) + p3
+  }, {
+    regex: /(^|\(|\s+)(solidity|contract|is|mapping|function|private|public|internal|external|view|true|false)(\s+|\)|\;|$)/g,
+    replacer: (match, p1, p2, p3) => p1 + blue(p2) + p3
+  }, {
+    regex: /(^|\(|\s+)(address|uint256|bytes32)(\s+|\)|\;|$)/g,
+    replacer: (match, p1, p2, p3) => p1 + cyan(p2) + p3
+  }
 ]
 
 
@@ -49,8 +49,10 @@ function formatSource(lines, options = {}) {
  */
 function formatLine(lineValue, lineNb, preParse = defaultOptions.preLineParse, postParse = defaultOptions.postLineParse) {
   let parsedLineValue = preParse(lineValue, lineNb)
-  //KEYWORDS_COLORS.forEach(({regex, color, replacer}) => parsedLineValue = parsedLineValue.replace(regex, `$1${chalk[color]('$2')}$3`))
-  KEYWORDS_COLORS.forEach(({regex, replacer}) => parsedLineValue = parsedLineValue.replace(regex, replacer))
+
+  for (const {regex, replacer} of syntax) 
+    parsedLineValue = parsedLineValue.replace(regex, replacer)
+    
   return postParse(`${parseLineNb(lineNb)} ${parsedLineValue}`, lineNb)
 }
 
