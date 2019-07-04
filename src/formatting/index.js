@@ -1,18 +1,20 @@
 const _ = require('lodash')
-const chalk = require('chalk')
+const { magenta, blue, cyan, gray } = require('chalk')
 const pad = require('pad-left')
+
 
 const KEYWORDS_COLORS = [{
   regex: /(^|\(|\s+)(pragma|import|using|for|return|returns|require|emit)(\s+|\)|\;|$)/g,
-  color: 'magenta',
+  replacer: (match, p1, p2, p3) => `${p1}${magenta(p2)}${p3}`
 }, {
   regex: /(^|\(|\s+)(solidity|contract|is|mapping|function|private|public|internal|external|view|true|false)(\s+|\)|\;|$)/g,
-  color: 'blue',
+  replacer: (match, p1, p2, p3) => `${p1}${blue(p2)}${p3}` 
 }, {
   regex: /(^|\(|\s+)(address|uint256|bytes32)(\s+|\)|\;|$)/g,
-  color: 'cyan',
-},
+  replacer: (match, p1, p2, p3) => `${p1}${cyan(p2)}${p3}`
+}
 ]
+
 
 const defaultOptions = {
   preLineParse: (lineValue, lineNb) => lineValue,
@@ -47,7 +49,8 @@ function formatSource(lines, options = {}) {
  */
 function formatLine(lineValue, lineNb, preParse = defaultOptions.preLineParse, postParse = defaultOptions.postLineParse) {
   let parsedLineValue = preParse(lineValue, lineNb)
-  KEYWORDS_COLORS.forEach(({regex, color}) => parsedLineValue = parsedLineValue.replace(regex, `$1${chalk[color]('$2')}$3`))
+  //KEYWORDS_COLORS.forEach(({regex, color, replacer}) => parsedLineValue = parsedLineValue.replace(regex, `$1${chalk[color]('$2')}$3`))
+  KEYWORDS_COLORS.forEach(({regex, replacer}) => parsedLineValue = parsedLineValue.replace(regex, replacer))
   return postParse(`${parseLineNb(lineNb)} ${parsedLineValue}`, lineNb)
 }
 
@@ -56,7 +59,7 @@ function parseLineNb(lineNb) {
         ? `${lineNb}`
         : ''
 
-  return `  ${chalk.gray(`${pad(line, 3, ' ')} |`)}`
+  return `  ${gray(`${pad(line, 3, ' ')} |`)}`
 }
 
 module.exports = {formatSource, formatLine}
