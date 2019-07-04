@@ -1,17 +1,25 @@
 const _ = require('lodash')
-const { magenta, blue, cyan, gray } = require('chalk')
+const { magenta, blue, cyan, green, gray } = require('chalk')
+const stripAnsi = require('strip-ansi')
 const pad = require('pad-left')
 
 
-const syntax = [{
+const syntax = [
+  {
     regex: /(^|\(|\s+)(pragma|import|using|for|return|returns|require|emit)(\s+|\)|\;|$)/g,
     replacer: (match, p1, p2, p3) => p1 + magenta(p2) + p3
-  }, {
-    regex: /(^|\(|\s+)(solidity|contract|is|mapping|function|private|public|internal|external|view|true|false)(\s+|\)|\;|$)/g,
+  }, 
+  {
+    regex: /(^|\(|\s+)(solidity|contract|is|memory|storage|mapping|function|private|public|internal|external|view|true|false)(\s+|\)|\;|$)/g,
     replacer: (match, p1, p2, p3) => p1 + blue(p2) + p3
-  }, {
+  }, 
+  { // Types
     regex: /(^|\(|\s+)(address|uint256|bytes32)(\s+|\)|\;|$)/g,
     replacer: (match, p1, p2, p3) => p1 + cyan(p2) + p3
+  }, 
+  { // Single line comments
+    regex: /\/\/.*/,
+    replacer: match => green(stripAnsi(match))
   }
 ]
 
@@ -52,14 +60,14 @@ function formatLine(lineValue, lineNb, preParse = defaultOptions.preLineParse, p
 
   for (const {regex, replacer} of syntax) 
     parsedLineValue = parsedLineValue.replace(regex, replacer)
-    
+
   return postParse(`${parseLineNb(lineNb)} ${parsedLineValue}`, lineNb)
 }
 
 function parseLineNb(lineNb) {
   const line = lineNb !== undefined
-        ? `${lineNb}`
-        : ''
+    ? `${lineNb}`
+    : ''
 
   return `  ${gray(`${pad(line, 3, ' ')} |`)}`
 }
