@@ -116,7 +116,6 @@ function getSyntax({ controls, declarations, types, comments }) {
 }
 
 function parseLineNb(lineNb, color) {
-  console.log('color: ', color)
   const line = lineNb !== undefined
     ? `${lineNb}`
     : ''
