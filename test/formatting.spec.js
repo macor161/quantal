@@ -13,7 +13,7 @@ function getMockedColors() {
 }
 
 describe('Fromatting', () => {
-    xtest('Format types', async () => {  
+    test('Format types', async () => {  
         
         const source = outdent`
         contract Test is Test2 {
@@ -29,7 +29,7 @@ describe('Fromatting', () => {
           
               return true;
             }
-          }`
+        }`
 
         const colors = getMockedColors()
         
@@ -58,12 +58,12 @@ describe('Fromatting', () => {
               bool t = false;
             }
           
-            function trueFunction() private returns (bool) {
+            function f() private returns (bool) {
               int var1 = -32;    
           
               return true;
             }
-          }`
+        }`
 
         const colors = getMockedColors()
         
@@ -82,8 +82,43 @@ describe('Fromatting', () => {
         expect(colors.declarations.mock.calls[8][0]).toBe('true')
     })
 
+
+    test('Format controls', async () => {  
+        
+        const source = outdent`
+        pragma solidity ^0.5.0;
+        import "./Test2.sol";
+
+        contract Test is Test2 {  
+            event Event1(address indexed member); 
+
+            constructor(bytes32 _key, address _address) public {
+              require(_address == address(0));
+            }
+          
+            function f() private returns (bool) {
+              int var1 = -32;    
+              emit Event1(address(0));
+              return true;
+            }
+        }`
+
+        const colors = getMockedColors()
+        
+        formatSource(source.split('\n'), { colors })
+
+        expect(colors.controls.mock.calls.length).toBe(6)
+        
+        expect(colors.controls.mock.calls[0][0]).toBe('pragma')
+        expect(colors.controls.mock.calls[1][0]).toBe('import')
+        expect(colors.controls.mock.calls[2][0]).toBe('require')
+        expect(colors.controls.mock.calls[3][0]).toBe('returns')
+        expect(colors.controls.mock.calls[4][0]).toBe('emit')
+        expect(colors.controls.mock.calls[5][0]).toBe('return')
+    })    
+
     
-    xtest('Format single line comments', async () => {  
+    test('Format single line comments', async () => {  
         
         const source = outdent`
         // This is a test

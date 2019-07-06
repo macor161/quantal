@@ -101,7 +101,7 @@ function getSyntax({ controls, declarations, types, comments }) {
       replacer: (match, p1, p2, p3) => p1 + controls(p2) + p3
     }, 
     { // Declarations
-      regex: /(^|\(|\s+)(solidity|contract|is|memory|storage|mapping|constructor|view|function|private|public|internal|external|true|false)(\s+|\(|\)|\;|$)/g,
+      regex: /(^|\(|\s+)(solidity|contract|is|memory|storage|mapping|constructor|view|function|private|public|internal|external|indexed|event|true|false)(\s+|\(|\)|\;|$)/g,
       replacer: (match, p1, p2, p3) => p1 + declarations(p2) + p3
     }, 
     { // Types
