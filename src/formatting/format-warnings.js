@@ -1,3 +1,7 @@
+/** 
+ * @typedef {import('../detailed-error').DetailedCompilerError} DetailedCompilerError 
+ */
+
 const {formatLine, formatSource} = require('./index')
 const chalk = require('chalk')
 const outdent = require('outdent')
@@ -5,6 +9,12 @@ const {cwd} = require('process')
 const {relative} = require('path')
 const {map} = require('../template-literals')
 
+
+/**
+ * Format and highlight syntax of multiple Solidity
+ * compiler warnings
+ * @param {DetailedCompilerError[]} warnings 
+ */
 function formatWarnings(warnings) {
   return outdent` 
         ${map(warnings, (err) => `${formatWarning(err)}`)}   
@@ -13,6 +23,11 @@ function formatWarnings(warnings) {
     `
 }
 
+/**
+ * Format and highlight syntax of a single Solidity
+ * compiler warning
+ * @param {DetailedCompilerError} warning
+ */
 function formatWarning(warning) {
   if (!warning.sourceContext) {
     return warning.formattedMessage

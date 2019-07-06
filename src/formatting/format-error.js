@@ -1,3 +1,7 @@
+/** 
+ * @typedef {import('../detailed-error').DetailedCompilerError} DetailedCompilerError 
+ */
+
 const {formatLine, formatSource} = require('./index')
 const chalk = require('chalk')
 const outdent = require('outdent')
@@ -5,6 +9,12 @@ const {cwd} = require('process')
 const {relative} = require('path')
 const {map} = require('../template-literals')
 
+
+/**
+ * Format and highlight syntax of multiple Solidity
+ * compiler errors
+ * @param {DetailedCompilerError[]} errors 
+ */
 function formatErrors(errors) {
   return outdent`
         ${map(errors, (err) => `${formatError(err)}`)}
@@ -13,6 +23,11 @@ function formatErrors(errors) {
     `
 }
 
+/**
+ * Format and highlight syntax of a single Solidity
+ * compiler error
+ * @param {DetailedCompilerError} error
+ */
 function formatError(error) {
   if (!error.sourceContext) {
     return error.formattedMessage

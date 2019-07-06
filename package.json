@@ -47,6 +47,7 @@
     "request-promise": "^4.2.2",
     "semver": "^6.1.1",
     "solc": "0.5.0",
+    "strip-ansi": "^5.2.0",
     "truffle-artifactor": "4.0.10",
     "truffle-contract": "4.0.15",
     "truffle-contract-sources": "0.1.3",
@@ -64,5 +65,8 @@
   "files": [
     "src"
   ],
-  "keywords": ["ethereumn", "solidity"]
+  "keywords": [
+    "ethereumn",
+    "solidity"
+  ]
 }
