@@ -105,7 +105,7 @@ function getSyntax({ controls, declarations, types, comments }) {
       replacer: (match, p1, p2, p3) => p1 + declarations(p2) + p3
     }, 
     { // Types
-      regex: /(^|\(|\s+)(address|string|u?int\d*|bytes\d*)(\s+|\)|\;|$)/g,
+      regex: /(^|\(|\s+)(address|string|u?int\d*|bool|bytes\d*)(\s+|\(|\)|\;|$)/g,
       replacer: (match, p1, p2, p3) => p1 + types(p2) + p3
     }, 
     { // Single line comments
