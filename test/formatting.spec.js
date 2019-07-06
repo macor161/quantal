@@ -13,7 +13,7 @@ function getMockedColors() {
 }
 
 describe('Fromatting', () => {
-    test('Format types', async () => {  
+    xtest('Format types', async () => {  
         
         const source = outdent`
         contract Test is Test2 {
@@ -47,8 +47,43 @@ describe('Fromatting', () => {
         expect(colors.types.mock.calls[8][0]).toBe('int')
     })
 
+    test('Format declarations', async () => {  
+        
+        const source = outdent`
+        pragma solidity ^0.5.0;
+        import "./Test2.sol";
+
+        contract Test is Test2 {          
+            constructor(bytes32 _key, address _address) public {
+              bool t = false;
+            }
+          
+            function trueFunction() private returns (bool) {
+              int var1 = -32;    
+          
+              return true;
+            }
+          }`
+
+        const colors = getMockedColors()
+        
+        formatSource(source.split('\n'), { colors })
+
+        expect(colors.declarations.mock.calls.length).toBe(9)
+        
+        expect(colors.declarations.mock.calls[0][0]).toBe('solidity')
+        expect(colors.declarations.mock.calls[1][0]).toBe('contract')
+        expect(colors.declarations.mock.calls[2][0]).toBe('is')
+        expect(colors.declarations.mock.calls[3][0]).toBe('constructor')
+        expect(colors.declarations.mock.calls[4][0]).toBe('public')
+        expect(colors.declarations.mock.calls[5][0]).toBe('false')
+        expect(colors.declarations.mock.calls[6][0]).toBe('function')
+        expect(colors.declarations.mock.calls[7][0]).toBe('private')
+        expect(colors.declarations.mock.calls[8][0]).toBe('true')
+    })
+
     
-    test('Format single line comments', async () => {  
+    xtest('Format single line comments', async () => {  
         
         const source = outdent`
         // This is a test
