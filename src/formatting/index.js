@@ -1,51 +1,57 @@
 const _ = require('lodash')
-const { magenta, blue, cyan, green, gray } = require('chalk')
 const stripAnsi = require('strip-ansi')
 const pad = require('pad-left')
+const {magenta, blue, cyan, green, gray} = require('chalk')
+
+/**
+ * @typedef SyntaxColors Solidity code highlight syntax colors.
+ * @property {function} controls Controls color (pragma, import, using, etc) Default: `chalk.magenta`
+ * @property {function} declarations Declarations color (contract, storage, memory, etc) Default: `chalk.blue`
+ * @property {function} types  Types color (uint, address, string, etc) Default: `chalk.cyan`
+ * @property {function} comments  Comments color. Default: `chalk.green`
+ * @property {function} lineNumbers  Line numbers color. Default: `chalk.gray`
+ */
+const DEFAULT_COLORS = { 
+  controls: magenta, 
+  declarations: blue, 
+  types: cyan, 
+  comments: green, 
+  lineNumbers: gray 
+}
 
 
-const syntax = [
-  {
-    regex: /(^|\(|\s+)(pragma|import|using|for|returns?|require|emit)(\s+|\(|\)|\;|$)/g,
-    replacer: (match, p1, p2, p3) => p1 + magenta(p2) + p3
-  }, 
-  {
-    regex: /(^|\(|\s+)(solidity|contract|is|memory|storage|mapping|view|function|private|public|internal|external|view|true|false)(\s+|\)|\;|$)/g,
-    replacer: (match, p1, p2, p3) => p1 + blue(p2) + p3
-  }, 
-  { // Types
-    regex: /(^|\(|\s+)(address|string|u?int\d*|bytes\d*)(\s+|\)|\;|$)/g,
-    replacer: (match, p1, p2, p3) => p1 + cyan(p2) + p3
-  }, 
-  { // Single line comments
-    regex: /\/\/.*/,
-    replacer: match => green(stripAnsi(match))
-  }
-]
-
-
-const defaultOptions = {
+/**
+ * @typedef {Object} FormatSourceOptions 
+ * @property {function} preLineParse
+ * @property {function} postLineParse
+ * @property {function} preParse
+ * @property {function} postParse
+ * @property {SyntaxColors} colors
+ */
+const defaultFormatSourceOptions = {
   preLineParse: (lineValue, lineNb) => lineValue,
   postLineParse: (lineValue, lineNb) => lineValue,
   preParse: (lines) => lines,
   postParse: (content) => content,
+  colors: DEFAULT_COLORS
 }
 
+
 /**
- * Highlight syntax of Solidity code
- * @param {Object} lines Properties are line numbers and values are lines content
- * @param {Object} options 
- * @return {string}
+ * @param {Object} lines 
+ * @param {FormatSourceOptions} options
+ * @returns {string}
  */
-function formatSource(lines, options = {}) {
-  const opts = {...defaultOptions, ...options}
+function formatSource(lines, options) {
+  const opts = {...defaultFormatSourceOptions, ...options}
 
   const result = _(opts.preParse(lines))
-      .map((val, lineNb) => formatLine(val, lineNb, opts.preLineParse, opts.postLineParse))
+      .map((val, lineNb) => formatLine(val, lineNb, opts.preLineParse, opts.postLineParse, opts.colors))
       .join('\n')
 
   return opts.postParse(result)
 }
+
 
 /**
  * Highlight syntax of a single line of Solidity code
@@ -53,23 +59,55 @@ function formatSource(lines, options = {}) {
  * @param {number} lineNb 
  * @param {function} preParse 
  * @param {function} postParse 
+ * @param {SyntaxColors} colors
  * @returns {string}
  */
-function formatLine(lineValue, lineNb, preParse = defaultOptions.preLineParse, postParse = defaultOptions.postLineParse) {
+function formatLine(lineValue, lineNb, preParse = defaultFormatSourceOptions.preLineParse, postParse = defaultFormatSourceOptions.postLineParse, colors = DEFAULT_COLORS) {
   let parsedLineValue = preParse(lineValue, lineNb)
+  const syntax = getSyntax(colors)
 
   for (const {regex, replacer} of syntax) 
     parsedLineValue = parsedLineValue.replace(regex, replacer)
 
-  return postParse(`${parseLineNb(lineNb)} ${parsedLineValue}`, lineNb)
+  return postParse(`${parseLineNb(lineNb, colors.lineNumbers)} ${parsedLineValue}`, lineNb)
 }
 
-function parseLineNb(lineNb) {
+
+/**
+ * Returns a list of syntax regexes and replacer functions to 
+ * parse Solidity code
+ * @param {SyntaxColors} colors Color functions
+ * @returns {{ regex: Regex, replacer: function}[]} 
+ */
+function getSyntax({ controls, declarations, types, comments }) {
+
+  return [
+    { // Controls
+      regex: /(^|\(|\s+)(pragma|import|using|for|returns?|require|emit)(\s+|\(|\)|\;|$)/g,
+      replacer: (match, p1, p2, p3) => p1 + controls(p2) + p3
+    }, 
+    { // Declarations
+      regex: /(^|\(|\s+)(solidity|contract|is|memory|storage|mapping|view|function|private|public|internal|external|view|true|false)(\s+|\)|\;|$)/g,
+      replacer: (match, p1, p2, p3) => p1 + declarations(p2) + p3
+    }, 
+    { // Types
+      regex: /(^|\(|\s+)(address|string|u?int\d*|bytes\d*)(\s+|\)|\;|$)/g,
+      replacer: (match, p1, p2, p3) => p1 + types(p2) + p3
+    }, 
+    { // Single line comments
+      regex: /\/\/.*/,
+      replacer: match => comments(stripAnsi(match))
+    }
+  ]
+}
+
+function parseLineNb(lineNb, color) {
+  console.log('color: ', color)
   const line = lineNb !== undefined
     ? `${lineNb}`
     : ''
 
-  return `  ${gray(`${pad(line, 3, ' ')} |`)}`
+  return `  ${color(`${pad(line, 3, ' ')} |`)}`
 }
 
 module.exports = {formatSource, formatLine}
