@@ -46,7 +46,13 @@ function formatSource(lines, options) {
   const opts = {...defaultFormatSourceOptions, ...options}
 
   const result = _(opts.preParse(lines))
-      .map((val, lineNb) => formatLine(val, lineNb, opts.preLineParse, opts.postLineParse, opts.colors))
+      .map((val, lineNb) => {
+        return formatLine(val, lineNb, { 
+          preParse: opts.preLineParse, 
+          postParse: opts.postLineParse, 
+          colors: opts.colors 
+        })
+      })
       .join('\n')
 
   return opts.postParse(result)
@@ -57,12 +63,20 @@ function formatSource(lines, options) {
  * Highlight syntax of a single line of Solidity code
  * @param {string} lineValue 
  * @param {number} lineNb 
- * @param {function} preParse 
- * @param {function} postParse 
- * @param {SyntaxColors} colors
+ * @param {Object} options
+ * @param {function} options.preParse 
+ * @param {function} options.postParse 
+ * @param {SyntaxColors} options.colors
  * @returns {string}
  */
-function formatLine(lineValue, lineNb, preParse = defaultFormatSourceOptions.preLineParse, postParse = defaultFormatSourceOptions.postLineParse, colors = DEFAULT_COLORS) {
+function formatLine(lineValue, lineNb, options) {
+  const { preParse, postParse, colors } = {
+     preParse: defaultFormatSourceOptions.preLineParse, 
+     postParse: defaultFormatSourceOptions.postLineParse, 
+     colors: DEFAULT_COLORS,
+     ...options
+  }
+
   let parsedLineValue = preParse(lineValue, lineNb)
   const syntax = getSyntax(colors)
 
