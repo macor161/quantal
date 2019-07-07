@@ -1,7 +1,7 @@
 /**
  * @typedef {import('commander').Command} Command
  */
-const chalk = require('chalk')
+const { green } = require('chalk')
 const {formatErrors} = require('../formatting/format-error')
 const {formatWarnings} = require('../formatting/format-warnings')
 const getOptions = require('../get-options')
@@ -14,25 +14,39 @@ const getOptions = require('../get-options')
  * @returns {function} Build command
  */
 function getBuildCmd({argv, logger}) {
-    return async () => {        
+    return async () => {       
         if (argv.watch) {
+            logger.log('Starting build in watch mode') 
             const { buildWatch } = require('./build-watch')
             const options = getOptions()
-            await buildWatch()
+            await buildWatch(options, {
+                onChange: onSourceFileChange,
+                onBuildComplete: handleBuildResults
+            })
         }
         else {
+            logger.log('Starting build') 
             const { build } = require('./build')
             const options = getOptions()
-            const results = await build(options)
-
-            if (results.errors && results.errors.length) 
-                logger.log(formatErrors(results.errors))
-            else if (results.warnings.length) 
-                logger.log(formatWarnings(results.warnings))
-            else 
-                logger.log(chalk.bold.green('Build successful'))                       
+            handleBuildResults(await build(options))                    
         }
     }
+
+    function onSourceFileChange() {
+        logger.log('Rebuilding')
+        return getOptions()
+    }
+
+    function handleBuildResults(results) {
+        if (results.errors && results.errors.length) 
+            logger.log(formatErrors(results.errors))
+        else if (results.warnings.length) 
+            logger.log(formatWarnings(results.warnings))
+        else 
+            logger.log(green.bold('Build successful'))   
+    }
 }
+
+
 
 module.exports = getBuildCmd

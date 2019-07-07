@@ -37,7 +37,6 @@ function loadCommand({argv, logger}) {
   // if (argv.version) {
   //     return require('./commands/version')({ argv, logger })
   // }
-
   return require('./build/command')({argv, logger})  
 }
 
