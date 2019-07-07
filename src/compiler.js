@@ -1,5 +1,4 @@
 require('v8-compile-cache')
-require('./setup-debug')
 const debug = require('debug')('compile')
 const compiler = require('./compiler/multiprocess-compiler')
 const OS = require('os')

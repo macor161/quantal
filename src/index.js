@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 require('v8-compile-cache')
+require('./utils/setup-debug')
+
 const debug = require('debug')('main')
 const jsonPackage = require('../package.json')
 const {Logger} = require('./utils/logger')

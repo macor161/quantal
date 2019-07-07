@@ -1,15 +1,15 @@
 const compileContracts = require('./compile-contracts')
 const getOptions = require('./get-options')
-const getPath = require('./get-path')
+const getPath = require('./utils/get-path')
 const fs = require('fs')
 const path = require('path')
+const chalk = require('chalk')
 const {formatErrors} = require('./formatting/format-error')
 const {formatWarnings} = require('./formatting/format-warnings')
-const chalk = require('chalk')
 const { preloadCompiler} = require('./compiler/load-compiler')
 
 /**
- *
+ * 
  * @param {Object} opts Options
  * @param {Function} opts.onComplete Called everytime a build is successfully completed
  */
