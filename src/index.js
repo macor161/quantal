@@ -38,8 +38,7 @@ function loadCommand({argv, logger}) {
   //     return require('./commands/version')({ argv, logger })
   // }
 
-  const getOptions = require('./get-options')
-  return require('./commands/build')({argv, logger, getOptions})  
+  return require('./build/command')({argv, logger})  
 }
 
 process.on('uncaughtException', function(e) {
