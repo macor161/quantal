@@ -1,25 +1,22 @@
 #!/usr/bin/env node
 require('v8-compile-cache')
-
 const debug = require('debug')('main')
-debug('quantal start')
-
 const jsonPackage = require('../package.json')
 const {Logger} = require('./utils/logger')
 const logger = new Logger()
 
-main()
-
+/**
+ * Initial function called by Quantal CLI.
+ * Parse arguments and launch the corresponding command.
+ */
 async function main() {
   try {
+    debug('Quantal start')
+
     const argv = require('commander')
         .option('-w, --watch', 'Watch for changes')
-        // Ganache (serve) command is currently disabled
-        //.option('-s, --serve', 'Start a ganache server')
         .version(jsonPackage.version)
         .parse(process.argv)
-
-    debug('argv loaded')
 
     const command = loadCommand({argv, logger})
     debug('command loaded')
@@ -34,18 +31,13 @@ async function main() {
 
 function loadCommand({argv, logger}) {
   // TODO: commander.js doesn't support overriding the --version flag
-  // We are temporarily using the commander.version() function
+  // Temporarily using the commander.version() function
   // if (argv.version) {
   //     return require('./commands/version')({ argv, logger })
   // }
-  // else if (argv.s) {
-  if (argv.serve) {
-    const getOptions = require('./get-options')
-    return require('./commands/serve')({argv, logger, getOptions})
-  } else {
-    const getOptions = require('./get-options')
-    return require('./commands/build')({argv, logger, getOptions})
-  }
+
+  const getOptions = require('./get-options')
+  return require('./commands/build')({argv, logger, getOptions})  
 }
 
 process.on('uncaughtException', function(e) {
@@ -53,6 +45,4 @@ process.on('uncaughtException', function(e) {
   debug('Uncaught Error: %o', e.stack)
 })
 
-process.on('unhandledRejection', (error) => {
-  // truffle-compile throws an unhandled promise rejection.
-})
+main()
