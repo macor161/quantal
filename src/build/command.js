@@ -1,9 +1,19 @@
+/**
+ * @typedef {import('commander').Command} Command
+ */
 const chalk = require('chalk')
 const {formatErrors} = require('../formatting/format-error')
 const {formatWarnings} = require('../formatting/format-warnings')
 const getOptions = require('../get-options')
 
-module.exports = ({argv}) => {
+/**
+ * Returns the build command for Quantal CLI
+ * @param {Object} options
+ * @param {Command} options.argv CLI arguments
+ * @param {Object} options.logger Logger
+ * @returns {function} Build command
+ */
+function getBuildCmd({argv, logger}) {
     return async () => {        
         if (argv.watch) {
             const { buildWatch } = require('./build-watch')
@@ -16,11 +26,13 @@ module.exports = ({argv}) => {
             const results = await build(options)
 
             if (results.errors && results.errors.length) 
-                console.log(formatErrors(results.errors))
+                logger.log(formatErrors(results.errors))
             else if (results.warnings.length) 
-                console.log(formatWarnings(results.warnings))
+                logger.log(formatWarnings(results.warnings))
             else 
-                console.log(chalk.bold.green('Build successful'))                       
+                logger.log(chalk.bold.green('Build successful'))                       
         }
     }
 }
+
+module.exports = getBuildCmd
