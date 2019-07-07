@@ -19,6 +19,7 @@ function getBuildCmd({argv, logger}) {
             logger.log('Starting build in watch mode') 
             const { buildWatch } = require('./build-watch')
             const options = getOptions()
+            
             await buildWatch(options, {
                 onChange: onSourceFileChange,
                 onBuildComplete: handleBuildResults

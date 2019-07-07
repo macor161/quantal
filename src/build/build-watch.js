@@ -1,50 +1,69 @@
-const getOptions = require('../get-options')
+const { build } = require('./build')
 const getPath = require('../utils/get-path')
 const fs = require('fs')
+const { isObject } = require('lodash')
 const path = require('path')
-const { preloadCompiler} = require('../compiler/load-compiler')
+
+/**
+ * @typedef WatchOptions
+ * @property {function} onChange Called everytime a change is detected. Will prevent a new build if it returns `false`
+ * @property {function} onBuildStart Called everytime a build is started
+ * @property {function} onBuildComplete Called everytime a build is completed
+ */
+const DEFAULT_WATCH_OPTIONS = {
+  onChange: (eventType, fileName) => null,
+  onBuildStart: () => null,
+  onBuildComplete: results => null
+}
 
 /**
  * Build contracts and watch for changes
  * @param {Object} buildOptions Options
- * @param {Object} watchOptions Watch options
- * @param {function} watchOptions.onChange Called everytime a change is detected
- * @param {function} watchOptions.onBuildStart Called everytime a build is started
- * @param {function} watchOptions.onBuildComplete Called everytime a build is completed
+ * @param {WatchOptions} watchOptions Watch options
  */
 async function buildWatch(buildOptions, watchOptions) {
-  const globalOptions = getOptions()
-  console.log('Starting build task')
+  const { onChange, onBuildStart, onBuildComplete } = { ...DEFAULT_WATCH_OPTIONS, ...watchOptions }
+  
+  // Wrapper around the build function to prevent concurrent builds 
+  // e.g. When a file change is detected while a build is currently running 
+  const buildFn = preventConcurentCalls(async options => {
+    onBuildStart()
+    const buildResults = await build(options)
+    onBuildComplete(buildResults)
+  })
 
-  await preloadCompiler(globalOptions.compiler.version)
+  fs.watch(getPath('contracts'), async (eventType, fileName) => {
+    if (path.extname(fileName).toLowerCase() !== '.sol') 
+      return
 
-  const buildFn = preventConcurentCalls(build)
+    const onChangeResults = onChange(eventType, fileName)
 
-  if (options.watch) {
-    fs.watch(getPath('contracts'), async (eventType, fileName) => {
-      if (path.extname(fileName).toLowerCase() !== '.sol') {
-        return
-      }
+    // Don't rebuild if onChange returns `false`
+    if (onChangeResults === false)
+      return
 
-      console.log(`${eventType} file change: ${fileName}`)
-      await buildFn(options)
-    })
-  }
-  await buildFn(options)
+    // Use onChange returned value as new build options
+    const newBuildOptions = isObject(onChangeResults)
+      ? onChangeResults
+      : buildOptions
+
+    await buildFn(newBuildOptions)
+  })
+  
+  await buildFn(buildOptions)
 }
 
 
 /**
  * Prevent an async function to be called multiple times while still running
- * @param {Function} fn
+ * @param {function} fn
  */
 function preventConcurentCalls(fn) {
   let isRunning = false
 
   return async function(...args) {
-    if (isRunning) {
-      return
-    }
+    if (isRunning) 
+      return    
 
     isRunning = true
     const returnedValue = await fn(...args)
