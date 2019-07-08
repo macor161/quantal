@@ -1,6 +1,6 @@
 const solcCompile = require('./compiler')
 const mkdirp = require('mkdirp')
-const {callbackify, promisify} = require('util')
+const {promisify} = require('util')
 const Config = require('./truffle-config')
 const expect = require('truffle-expect')
 const Resolver = require('truffle-resolver')
@@ -8,43 +8,33 @@ const Artifactor = require('truffle-artifactor')
 const DEFAULT_COMPILER = 'solc'
 
 module.exports = function compileContracts(options) {
-  return new Promise((res, rej) => {
     // Currently recompiles all contracts everytime to make sure
     // we receive all warning messages
     const config = Config.detect({all: true})
-
-    Contracts.compile(config, (err, result) => {
-      if (err) {
-        return rej(err)
-      }
-      res(result)
-    })
-  })
+    return Contracts.compile(config)
 }
 
-// Oroginal source: https://github.com/trufflesuite/truffle/blob/develop/packages/truffle-workflow-compile/index.js
 
 const SUPPORTED_COMPILERS = {
   solc: solcCompile,
-};
+}
 
 function prepareConfig(options) {
-  expect.options(options, ['contracts_build_directory']);
-
-  expect.one(options, ['contracts_directory', 'files']);
+  expect.options(options, ['contracts_build_directory'])
+  expect.one(options, ['contracts_directory', 'files'])
 
   // Use a config object to ensure we get the default sources.
-  const config = Config.default().merge(options);
+  const config = Config.default().merge(options)
 
-  config.compilersInfo = {};
+  config.compilersInfo = {}
 
-  if (!config.resolver) config.resolver = new Resolver(config);
+  if (!config.resolver) config.resolver = new Resolver(config)
 
   if (!config.artifactor) {
-    config.artifactor = new Artifactor(config.contracts_build_directory);
+    config.artifactor = new Artifactor(config.contracts_build_directory)
   }
 
-  return config;
+  return config
 }
 
 function multiPromisify(func) {
@@ -85,13 +75,13 @@ const Contracts = {
   // network_id: network id to link saved contract artifacts.
   // quiet: Boolean. Suppress output. Defaults to false.
   // strict: Boolean. Return compiler warnings as errors. Defaults to false.
-  compile: callbackify(async function(options) {
+  compile: async function(options) {
     const config = prepareConfig(options)
 
     const compilations = await this.compileSources(config)
 
-    return await this.collectCompilations(compilations);
-  }),
+    return this.collectCompilations(compilations)
+  },
 
   compileSources: async function(config, compilers) {
     const compile = SUPPORTED_COMPILERS[DEFAULT_COMPILER];
