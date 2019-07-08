@@ -26,7 +26,7 @@ async function buildWatch(buildOptions, watchOptions) {
   
   // Wrapper around the build function to prevent concurrent builds 
   // e.g. When a file change is detected while a build is currently running 
-  const buildFn = preventConcurentCalls(async options => {
+  const wrappedBuild = preventConcurentCalls(async options => {
     onBuildStart()
     const buildResults = await build(options)
     onBuildComplete(buildResults)
@@ -47,10 +47,10 @@ async function buildWatch(buildOptions, watchOptions) {
       ? onChangeResults
       : buildOptions
 
-    await buildFn(newBuildOptions)
+    await wrappedBuild(newBuildOptions)
   })
   
-  await buildFn(buildOptions)
+  await wrappedBuild(buildOptions)
 }
 
 

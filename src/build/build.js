@@ -1,16 +1,15 @@
-const solcCompile = require('../compiler')
 const { mkdirp } = require('fs-extra')
-const Config = require('../truffle-config')
 const expect = require('truffle-expect')
 const Resolver = require('truffle-resolver')
 const Artifactor = require('truffle-artifactor')
+const Config = require('../truffle-config')
+const solcCompile = require('../compiler')
 const { preloadCompiler} = require('../compiler/load-compiler')
-
-const DEFAULT_COMPILER = 'solc'
-
+const multiPromisify = require('../utils/multi-promisify')
 
 /**
- * Build contracts
+ * Build contracts from Solidity sources and write output
+ * artifacts to json files
  * @param {Object} options Options
  */
 async function build(options) {
@@ -74,26 +73,14 @@ async function compileSources(config) {
   if (contracts && Object.keys(contracts).length > 0) 
     await writeContracts(contracts, config)    
 
-  return {contracts, output, warnings}
-  
+  return {contracts, output, warnings}  
 }
+
 
 async function writeContracts(contracts, options) {
   await mkdirp(options.contracts_build_directory)
   await options.artifactor.saveAll(contracts, {network_id: options.network_id})
 }
 
-function multiPromisify(func) {
-  return (...args) =>
-    new Promise((accept, reject) => {
-      const callback = (err, ...results) => {
-        if (err) reject(err)
-
-        accept(results)
-      }
-
-      func(...args, callback)
-    })
-}
 
 module.exports = { build }

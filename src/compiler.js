@@ -1,4 +1,3 @@
-require('v8-compile-cache')
 const debug = require('debug')('compile')
 const compiler = require('./compiler/multiprocess-compiler')
 const OS = require('os')
@@ -150,7 +149,6 @@ const compile = function(sources, options, callback) {
     }
 
     if (errors.length > 0) {
-      options.logger.log('');
       // TODO: Add back the truffle error
       // errors = errors.map(error => error.formattedMessage).join();
       // if (errors.includes("requires different compiler version")) {
