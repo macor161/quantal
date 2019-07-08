@@ -1,4 +1,4 @@
-const {Batch} = require('./batch')
+const { Batch } = require('./batch')
 
 /**
  * Separate compilation work of a dependency tree into multiple
@@ -26,8 +26,8 @@ function dispatchWork(tree, batchNumber = 1) {
  */
 function createEmptyBatches(batchNumber) {
   return Array
-      .from({length: batchNumber})
-      .map(() => new Batch())
+    .from({ length: batchNumber })
+    .map(() => new Batch())
 }
 
 /**
@@ -45,8 +45,8 @@ function getMinimumWorkloadConfiguration(batches, branch) {
   for (const [i] of batches.entries()) {
     const trialBatch = batches.map((k, index) => {
       return index === i
-                ? newBatches[index]
-                : batches[index]
+        ? newBatches[index]
+        : batches[index]
     })
     const workload = getWorkload(trialBatch)
 
@@ -75,4 +75,4 @@ function getWorkload(batches) {
   return largestWorkload
 }
 
-module.exports = {dispatchWork}
+module.exports = { dispatchWork }

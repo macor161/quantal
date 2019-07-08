@@ -41,29 +41,6 @@ class Batch {
   }
 }
 
-/**
- * Returns the hash for an array of Batch objects
- * @param {Batch[]} batches
- */
-function batchArrayHash(batches) {
-  return batches
-      .map((batch) => batch.hash())
-      .sort()
-      .join(';')
-}
 
-/**
- * Adds a range of values to a Set object.
- * Doesn't return a new Set object.
- * @param {any[]} values
- * @param {Set} set
- */
-/* function addRange(values, set) {
-  for (const value of values) {
-    set.add(value)
-  }
 
-  return set
-} */
-
-module.exports = {Batch, batchArrayHash}
+module.exports = { Batch }

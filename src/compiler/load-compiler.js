@@ -16,15 +16,13 @@ const LATEST_VERSION = '0.5.9'
  */
 async function preloadCompiler(version = LATEST_VERSION) {
   version = getFormattedVersion(version)
-  if (!isOsSupported(getOs())) {
-    throw new Error(`Unsupported OS: ${getOs()}`)
-  }
+  if (!isOsSupported(getOs())) 
+    throw new Error(`Unsupported OS: ${getOs()}`)  
 
   const cachedCompilerPath = await getCachedCompilerPath(version)
 
-  if (!(await exists(cachedCompilerPath))) {
-    await downloadCompiler(version)
-  }
+  if (!(await exists(cachedCompilerPath))) 
+    await downloadCompiler(version)  
 
   chmodSync(cachedCompilerPath, '755')
 }
@@ -97,8 +95,7 @@ function downloadCompiler(version) {
 
     const fileRequest = progress(request(url), {
       throttle: 500,
-    })
-      .on('progress', (state) => {
+    }).on('progress', (state) => {
         progressBar.update(parseInt(state.percent * 100))
       })
       .on('response', (response) => {
@@ -115,7 +112,7 @@ function downloadCompiler(version) {
         }
       })
       .on('error', (err) => {
-
+        rej(err)
       })
       .on('end', () => {
         progressBar.update(100)
