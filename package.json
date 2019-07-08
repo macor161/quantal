@@ -35,7 +35,6 @@
     "import-fresh": "^3.0.0",
     "line-column": "^1.0.2",
     "lodash": "^4.17.11",
-    "mkdirp": "^0.5.1",
     "multispinner": "^0.2.1",
     "ora": "^3.4.0",
     "original-require": "1.0.1",

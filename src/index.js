@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 require('v8-compile-cache')
+require('./utils/setup-debug')
+
 const debug = require('debug')('main')
 const jsonPackage = require('../package.json')
 const {Logger} = require('./utils/logger')
@@ -35,9 +37,7 @@ function loadCommand({argv, logger}) {
   // if (argv.version) {
   //     return require('./commands/version')({ argv, logger })
   // }
-
-  const getOptions = require('./get-options')
-  return require('./commands/build')({argv, logger, getOptions})  
+  return require('./build/command')({argv, logger})  
 }
 
 process.on('uncaughtException', function(e) {

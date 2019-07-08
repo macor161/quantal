@@ -7,7 +7,7 @@ const chalk = require('chalk')
 const outdent = require('outdent')
 const {cwd} = require('process')
 const {relative} = require('path')
-const {map} = require('../template-literals')
+const {map} = require('../utils/template-literals')
 
 
 /**
