@@ -20,18 +20,12 @@ const _ = require('lodash')
 //   quiet: false,
 //   logger: console
 // }
-const compile = function(sources, options, callback) {
-  if (typeof options === 'function') {
-    callback = options
-    options = {}
-  }
-
+const compile = function(sources, options) {
   const solcVersion = getOptions().compiler.version
   options.compilers.solc.version = solcVersion
 
-  if (!options.logger) {
-    options.logger = console
-  }
+  if (!options.logger) 
+    options.logger = console  
 
   const hasTargets =
     options.compilationTargets && options.compilationTargets.length
