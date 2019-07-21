@@ -21,6 +21,7 @@ const _ = require('lodash')
 //   logger: console
 // }
 const compile = function(sources, options) {
+  return new Promise((res,rej) => {
   const solcVersion = getOptions().compiler.version
   options.compilers.solc.version = solcVersion
 
@@ -117,7 +118,12 @@ const compile = function(sources, options) {
 
   // Nothing to compile? Bail.
   if (Object.keys(sources).length === 0) {
-    return callback(null, [], [])
+    return res({
+      contracts: [], 
+      files: {},
+      compilerInfo: null,
+      warnings: []
+    })
   }
 
   const onCompiled = (standardOutput) => {
@@ -153,7 +159,9 @@ const compile = function(sources, options) {
       //     `\nError: Truffle is currently using solc ${configSolcVer}, but one or more of your contracts specify "${contractSolcVer}".\nPlease update your truffle config or pragma statement(s).\n(See https://truffleframework.com/docs/truffle/reference/configuration#compiler-configuration for information on\nconfiguring Truffle to use a specific solc compiler version.)`
       //   );
       // }
-      return Promise.all(errors.map((err) => detailedError(err))).then(callback)
+      return Promise
+        .all(errors.map((err) => detailedError(err)))
+        .then(errors => rej(errors))
     }
 
     const contracts = standardOutput.contracts;
@@ -248,16 +256,20 @@ const compile = function(sources, options) {
       });
     });
 
-    const compilerInfo = {name: 'solc', version: getFormattedVersion(solcVersion)};
+    const compilerInfo = {name: 'solc', version: getFormattedVersion(solcVersion)}
 
     Promise.all(warnings.map((warn) => detailedError(warn, standardOutput.sources[_.get(warn, ['sourceLocation', 'file'])])))
-        .then((warnings) => callback(null, returnVal, files, compilerInfo, warnings))
+        .then((warnings) => {
+          return res({ contracts: returnVal, files, compilerInfo, warnings })
+        })
   }
 
   
   debug('Starting compilation')
   compiler(operatingSystemIndependentSources, compilerSettings, options.compilers.solc.version)
       .then(onCompiled)
+
+  })
 }
 
 function replaceLinkReferences(bytecode, linkReferences, libraryName) {
@@ -349,14 +361,16 @@ function orderABI(contract) {
 // contracts_directory: String. Directory where .sol files can be found.
 // quiet: Boolean. Suppress output. Defaults to false.
 // strict: Boolean. Return compiler warnings as errors. Defaults to false.
-compile.all = function(options, callback) {
-  debug('compile.all started')
-  find_contracts(options.contracts_directory, function(err, files) {
-    if (err) return callback(err);
-    options.paths = files;
-    compile.with_dependencies(options, callback);
-  });
-};
+compile.all = function(options) {
+  return new Promise((res, rej) => { 
+    debug('compile.all started')
+    find_contracts(options.contracts_directory, function(err, files) {
+      if (err) return rej(err)
+      options.paths = files
+      res(compile.with_dependencies(options))
+    })
+  })
+}
 
 // contracts_directory: String. Directory where .sol files can be found.
 // build_directory: String. Optional. Directory where .sol.js files can be found. Only required if `all` is false.
@@ -364,47 +378,56 @@ compile.all = function(options, callback) {
 //      in the build directory to see what needs to be compiled.
 // quiet: Boolean. Suppress output. Defaults to false.
 // strict: Boolean. Return compiler warnings as errors. Defaults to false.
-compile.necessary = function(options, callback) {
-  options.logger = options.logger || console;
+compile.necessary = function(options) {
+  return new Promise((res, rej) => { 
+    options.logger = options.logger || console
 
-  Profiler.updated(options, function(err, updated) {
-    if (err) return callback(err);
+    Profiler.updated(options, function(err, updated) {
+      if (err) return rej(err)
 
-    if (updated.length === 0 && options.quiet !== true) {
-      return callback(null, [], {});
-    }
-
-    options.paths = updated;
-    compile.with_dependencies(options, callback);
-  });
-};
-
-compile.with_dependencies = function(options, callback) {
-  options.logger = options.logger || console;
-  options.contracts_directory = options.contracts_directory || process.cwd();
-
-  expect.options(options, [
-    'paths',
-    'working_directory',
-    'contracts_directory',
-    'resolver',
-  ]);
-
-  const config = Config.default().merge(options);
-
-  Profiler.required_sources(
-      config.with({
-        paths: options.paths,
-        base_path: options.contracts_directory,
-        resolver: options.resolver,
-      }),
-      (err, allSources, required) => {
-        if (err) return callback(err);
-
-        options.compilationTargets = required;
-        compile(allSources, options, callback);
+      if (updated.length === 0 && options.quiet !== true) {
+        return res({
+          contracts: [], 
+          files: {},
+          compilerInfo: null,
+          warnings: []
+        })
       }
-  );
+
+      options.paths = updated;
+      res(compile.with_dependencies(options))
+    })
+  })
+}
+
+compile.with_dependencies = function(options) {
+  return new Promise((res, rej) => { 
+    options.logger = options.logger || console;
+    options.contracts_directory = options.contracts_directory || process.cwd();
+
+    expect.options(options, [
+      'paths',
+      'working_directory',
+      'contracts_directory',
+      'resolver',
+    ])
+
+    const config = Config.default().merge(options)
+
+    Profiler.required_sources(
+        config.with({
+          paths: options.paths,
+          base_path: options.contracts_directory,
+          resolver: options.resolver,
+        }),
+        (err, allSources, required) => {
+          if (err) return rej(err)
+
+          options.compilationTargets = required
+          res(compile(allSources, options))
+        }
+    );
+  })
 };
 
 module.exports = compile

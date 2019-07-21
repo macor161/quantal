@@ -19,7 +19,7 @@ async function build(options) {
     const compilation = await compileSources(config)
 
     return {
-      outputs: { [compilation.compiler]: compilation.output },
+      outputs: { [compilation.compiler]: compilation.files },
       contracts: compilation.contracts,
       warnings: compilation.warnings || [],
       errors: []
@@ -60,20 +60,18 @@ async function compileSources(config) {
       ? solcCompile.all
       : solcCompile.necessary
 
-  const [contracts, output, compilerUsed, warnings] = await multiPromisify(
-      compileFunc
-  )(config)
+  const {contracts, files, compilerInfo, warnings} = await compileFunc(config)
 
-  if (compilerUsed) {
-    config.compilersInfo[compilerUsed.name] = {
-      version: compilerUsed.version,
+  if (compilerInfo) {
+    config.compilersInfo[compilerInfo.name] = {
+      version: compilerInfo.version,
     }
   }
 
   if (contracts && Object.keys(contracts).length > 0) 
     await writeContracts(contracts, config)    
 
-  return {contracts, output, warnings}  
+  return {contracts, files, warnings}  
 }
 
 
