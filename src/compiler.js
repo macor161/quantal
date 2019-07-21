@@ -9,6 +9,19 @@ const detailedError = require('./detailed-error')
 const {getFormattedVersion} = require('./compiler/load-compiler')
 const getOptions = require('./get-options')
 const _ = require('lodash')
+const defaultSelectors = {
+  '': ['legacyAST', 'ast'],
+  '*': [
+    'abi',
+    'metadata',
+    'evm.bytecode.object',
+    'evm.bytecode.sourceMap',
+    'evm.deployedBytecode.object',
+    'evm.deployedBytecode.sourceMap',
+    'userdoc',
+    'devdoc',
+  ],
+}
 
 // Most basic of the compile commands. Takes a hash of sources, where
 // the keys are file or module paths and the values are the bodies of
@@ -56,49 +69,12 @@ const compile = function(sources, options) {
     options.compilers.solc.settings.evmVersion = options.solc.evmVersion
     options.compilers.solc.settings.optimizer = options.solc.optimizer
   }
-
-  // Ensure sources have operating system independent paths
-  // i.e., convert backslashes to forward slashes; things like C: are left intact.
-  const operatingSystemIndependentSources = {}
-  const operatingSystemIndependentTargets = {}
-  const originalPathMappings = {}
-
-  Object.keys(sources).forEach(function(source) {
-    // Turn all backslashes into forward slashes
-    let replacement = source.replace(/\\/g, '/')
-
-    // Turn G:/.../ into /G/.../ for Windows
-    if (replacement.length >= 2 && replacement[1] === ':') {
-      replacement = '/' + replacement;
-      replacement = replacement.replace(':', '')
-    }
-
-    // Save the result
-    operatingSystemIndependentSources[replacement] = sources[source]
-
-    // Just substitute replacement for original in target case. It's
-    // a disposable subset of `sources`
-    if (hasTargets && options.compilationTargets.includes(source)) {
-      operatingSystemIndependentTargets[replacement] = sources[source]
-    }
-
-    // Map the replacement back to the original source path.
-    originalPathMappings[replacement] = source;
-  })
-
-  const defaultSelectors = {
-    '': ['legacyAST', 'ast'],
-    '*': [
-      'abi',
-      'metadata',
-      'evm.bytecode.object',
-      'evm.bytecode.sourceMap',
-      'evm.deployedBytecode.object',
-      'evm.deployedBytecode.sourceMap',
-      'userdoc',
-      'devdoc',
-    ],
-  }
+  
+  const { 
+    operatingSystemIndependentSources,
+    operatingSystemIndependentTargets,
+    originalPathMappings
+  } = formatPaths(sources, hasTargets)
 
   // Specify compilation targets
   // Each target uses defaultSelectors, defaulting to single target `*` if targets are unspecified
@@ -270,6 +246,46 @@ const compile = function(sources, options) {
       .then(onCompiled)
 
   })
+}
+
+/**
+ * Ensure sources have operating system independent paths
+ * i.e., convert backslashes to forward slashes; things like C: are left intact.
+ */
+function formatPaths(sources, hasTargets) {
+
+  const operatingSystemIndependentSources = {}
+  const operatingSystemIndependentTargets = {}
+  const originalPathMappings = {}
+
+  Object.keys(sources).forEach(function(source) {
+    // Turn all backslashes into forward slashes
+    let replacement = source.replace(/\\/g, '/')
+
+    // Turn G:/.../ into /G/.../ for Windows
+    if (replacement.length >= 2 && replacement[1] === ':') {
+      replacement = '/' + replacement;
+      replacement = replacement.replace(':', '')
+    }
+
+    // Save the result
+    operatingSystemIndependentSources[replacement] = sources[source]
+
+    // Just substitute replacement for original in target case. It's
+    // a disposable subset of `sources`
+    if (hasTargets && options.compilationTargets.includes(source)) {
+      operatingSystemIndependentTargets[replacement] = sources[source]
+    }
+
+    // Map the replacement back to the original source path.
+    originalPathMappings[replacement] = source;
+  })
+
+  return {
+    operatingSystemIndependentSources,
+    operatingSystemIndependentTargets,
+    originalPathMappings
+  }
 }
 
 function replaceLinkReferences(bytecode, linkReferences, libraryName) {
