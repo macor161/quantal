@@ -136,7 +136,6 @@ const compile = function(sources, options) {
       const returnVal = { };
 
       // This block has comments in it as it's being prepared for solc > 0.4.10
-      console.log('contract: ', Object.keys(contracts))
       Object.keys(contracts).forEach((source_path) => {
         const files_contracts = contracts[source_path];
 
@@ -230,6 +229,7 @@ const compile = function(sources, options) {
     
     debug('Starting compilation')
     const standardOutput = await compiler(operatingSystemIndependentSources, compilerSettings, options.compilers.solc.version)
+    console.log('sources: ', standardOutput.sources)
     onCompiled(standardOutput)
 
   })

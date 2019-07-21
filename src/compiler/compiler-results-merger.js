@@ -1,7 +1,7 @@
 class CompilerResultsMerger {
 
     constructor(compilerResults = []) {
-        this._lastAstId = 0
+        this._lastSourceId = 0
         this._lastAstNodeId = 0
         this._results = {
             contracts: {},
@@ -14,7 +14,18 @@ class CompilerResultsMerger {
     }
 
     addResults(compilerResults) {
-        this._results.sources = { ...(this._results.sources), ...(compilerResults.sources) }
+        //console.log('sources: ', compilerResults.sources)
+        let lastSourceId = this._lastSourceId
+        for (const [path, source] of Object.entries(compilerResults.sources)) {
+            source.id += this._lastSourceId
+            this._results.sources[path] = source
+
+            if (lastSourceId < source.id)
+                lastSourceId = source.id
+        }
+
+        this._lastSourceId = lastSourceId + 1
+
         this._results.contracts = { ...(this._results.contracts), ...(compilerResults.contracts) }
 
         if (compilerResults.errors)
