@@ -5,6 +5,7 @@ const cpus = os.cpus()
 const Worker = require('./worker')
 const { basename } = require('path')
 const { dispatchWork } = require('./dispatch-work')
+const { CompilerResultsMerger } = require('./compiler-results-merger')
 const Multispinner = require('multispinner')
 const chalk = require('chalk')
 
@@ -70,21 +71,11 @@ module.exports = function (sources, options, solcVersion) {
       }))
       .then((results) => {
         debug('merging results')
-        const result = results[0]
-        // debug(`results ${0}: %o`, results[0])
-        for (let i = 1; i < results.length; i++) {
-          // debug(`results ${i}: %o`, results[i])
-          result.sources = { ...result.sources, ...(results[i].sources) }
-
-          if (results[i].errors) {
-            result.errors = (result.errors || []).concat(results[i].errors)
-          }
-
-          result.contracts = { ...result.contracts, ...(results[i].contracts) }
-        }
+        //const result = results[0]
+        const merger = new CompilerResultsMerger(results)
 
         debug('results merged')
-        res(result)
+        res(merger.getResults())
         workers.forEach((worker) => worker.close())
       })
   })
@@ -102,3 +93,5 @@ function initWorkers(solcVersion, options) {
 function unique(items) {
   return Array.from(new Set(items))
 }
+
+

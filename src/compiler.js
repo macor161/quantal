@@ -96,11 +96,11 @@ const compile = function(sources, options) {
       })
     }
 
-    const onCompiled = (standardOutput) => {
+    const onCompiled = async (standardOutput) => {
       debug('Compilation done')
 
       let errors = standardOutput.errors || []
-
+      //console.log('standardOutput: ', standardOutput.contracts['/Users/mathew/workspace/quantal/test/test-project/contracts/ERC20.sol'].ERC20)
       let warnings = []
 
       if (options.strict !== true) {
@@ -119,9 +119,10 @@ const compile = function(sources, options) {
         //     `\nError: Truffle is currently using solc ${configSolcVer}, but one or more of your contracts specify "${contractSolcVer}".\nPlease update your truffle config or pragma statement(s).\n(See https://truffleframework.com/docs/truffle/reference/configuration#compiler-configuration for information on\nconfiguring Truffle to use a specific solc compiler version.)`
         //   );
         // }
-        return Promise
+        const detailedErrors = await Promise
           .all(errors.map((err) => detailedError(err)))
-          .then(errors => rej(errors))
+
+        rej(detailedErrors)
       }
 
       const contracts = standardOutput.contracts;
@@ -135,11 +136,13 @@ const compile = function(sources, options) {
       const returnVal = { };
 
       // This block has comments in it as it's being prepared for solc > 0.4.10
+      console.log('contract: ', Object.keys(contracts))
       Object.keys(contracts).forEach((source_path) => {
         const files_contracts = contracts[source_path];
 
         Object.keys(files_contracts).forEach((contract_name) => {
           const contract = files_contracts[contract_name];
+          //console.log('contract ' + contract_name + ': ', contract)
 
           // All source will have a key, but only the compiled source will have
           // the evm output.
