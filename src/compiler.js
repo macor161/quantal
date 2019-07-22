@@ -29,7 +29,6 @@ const defaultSelectors = {
 //
 // Default options:
 // {
-//   strict: false,
 //   quiet: false,
 // }
 const compile = function(sources, options) {
@@ -99,43 +98,20 @@ const compile = function(sources, options) {
     const onCompiled = async (standardOutput) => {
       debug('Compilation done')
 
-      let errors = standardOutput.errors || []
-      //console.log('standardOutput: ', standardOutput.contracts['/Users/mathew/workspace/quantal/test/test-project/contracts/ERC20.sol'].ERC20)
-      let warnings = []
+      const { contracts, sources, errors: allErrors = [] } = standardOutput
+      const warnings = allErrors.filter((error) => error.severity === 'warning')
+      const errors = allErrors.filter((error) => error.severity !== 'warning')      
 
-      if (options.strict !== true) {
-        warnings = errors.filter((error) => error.severity === 'warning')
-        errors = errors.filter((error) => error.severity !== 'warning')
-      }
+      if (errors.length > 0) 
+        return rej(await Promise.all(errors.map((err) => detailedError(err))))      
 
-      if (errors.length > 0) {
-        // TODO: Add back the truffle error
-        // errors = errors.map(error => error.formattedMessage).join();
-        // if (errors.includes("requires different compiler version")) {
-        //   const contractSolcVer = errors.match(/pragma solidity[^;]*/gm)[0];
-        //   const configSolcVer =
-        //     options.compilers.solc.version || semver.valid(solc.version());
-        //   errors = errors.concat(
-        //     `\nError: Truffle is currently using solc ${configSolcVer}, but one or more of your contracts specify "${contractSolcVer}".\nPlease update your truffle config or pragma statement(s).\n(See https://truffleframework.com/docs/truffle/reference/configuration#compiler-configuration for information on\nconfiguring Truffle to use a specific solc compiler version.)`
-        //   );
-        // }
-        const detailedErrors = await Promise
-          .all(errors.map((err) => detailedError(err)))
+      const files = []      
+      for (const [filePath, source] of Object.entries(sources))
+        files[source.id] = originalPathMappings[filePath]
 
-        rej(detailedErrors)
-      }
+      const returnVal = {}
+      console.log('contracts: ', contracts)
 
-      const contracts = standardOutput.contracts;
-
-      const files = [];
-      Object.keys(standardOutput.sources).forEach((filename) => {
-        const source = standardOutput.sources[filename];
-        files[source.id] = originalPathMappings[filename];
-      });
-
-      const returnVal = { };
-
-      // This block has comments in it as it's being prepared for solc > 0.4.10
       Object.keys(contracts).forEach((source_path) => {
         const files_contracts = contracts[source_path];
 
@@ -153,8 +129,8 @@ const compile = function(sources, options) {
             source: operatingSystemIndependentSources[source_path],
             sourceMap: contract.evm.bytecode.sourceMap,
             deployedSourceMap: contract.evm.deployedBytecode.sourceMap,
-            legacyAST: standardOutput.sources[source_path].legacyAST,
-            ast: standardOutput.sources[source_path].ast,
+            legacyAST: sources[source_path].legacyAST,
+            ast: sources[source_path].ast,
             abi: contract.abi,
             metadata: contract.metadata,
             bytecode: '0x' + contract.evm.bytecode.object,
@@ -175,12 +151,10 @@ const compile = function(sources, options) {
           // Go through the link references and replace them with older-style
           // identifiers. We'll do this until we're ready to making a breaking
           // change to this code.
-          Object.keys(contract.evm.bytecode.linkReferences).forEach(function(
-              file_name
-          ) {
+          Object.keys(contract.evm.bytecode.linkReferences).forEach(file_name => {
             const fileLinks = contract.evm.bytecode.linkReferences[file_name];
 
-            Object.keys(fileLinks).forEach(function(library_name) {
+            Object.keys(fileLinks).forEach(library_name => {
               const linkReferences = fileLinks[library_name] || [];
 
               contract_definition.bytecode = replaceLinkReferences(
@@ -197,12 +171,10 @@ const compile = function(sources, options) {
           });
 
           // Now for the deployed bytecode
-          Object.keys(contract.evm.deployedBytecode.linkReferences).forEach(
-              function(file_name) {
-                const fileLinks =
-                  contract.evm.deployedBytecode.linkReferences[file_name];
+          Object.keys(contract.evm.deployedBytecode.linkReferences).forEach(file_name => {
+                const fileLinks = contract.evm.deployedBytecode.linkReferences[file_name]
 
-                Object.keys(fileLinks).forEach(function(library_name) {
+                Object.keys(fileLinks).forEach(library_name => {
                   const linkReferences = fileLinks[library_name] || [];
 
                   contract_definition.deployedBytecode = replaceLinkReferences(
@@ -229,7 +201,6 @@ const compile = function(sources, options) {
     
     debug('Starting compilation')
     const standardOutput = await compiler(operatingSystemIndependentSources, compilerSettings, options.compilers.solc.version)
-    console.log('sources: ', standardOutput.sources)
     onCompiled(standardOutput)
 
   })
@@ -363,7 +334,6 @@ function orderABI(contract) {
 
 // contracts_directory: String. Directory where .sol files can be found.
 // quiet: Boolean. Suppress output. Defaults to false.
-// strict: Boolean. Return compiler warnings as errors. Defaults to false.
 compile.all = function(options) {
   return new Promise((res, rej) => { 
     debug('compile.all started')
@@ -380,7 +350,6 @@ compile.all = function(options) {
 // all: Boolean. Compile all sources found. Defaults to true. If false, will compare sources against built files
 //      in the build directory to see what needs to be compiled.
 // quiet: Boolean. Suppress output. Defaults to false.
-// strict: Boolean. Return compiler warnings as errors. Defaults to false.
 compile.necessary = function(options) {
   return new Promise((res, rej) => { 
     Profiler.updated(options, function(err, updated) {

@@ -14,8 +14,8 @@ class CompilerResultsMerger {
     }
 
     addResults(compilerResults) {
-        //console.log('sources: ', compilerResults.sources)
         let lastSourceId = this._lastSourceId
+
         for (const [path, source] of Object.entries(compilerResults.sources)) {
             source.id += this._lastSourceId
             this._results.sources[path] = source
@@ -25,7 +25,6 @@ class CompilerResultsMerger {
         }
 
         this._lastSourceId = lastSourceId + 1
-
         this._results.contracts = { ...(this._results.contracts), ...(compilerResults.contracts) }
 
         if (compilerResults.errors)
