@@ -1,14 +1,14 @@
 const debug = require('debug')('compile')
 const compiler = require('./compiler/multiprocess-compiler')
-const OS = require('os')
 const Profiler = require('./profiler')
 const expect = require('truffle-expect')
-const find_contracts = require('truffle-contract-sources')
+const { findContractFiles } = require('./find-contract-files')
 const Config = require('./truffle-config')
 const detailedError = require('./detailed-error')
 const {getFormattedVersion} = require('./compiler/load-compiler')
 const getOptions = require('./get-options')
 const _ = require('lodash')
+
 const defaultSelectors = {
   '': ['legacyAST', 'ast'],
   '*': [
@@ -23,11 +23,11 @@ const defaultSelectors = {
   ],
 }
 
+
 // Most basic of the compile commands. Takes a hash of sources, where
 // the keys are file or module paths and the values are the bodies of
 // the contracts. Does not evaulate dependencies that aren't already given.
-const compile = function(inputSources, options) {
-  return new Promise(async (res,rej) => {
+const compile = async function(inputSources, options) {
     const solcVersion = getOptions().compiler.version
     options.compilers.solc.version = solcVersion
     const compilerInfo = { name: 'solc', version: getFormattedVersion(solcVersion) }
@@ -82,12 +82,12 @@ const compile = function(inputSources, options) {
 
     // Nothing to compile? Bail.
     if (Object.keys(inputSources).length === 0) {
-      return res({
+      return {
         contracts: [], 
         files: {},
         compilerInfo: null,
         warnings: []
-      })
+      }
     }
 
     debug('Starting compilation')
@@ -100,7 +100,7 @@ const compile = function(inputSources, options) {
     const errors = allErrors.filter((error) => error.severity !== 'warning')      
 
     if (errors.length > 0) 
-      return rej(await Promise.all(errors.map((err) => detailedError(err))))      
+      throw(await Promise.all(errors.map((err) => detailedError(err))))
 
     const files = []      
     for (const [filePath, source] of Object.entries(sources))
@@ -184,13 +184,11 @@ const compile = function(inputSources, options) {
     })
 
     
-    Promise.all(warnings.map((warn) => detailedError(warn, standardOutput.sources[_.get(warn, ['sourceLocation', 'file'])])))
-        .then((warnings) => {
-          return res({ contracts: returnVal, files, compilerInfo, warnings })
-        })
-    
+    const detailedWarnings = await Promise.all(
+      warnings.map((warn) => detailedError(warn, sources[_.get(warn, ['sourceLocation', 'file'])]))
+    )
 
-  })
+    return { contracts: returnVal, files, compilerInfo, warnings: detailedWarnings }  
 }
 
 /**
@@ -320,15 +318,10 @@ function orderABI(contract) {
 }
 
 // contracts_directory: String. Directory where .sol files can be found.
-compile.all = function(options) {
-  return new Promise((res, rej) => { 
+compile.all = async function(options) {
     debug('compile.all started')
-    find_contracts(options.contracts_directory, function(err, files) {
-      if (err) return rej(err)
-      options.paths = files
-      res(compile.with_dependencies(options))
-    })
-  })
+    options.paths = await findContractFiles(options.contracts_directory)
+    return compile.with_dependencies(options)
 }
 
 // contracts_directory: String. Directory where .sol files can be found.
