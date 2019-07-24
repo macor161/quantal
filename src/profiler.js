@@ -1,5 +1,6 @@
 // Compares .sol files to their .sol.js counterparts,
 // determines which .sol files have been updated.
+// Original source code: https://github.com/trufflesuite/truffle/blob/v5.0.10/packages/truffle-compile/profiler.js
 
 const path = require('path');
 const async = require('async');

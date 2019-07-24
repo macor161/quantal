@@ -1,3 +1,5 @@
+// Original source code: https://github.com/trufflesuite/truffle/blob/v5.0.10/packages/truffle-compile/index.js
+
 const debug = require('debug')('compile')
 const compiler = require('./compiler/multiprocess-compiler')
 const Profiler = require('./profiler')
@@ -7,6 +9,7 @@ const Config = require('./truffle-config')
 const detailedError = require('./detailed-error')
 const {getFormattedVersion} = require('./compiler/load-compiler')
 const getOptions = require('./get-options')
+const { formatPaths } = require('./utils/format-paths')
 const _ = require('lodash')
 
 const defaultSelectors = {
@@ -191,45 +194,7 @@ const compile = async function(inputSources, options) {
     return { contracts: returnVal, files, compilerInfo, warnings: detailedWarnings }  
 }
 
-/**
- * Ensure sources have operating system independent paths
- * i.e., convert backslashes to forward slashes; things like C: are left intact.
- */
-function formatPaths(sources, hasTargets) {
 
-  const operatingSystemIndependentSources = {}
-  const operatingSystemIndependentTargets = {}
-  const originalPathMappings = {}
-
-  Object.keys(sources).forEach(function(source) {
-    // Turn all backslashes into forward slashes
-    let replacement = source.replace(/\\/g, '/')
-
-    // Turn G:/.../ into /G/.../ for Windows
-    if (replacement.length >= 2 && replacement[1] === ':') {
-      replacement = '/' + replacement;
-      replacement = replacement.replace(':', '')
-    }
-
-    // Save the result
-    operatingSystemIndependentSources[replacement] = sources[source]
-
-    // Just substitute replacement for original in target case. It's
-    // a disposable subset of `sources`
-    if (hasTargets && options.compilationTargets.includes(source)) {
-      operatingSystemIndependentTargets[replacement] = sources[source]
-    }
-
-    // Map the replacement back to the original source path.
-    originalPathMappings[replacement] = source;
-  })
-
-  return {
-    operatingSystemIndependentSources,
-    operatingSystemIndependentTargets,
-    originalPathMappings
-  }
-}
 
 function replaceLinkReferences(bytecode, linkReferences, libraryName) {
   let linkId = '__' + libraryName;
