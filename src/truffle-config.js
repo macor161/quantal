@@ -1,3 +1,5 @@
+// Original source code: https://github.com/trufflesuite/truffle/blob/v5.0.10/packages/truffle-config/index.js
+
 const _ = require("lodash");
 const path = require("path");
 const Provider = require("truffle-provider");

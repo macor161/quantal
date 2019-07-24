@@ -1,3 +1,5 @@
+// Original source code: https://github.com/trufflesuite/truffle/blob/v5.0.10/packages/truffle-compile/parser.js
+
 const debug = require('debug')('compile:parser'); // eslint-disable-line no-unused-vars
 const CompileError = require('./compileerror');
 

@@ -1,3 +1,5 @@
+// Original source code: https://github.com/trufflesuite/truffle/blob/v5.0.10/packages/truffle-compile/compileerror.js
+
 const colors = require('colors');
 const TruffleError = require('truffle-error');
 const inherits = require('util').inherits;
