@@ -1,0 +1,12 @@
+language: node_js
+cache: npm
+notifications:
+  email: false
+node_js:
+  - '11'
+  - '10'
+install:
+  - yarn install
+script:
+  - yarn lint
+  - yarn test
