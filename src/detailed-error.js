@@ -1,14 +1,15 @@
 const lineColumn = require('line-column')
-const {isObject, range, get} = require('lodash')
-const {promisify} = require('util')
-const {isAbsolute} = require('path')
+const { isObject, range, get } = require('lodash')
+const { promisify } = require('util')
+const { isAbsolute } = require('path')
 const fs = require('fs')
+
 const readFile = promisify(fs.readFile)
 
 const LINES_OF_CONTEXT = 6
 
 
-/** 
+/**
  * @typedef {Object} DetailedCompilerError
  * @property {string} type Error type (i.e. "TypeError", "InternalCompilerError", "Exception", etc.)
  * @property {string} severity Error severity ("error" or "warning")
@@ -26,14 +27,13 @@ const LINES_OF_CONTEXT = 6
 
 /**
  * Returns a `DetailedCompilerError` from a solc error
- * 
+ *
  * @param compilerOutputError solc error
  * @param compileResult compiler's result
- * @returns {DetailedCompilerOutputError} 
+ * @returns {DetailedCompilerOutputError}
  */
 module.exports = async function detailedCompilerOutputError(compilerOutputError, compileResult) {
   try {
-    
     const fileContent = get(compileResult, 'source')
       ? compileResult.source
       : await getSource(compilerOutputError)
@@ -56,15 +56,15 @@ module.exports = async function detailedCompilerOutputError(compilerOutputError,
 }
 
 function addSourceContext(error, fileContent) {
-  if (!isObject(error.sourceLocation) || isNaN(error.sourceLocation.line)) {
+  if (!isObject(error.sourceLocation) || Number.isNaN(error.sourceLocation.line))
     return error
-  }
+
 
   const lines = fileContent.split(/\r?\n/)
 
-  if (lines.length === 0) 
+  if (lines.length === 0)
     return error
-  
+
   const index = error.sourceLocation.line - 1
   const lineStart = Math.max(0, index - Math.ceil((LINES_OF_CONTEXT - 1) / 2)) + 1
   const lineEnd = Math.min(lines.length - 1, lineStart + LINES_OF_CONTEXT - 1) + 1
@@ -72,13 +72,12 @@ function addSourceContext(error, fileContent) {
   return {
     ...error,
     sourceContext: range(lineStart, lineEnd)
-      .reduce((acc, line) => ({...acc, [line]: lines[line - 1]}), {}),
+      .reduce((acc, line) => ({ ...acc, [line]: lines[line - 1] }), {}),
   }
 }
 
 
 function getSource(compilerOutputError) {
-  if (compilerOutputError.sourceLocation && isAbsolute(compilerOutputError.sourceLocation.file)) {
+  if (compilerOutputError.sourceLocation && isAbsolute(compilerOutputError.sourceLocation.file))
     return readFile(compilerOutputError.sourceLocation.file, 'utf-8')
-  }
 }

@@ -1,16 +1,17 @@
 const debug = require('debug')('multiprocess-compiler')
 const os = require('os')
+const { basename } = require('path')
+const chalk = require('chalk')
+const Multispinner = require('multispinner')
 const { DependencyTree } = require('../dependency-tree')
+
 const cpus = os.cpus()
 const Worker = require('./worker')
-const { basename } = require('path')
 const { dispatchWork } = require('./dispatch-work')
 const { CompilerResultsMerger } = require('./compiler-results-merger')
-const Multispinner = require('multispinner')
-const chalk = require('chalk')
 
 module.exports = function (sources, options, solcVersion) {
-  return new Promise((res, rej) => {
+  return new Promise(res => {
     debug(`Generating dependency tree for ${cpus.length} workers`)
 
     const workers = initWorkers(solcVersion, options)
@@ -32,21 +33,20 @@ module.exports = function (sources, options, solcVersion) {
       const worker = workers[i]
       debug(`batch ${i} load: ${batch.workload()}`)
 
-      for (const branch of batch.getBranches()) {
+      for (const branch of batch.getBranches())
         worker.addSource(branch)
-      }
     }
 
     const compilers = workers
-      .filter((worker) => worker.hasSources())
+      .filter(worker => worker.hasSources())
 
     const spinners = compilers
       .reduce((acc, compiler, i) => ({
         ...acc,
-        [i]: `Compiler #${i + 1} ${chalk.gray(`[${unique(Object.keys(compiler.input.sources))
-          .map((key) => basename(key))
+        [i]: `Compiler #${i + 1} ${chalk.gray(`[${`${unique(Object.keys(compiler.input.sources))
+          .map(key => basename(key))
           .join(', ')
-          .substring(0, 60) + '...'}]`)}`,
+          .substring(0, 60)}...`}]`)}`,
       }), {})
 
     const multispinner = new Multispinner(spinners, {
@@ -60,23 +60,22 @@ module.exports = function (sources, options, solcVersion) {
     debug(`sending input ${new Date().toISOString()}`)
 
     Promise.all(compilers
-        .map((worker, i) => worker.compile().then((result) => {
-          multispinner.success(i); 
-          return result
-        }))
-      )
-      .then((results) => new Promise((res) => {
+      .map((worker, i) => worker.compile().then(result => {
+        multispinner.success(i);
+        return result
+      })))
+      .then(results => new Promise(resolve => {
         // Must wait 80ms to prevent a display bug in multispinner
-        setTimeout(() => res(results), 80)
+        setTimeout(() => resolve(results), 80)
       }))
-      .then((results) => {
+      .then(results => {
         debug('merging results')
-        //const result = results[0]
+        // const result = results[0]
         const merger = new CompilerResultsMerger(results)
 
         debug('results merged')
         res(merger.getResults())
-        workers.forEach((worker) => worker.close())
+        workers.forEach(worker => worker.close())
       })
   })
 }
@@ -93,5 +92,3 @@ function initWorkers(solcVersion, options) {
 function unique(items) {
   return Array.from(new Set(items))
 }
-
-

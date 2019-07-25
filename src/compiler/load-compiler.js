@@ -1,8 +1,8 @@
-const getOs = require('../utils/get-os')
 const { createWriteStream, exists, chmodSync } = require('fs-extra')
-const qconfig = require('../qconfig')()
 const path = require('path')
 const { maxSatisfying } = require('semver')
+const qconfig = require('../qconfig')()
+const getOs = require('../utils/get-os')
 const { supportedSolcVersions, isOsSupported } = require('../compiler-versions')
 
 const DOWNLOAD_URL = 'http://solc.quantal.io'
@@ -16,13 +16,13 @@ const LATEST_VERSION = '0.5.9'
  */
 async function preloadCompiler(version = LATEST_VERSION) {
   version = getFormattedVersion(version)
-  if (!isOsSupported(getOs())) 
-    throw new Error(`Unsupported OS: ${getOs()}`)  
+  if (!isOsSupported(getOs()))
+    throw new Error(`Unsupported OS: ${getOs()}`)
 
   const cachedCompilerPath = await getCachedCompilerPath(version)
 
-  if (!(await exists(cachedCompilerPath))) 
-    await downloadCompiler(version)  
+  if (!(await exists(cachedCompilerPath)))
+    await downloadCompiler(version)
 
   chmodSync(cachedCompilerPath, '755')
 }
@@ -35,12 +35,12 @@ async function preloadCompiler(version = LATEST_VERSION) {
  */
 async function loadCompiler(version = LATEST_VERSION) {
   version = getFormattedVersion(version)
-  if (!isOsSupported(getOs())) {
+  if (!isOsSupported(getOs()))
     throw new Error(`Unsupported OS: ${getOs()}`)
-  }
+
 
   return (await isCompilerInCache(version))
-    ? await getCachedCompiler(version)
+    ? getCachedCompiler(version)
     : downloadCompiler(version)
 }
 
@@ -95,10 +95,10 @@ function downloadCompiler(version) {
 
     const fileRequest = progress(request(url), {
       throttle: 500,
-    }).on('progress', (state) => {
-        progressBar.update(parseInt(state.percent * 100))
-      })
-      .on('response', (response) => {
+    }).on('progress', state => {
+      progressBar.update(parseInt(state.percent * 100, 10))
+    })
+      .on('response', response => {
         if (response.statusCode === 200) {
           const fileStream = createWriteStream(filePath)
             .on('finish', () => {
@@ -107,11 +107,10 @@ function downloadCompiler(version) {
               })
             })
           fileRequest.pipe(fileStream)
-        } else {
+        } else
           rej(new Error(`Unable to find solc ${version}`))
-        }
       })
-      .on('error', (err) => {
+      .on('error', err => {
         rej(err)
       })
       .on('end', () => {

@@ -8,7 +8,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
   },
   "repository": {
     "type": "git",
@@ -32,6 +33,7 @@
     "debug": "^4.1.1",
     "find-up": "^2.1.0",
     "fs-extra": "^7.0.1",
+    "glob": "^7.1.4",
     "import-fresh": "^3.0.0",
     "line-column": "^1.0.2",
     "lodash": "^4.17.15",
@@ -58,7 +60,10 @@
   },
   "devDependencies": {
     "eslint": "^5.16.0",
-    "eslint-config-google": "^0.13.0",
+    "eslint-config-airbnb": "^17.1.1",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.14.3",
     "jest": "^24.8.0"
   },
   "files": [

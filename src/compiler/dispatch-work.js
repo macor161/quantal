@@ -13,9 +13,9 @@ function dispatchWork(tree, batchNumber = 1) {
 
   let batches = createEmptyBatches(batchNumber)
 
-  for (const branch of branches) {
+  for (const branch of branches)
     batches = getMinimumWorkloadConfiguration(batches, branch)
-  }
+
 
   return batches
 }
@@ -40,14 +40,12 @@ function createEmptyBatches(batchNumber) {
 function getMinimumWorkloadConfiguration(batches, branch) {
   let minimumConfiguration
   let minimumConfigurationWorkload = Infinity
-  const newBatches = batches.map((batch) => batch.addBranch(branch))
+  const newBatches = batches.map(batch => batch.addBranch(branch))
 
   for (const [i] of batches.entries()) {
-    const trialBatch = batches.map((k, index) => {
-      return index === i
-        ? newBatches[index]
-        : batches[index]
-    })
+    const trialBatch = batches.map((k, index) => (index === i
+      ? newBatches[index]
+      : batches[index]))
     const workload = getWorkload(trialBatch)
 
     if (workload < minimumConfigurationWorkload) {
@@ -68,9 +66,8 @@ function getWorkload(batches) {
 
   for (const batch of batches) {
     const workload = batch.workload()
-    if (workload > largestWorkload) {
+    if (workload > largestWorkload)
       largestWorkload = workload
-    }
   }
   return largestWorkload
 }

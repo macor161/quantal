@@ -1,33 +1,35 @@
 // Original source code: https://github.com/trufflesuite/truffle/blob/v5.0.10/packages/truffle-config/index.js
+/* eslint no-shadow: 0 */
+/* eslint no-undef: 0 */
 
-const _ = require("lodash");
-const path = require("path");
-const Provider = require("truffle-provider");
-const TruffleError = require("truffle-error");
-const Module = require("module");
-const findUp = require("find-up");
-const originalrequire = require("original-require");
-const Configstore = require("configstore");
+const _ = require('lodash');
+const path = require('path');
+const Provider = require('truffle-provider');
+const TruffleError = require('truffle-error');
+const Module = require('module');
+const findUp = require('find-up');
+const originalrequire = require('original-require');
+const Configstore = require('configstore');
 
-const DEFAULT_CONFIG_FILENAME = "truffle-config.js";
-const BACKUP_CONFIG_FILENAME = "truffle.js"; // old config filename
+const DEFAULT_CONFIG_FILENAME = 'truffle-config.js';
+const BACKUP_CONFIG_FILENAME = 'truffle.js'; // old config filename
 
 class Config {
   constructor(truffle_directory, working_directory, network) {
     const default_tx_values = {
       gas: 6721975,
       gasPrice: 20000000000, // 20 gwei,
-      from: null
+      from: null,
     };
 
     // This is a list of multi-level keys with defaults
     // we need to _.merge. Using this list for safety
     // vs. just merging all objects.
-    this._deepCopy = ["compilers"];
+    this._deepCopy = ['compilers'];
 
     this._values = {
       truffle_directory:
-        truffle_directory || path.resolve(path.join(__dirname, "../")),
+        truffle_directory || path.resolve(path.join(__dirname, '../')),
       working_directory: working_directory || process.cwd(),
       network,
       networks: {},
@@ -43,29 +45,28 @@ class Config {
       resolver: null,
       artifactor: null,
       ethpm: {
-        ipfs_host: "ipfs.infura.io",
-        ipfs_protocol: "https",
-        registry: "0x8011df4830b4f696cd81393997e5371b93338878",
-        install_provider_uri: "https://ropsten.infura.io/truffle"
+        ipfs_host: 'ipfs.infura.io',
+        ipfs_protocol: 'https',
+        registry: '0x8011df4830b4f696cd81393997e5371b93338878',
+        install_provider_uri: 'https://ropsten.infura.io/truffle',
       },
       compilers: {
         solc: {
           settings: {
             optimizer: {
               enabled: false,
-              runs: 200
-            }
-          }
+              runs: 200,
+            },
+          },
         },
-        vyper: {}
+        vyper: {},
       },
       logger: {
-        log() {}
-      }
+        log() {},
+      },
     };
 
-    const resolveDirectory = value =>
-      path.resolve(this.working_directory, value);
+    const resolveDirectory = value => path.resolve(this.working_directory, value);
 
     const props = {
       // These are already set.
@@ -82,34 +83,34 @@ class Config {
       compilers() {},
 
       build_directory: {
-        default: () => path.join(this.working_directory, "build"),
-        transform: resolveDirectory
+        default: () => path.join(this.working_directory, 'build'),
+        transform: resolveDirectory,
       },
       contracts_directory: {
-        default: () => path.join(this.working_directory, "contracts"),
-        transform: resolveDirectory
+        default: () => path.join(this.working_directory, 'contracts'),
+        transform: resolveDirectory,
       },
       contracts_build_directory: {
-        default: () => path.join(this.build_directory, "contracts"),
-        transform: resolveDirectory
+        default: () => path.join(this.build_directory, 'contracts'),
+        transform: resolveDirectory,
       },
       migrations_directory: {
-        default: () => path.join(this.working_directory, "migrations"),
-        transform: resolveDirectory
+        default: () => path.join(this.working_directory, 'migrations'),
+        transform: resolveDirectory,
       },
       migrations_file_extension_regexp() {
         return /^\.(js|es6?)$/;
       },
       test_directory: {
-        default: () => path.join(this.working_directory, "test"),
-        transform: resolveDirectory
+        default: () => path.join(this.working_directory, 'test'),
+        transform: resolveDirectory,
       },
       test_file_extension_regexp() {
         return /.*\.(js|ts|es|es6|jsx|sol)$/;
       },
       example_project_directory: {
-        default: () => path.join(this.truffle_directory, "example"),
-        transform: resolveDirectory
+        default: () => path.join(this.truffle_directory, 'example'),
+        transform: resolveDirectory,
       },
       network_id: {
         get() {
@@ -121,25 +122,25 @@ class Config {
         },
         set() {
           throw new Error(
-            "Do not set config.network_id. Instead, set config.networks and then config.networks[<network name>].network_id"
+            'Do not set config.network_id. Instead, set config.networks and then config.networks[<network name>].network_id',
           );
-        }
+        },
       },
       network_config: {
         get() {
-          const network = this.network;
+          const { network } = this;
 
           if (network === null || network === undefined) {
             throw new Error(
-              "Network not set. Cannot determine network to use."
+              'Network not set. Cannot determine network to use.',
             );
           }
 
           let conf = this.networks[network];
 
-          if (conf === null || conf === undefined) {
+          if (conf === null || conf === undefined)
             config = {};
-          }
+
 
           conf = _.extend({}, default_tx_values, conf);
 
@@ -147,9 +148,9 @@ class Config {
         },
         set() {
           throw new Error(
-            "Don't set config.network_config. Instead, set config.networks with the desired values."
+            "Don't set config.network_config. Instead, set config.networks with the desired values.",
           );
-        }
+        },
       },
       from: {
         get() {
@@ -161,9 +162,9 @@ class Config {
         },
         set() {
           throw new Error(
-            "Don't set config.from directly. Instead, set config.networks and then config.networks[<network name>].from"
+            "Don't set config.from directly. Instead, set config.networks and then config.networks[<network name>].from",
           );
-        }
+        },
       },
       gas: {
         get() {
@@ -175,9 +176,9 @@ class Config {
         },
         set() {
           throw new Error(
-            "Don't set config.gas directly. Instead, set config.networks and then config.networks[<network name>].gas"
+            "Don't set config.gas directly. Instead, set config.networks and then config.networks[<network name>].gas",
           );
-        }
+        },
       },
       gasPrice: {
         get() {
@@ -189,15 +190,15 @@ class Config {
         },
         set() {
           throw new Error(
-            "Don't set config.gasPrice directly. Instead, set config.networks and then config.networks[<network name>].gasPrice"
+            "Don't set config.gasPrice directly. Instead, set config.networks and then config.networks[<network name>].gasPrice",
           );
-        }
+        },
       },
       provider: {
         get() {
-          if (!this.network) {
+          if (!this.network)
             return null;
-          }
+
 
           const options = this.network_config;
           options.verboseRpc = this.verboseRpc;
@@ -206,9 +207,9 @@ class Config {
         },
         set() {
           throw new Error(
-            "Don't set config.provider directly. Instead, set config.networks and then set config.networks[<network name>].provider"
+            "Don't set config.provider directly. Instead, set config.networks and then set config.networks[<network name>].provider",
           );
-        }
+        },
       },
       confirmations: {
         get() {
@@ -220,9 +221,9 @@ class Config {
         },
         set() {
           throw new Error(
-            "Don't set config.confirmations directly. Instead, set config.networks and then config.networks[<network name>].confirmations"
+            "Don't set config.confirmations directly. Instead, set config.networks and then config.networks[<network name>].confirmations",
           );
-        }
+        },
       },
       production: {
         get() {
@@ -234,9 +235,9 @@ class Config {
         },
         set() {
           throw new Error(
-            "Don't set config.production directly. Instead, set config.networks and then config.networks[<network name>].production"
+            "Don't set config.production directly. Instead, set config.networks and then config.networks[<network name>].production",
           );
-        }
+        },
       },
       timeoutBlocks: {
         get() {
@@ -248,10 +249,10 @@ class Config {
         },
         set() {
           throw new Error(
-            "Don't set config.timeoutBlocks directly. Instead, set config.networks and then config.networks[<network name>].timeoutBlocks"
+            "Don't set config.timeoutBlocks directly. Instead, set config.networks and then config.networks[<network name>].timeoutBlocks",
           );
-        }
-      }
+        },
+      },
     };
 
     Object.keys(props).forEach(prop => {
@@ -269,30 +270,30 @@ class Config {
     Object.defineProperty(this, propertyName, {
       // retrieve config property value
       get:
-        descriptor.get ||
-        function() {
+        descriptor.get
+        || function () {
           // value is specified
-          if (propertyName in this._values) {
+          if (propertyName in this._values)
             return this._values[propertyName];
-          }
+
 
           // default getter is specified
-          if (descriptor.default) {
+          if (descriptor.default)
             return descriptor.default();
-          }
+
 
           // descriptor is a function
           return descriptor();
         },
       set:
-        descriptor.set ||
-        function(value) {
+        descriptor.set
+        || function (value) {
           this._values[propertyName] = descriptor.transform
             ? descriptor.transform(value)
             : value;
         },
       configurable: true,
-      enumerable: true
+      enumerable: true,
     });
   }
 
@@ -316,18 +317,17 @@ class Config {
   }
 
   merge(obj) {
-    let clone = this.normalize(obj);
+    const clone = this.normalize(obj);
 
     // Only set keys for values that don't throw.
     const propertyNames = Object.keys(obj);
 
     propertyNames.forEach(key => {
       try {
-        if (typeof clone[key] === "object" && this._deepCopy.includes(key)) {
+        if (typeof clone[key] === 'object' && this._deepCopy.includes(key))
           this[key] = _.merge(this[key], clone[key]);
-        } else {
+        else
           this[key] = clone[key];
-        }
       } catch (e) {
         // Do nothing.
       }
@@ -341,7 +341,7 @@ Config.default = () => new Config();
 
 Config.search = (options = {}, filename) => {
   const searchOptions = {
-    cwd: options.working_directory || options.workingDirectory
+    cwd: options.working_directory || options.workingDirectory,
   };
 
   if (!filename) {
@@ -350,18 +350,18 @@ Config.search = (options = {}, filename) => {
     const backupConfig = findUp.sync(BACKUP_CONFIG_FILENAME, searchOptions);
     if (defaultConfig && backupConfig) {
       console.warn(
-        `Warning: Both ${DEFAULT_CONFIG_FILENAME} and ${BACKUP_CONFIG_FILENAME} were found. Merging both with priority to ${DEFAULT_CONFIG_FILENAME}.`
+        `Warning: Both ${DEFAULT_CONFIG_FILENAME} and ${BACKUP_CONFIG_FILENAME} were found. Merging both with priority to ${DEFAULT_CONFIG_FILENAME}.`,
       );
       return [backupConfig, defaultConfig];
-    } else if (backupConfig && !defaultConfig) {
-      if (isWin)
+    } if (backupConfig && !defaultConfig) {
+      if (isWin) {
         console.warn(
-          `Warning: Please rename ${BACKUP_CONFIG_FILENAME} to ${DEFAULT_CONFIG_FILENAME} to ensure Windows compatibility.`
+          `Warning: Please rename ${BACKUP_CONFIG_FILENAME} to ${DEFAULT_CONFIG_FILENAME} to ensure Windows compatibility.`,
         );
+      }
       return [backupConfig];
-    } else {
-      return [defaultConfig];
     }
+    return [defaultConfig];
   }
 
   return [findUp.sync(filename, searchOptions)];
@@ -370,24 +370,22 @@ Config.search = (options = {}, filename) => {
 Config.detect = (options = {}, filename) => {
   const configFiles = Config.search(options, filename);
 
-  if (configFiles.length < 1) {
-    throw new TruffleError("Could not find suitable configuration file.");
-  }
+  if (configFiles.length < 1)
+    throw new TruffleError('Could not find suitable configuration file.');
+
 
   return Config.multiLoad(configFiles, options);
 };
 
-Config.multiLoad = (filePaths, options) => {
-  return Config.loadObject(
-    filePaths
-      .map(filePath => ({
-        working_directory: path.dirname(path.resolve(filePath)),
-        ...originalrequire(filePath)
-      }))
-      .reduce((mergedConfig, config) => _.merge(mergedConfig, config), {}),
-    options
-  )     
-}
+Config.multiLoad = (filePaths, options) => Config.loadObject(
+  filePaths
+    .map(filePath => ({
+      working_directory: path.dirname(path.resolve(filePath)),
+      ...originalrequire(filePath),
+    }))
+    .reduce((mergedConfig, config) => _.merge(mergedConfig, config), {}),
+  options,
+)
 
 Config.loadObject = (configObj, options) => {
   const config = new Config();
@@ -414,14 +412,13 @@ Config.load = (file, options) => {
   return config;
 };
 
-Config.getUserConfig = () =>
-  new Configstore("truffle", {}, { globalConfigPath: true });
+Config.getUserConfig = () => new Configstore('truffle', {}, { globalConfigPath: true });
 
 Config.getTruffleDataDirectory = () => {
   const configStore = new Configstore(
-    "truffle",
+    'truffle',
     {},
-    { globalConfigPath: true }
+    { globalConfigPath: true },
   );
   return path.dirname(configStore.path);
 };

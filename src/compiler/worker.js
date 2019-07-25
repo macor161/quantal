@@ -1,10 +1,10 @@
-const {spawn} = require('child_process')
+const { spawn } = require('child_process')
 const JSONStream = require('JSONStream')
-const {loadCompiler} = require('./load-compiler')
-const {isEmpty} = require('lodash')
+const { isEmpty } = require('lodash')
+const { loadCompiler } = require('./load-compiler')
 
 module.exports = class Worker {
-  constructor({version, compilerOptions, id} = {}) {
+  constructor({ version, compilerOptions, id } = {}) {
     this.solcVersion = version
     this.compilerOptions = compilerOptions
     this.id = id
@@ -16,9 +16,9 @@ module.exports = class Worker {
     }
 
     // solc doesn't support empty brackets
-    if (isEmpty(this.input.settings.evmVersion)) {
+    if (isEmpty(this.input.settings.evmVersion))
       this.input.settings.evmVersion = undefined
-    }
+
 
     this._debug = require('debug')(`worker-${id}`)
   }
@@ -26,10 +26,10 @@ module.exports = class Worker {
   addSource(sourceNode) {
     this.branches.push(sourceNode)
     this.input.sources = sourceNode.getNodes()
-        .reduce((acc, dep) => {
-          acc[dep.path] = {content: dep.content}
-          return acc
-        }, this.input.sources || {})
+      .reduce((acc, dep) => {
+        acc[dep.path] = { content: dep.content }
+        return acc
+      }, this.input.sources || {})
   }
 
   hasSources() {
@@ -37,9 +37,8 @@ module.exports = class Worker {
   }
 
   close() {
-    if (this._process && !this._process.killed) {
+    if (this._process && !this._process.killed)
       this._process.kill()
-    }
   }
 
   async compile() {
@@ -48,16 +47,16 @@ module.exports = class Worker {
 
     const result = await this._sendInputToProcess()
 
-    for (const path in result.sources) {
+    for (const path in result.sources)
       result.sources[path].source = this.input.sources[path] && this.input.sources[path].content
-    }
+
 
     this._debug('compile done')
     return result
   }
 
   _sendInputToProcess() {
-    return new Promise(async (res, rej) => {
+    return new Promise(async res => {
       const compilerPath = await loadCompiler(this.solcVersion)
       this._debug('spawning compiler process %o', compilerPath)
       const solc = spawn(compilerPath, ['--standard-json'])
@@ -65,14 +64,14 @@ module.exports = class Worker {
       this._debug('compiler process ready')
 
       solc.stdout
-          .pipe(JSONStream.parse())
-          .on('data', (data) => {
-            this._debug(`data received ${new Date().toISOString()}`)
-            // Data could eventually be returned incrementally
-            res(data)
-          })
+        .pipe(JSONStream.parse())
+        .on('data', data => {
+          this._debug(`data received ${new Date().toISOString()}`)
+          // Data could eventually be returned incrementally
+          res(data)
+        })
 
-      solc.stderr.on('data', (data) => {
+      solc.stderr.on('data', data => {
         console.log(`stderr: ${data}`);
       });
 
@@ -80,7 +79,7 @@ module.exports = class Worker {
         this._debug(`process connexion closed ${new Date().toISOString()}`)
       })
 
-      solc.stdin.write(JSON.stringify(this.input) + '\n')
+      solc.stdin.write(`${JSON.stringify(this.input)}\n`)
       solc.stdin.end()
     })
   }
