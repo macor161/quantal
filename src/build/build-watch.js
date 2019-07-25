@@ -1,8 +1,8 @@
-const { build } = require('./build')
-const getPath = require('../utils/get-path')
 const fs = require('fs')
 const { isObject } = require('lodash')
 const path = require('path')
+const getPath = require('../utils/get-path')
+const { build } = require('./build')
 
 /**
  * @typedef WatchOptions
@@ -11,9 +11,9 @@ const path = require('path')
  * @property {function} onBuildComplete Called everytime a build is completed
  */
 const DEFAULT_WATCH_OPTIONS = {
-  onChange: (eventType, fileName) => null,
+  onChange: () => null,
   onBuildStart: () => null,
-  onBuildComplete: results => null
+  onBuildComplete: () => null,
 }
 
 /**
@@ -23,9 +23,9 @@ const DEFAULT_WATCH_OPTIONS = {
  */
 async function buildWatch(buildOptions, watchOptions) {
   const { onChange, onBuildStart, onBuildComplete } = { ...DEFAULT_WATCH_OPTIONS, ...watchOptions }
-  
-  // Wrapper around the build function to prevent concurrent builds 
-  // e.g. When a file change is detected while a build is currently running 
+
+  // Wrapper around the build function to prevent concurrent builds
+  // e.g. When a file change is detected while a build is currently running
   const wrappedBuild = preventConcurentCalls(async options => {
     onBuildStart()
     const buildResults = await build(options)
@@ -33,7 +33,7 @@ async function buildWatch(buildOptions, watchOptions) {
   })
 
   fs.watch(getPath('contracts'), async (eventType, fileName) => {
-    if (path.extname(fileName).toLowerCase() !== '.sol') 
+    if (path.extname(fileName).toLowerCase() !== '.sol')
       return
 
     const onChangeResults = onChange(eventType, fileName)
@@ -49,7 +49,7 @@ async function buildWatch(buildOptions, watchOptions) {
 
     await wrappedBuild(newBuildOptions)
   })
-  
+
   await wrappedBuild(buildOptions)
 }
 
@@ -61,9 +61,9 @@ async function buildWatch(buildOptions, watchOptions) {
 function preventConcurentCalls(fn) {
   let isRunning = false
 
-  return async function(...args) {
-    if (isRunning) 
-      return    
+  return async function (...args) {
+    if (isRunning)
+      return
 
     isRunning = true
     const returnedValue = await fn(...args)

@@ -2,8 +2,8 @@ class Batch {
   constructor(branches = []) {
     this._branches = branches
     const nodes = branches
-        .map((branch) => branch.getNodes())
-        .reduce((acc, val) => acc.concat(val), [])
+      .map(branch => branch.getNodes())
+      .reduce((acc, val) => acc.concat(val), [])
 
     this._nodes = new Set(nodes)
   }
@@ -27,9 +27,9 @@ class Batch {
      */
   hash() {
     return this._branches
-        .map((branch) => branch.getId())
-        .sort()
-        .join(',')
+      .map(branch => branch.getId())
+      .sort()
+      .join(',')
   }
 
   /**
@@ -40,7 +40,6 @@ class Batch {
     return this._nodes.size
   }
 }
-
 
 
 module.exports = { Batch }

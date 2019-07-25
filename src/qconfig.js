@@ -2,7 +2,7 @@
  * Manages global config information
  */
 
-const {homedir} = require('os')
+const { homedir } = require('os')
 const path = require('path')
 const fs = require('fs-extra')
 
@@ -15,13 +15,12 @@ function init() {
   const mainFolderPath = getFolderPath()
   const solcCachePath = getSolcCachePath()
 
-  if (!fs.existsSync(mainFolderPath)) {
+  if (!fs.existsSync(mainFolderPath))
     fs.mkdirSync(mainFolderPath)
-  }
 
-  if (!fs.existsSync(solcCachePath)) {
+
+  if (!fs.existsSync(solcCachePath))
     fs.mkdirSync(solcCachePath)
-  }
 }
 
 /**
@@ -38,7 +37,7 @@ function getSolcCachePath() {
   return path.resolve(getFolderPath(), 'solc')
 }
 
-module.exports = function() {
+module.exports = function () {
   init()
 
   return {

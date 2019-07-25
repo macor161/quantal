@@ -23,9 +23,9 @@ class DependencyTree {
      * @param {string} file.content File source code
      */
   addFile(file) {
-    if (this._files[file.path]) {
+    if (this._files[file.path])
       console.error(`File ${file.path} already exists in dependency tree`)
-    }
+
 
     const fileNode = new DependencyTreeNode(file)
     this._files[fileNode.path] = fileNode
@@ -39,7 +39,7 @@ class DependencyTree {
      */
   getBranches() {
     return this._leafs
-        .map((leaf, index) => new Branch({node: leaf, id: index}))
+      .map((leaf, index) => new Branch({ node: leaf, id: index }))
   }
 
   /**
@@ -51,8 +51,8 @@ class DependencyTree {
 
   _fillInDependencies(file) {
     file.dependencies = file.imports
-        .filter((path) => this._files[path] !== undefined)
-        .map((path) => this._files[path])
+      .filter(path => this._files[path] !== undefined)
+      .map(path => this._files[path])
   }
 
   _updateFilesWithMissingDependencies(newFile) {
@@ -64,17 +64,16 @@ class DependencyTree {
     }
 
     this._filesWithMissingDependencies = this._filesWithMissingDependencies
-        .concat([newFile])
-        .filter((file) => file.isMissingDependencies())
+      .concat([newFile])
+      .filter(file => file.isMissingDependencies())
 
-    if (newFile.isLeaf()) {
+    if (newFile.isLeaf())
       this._leafs.push(newFile)
-    }
   }
 
   _updateLeafs() {
     this._leafs = this._leafs
-        .filter((node) => node.isLeaf())
+      .filter(node => node.isLeaf())
   }
 }
 
@@ -100,14 +99,14 @@ class DependencyTreeNode {
 
   /**
    * Returns the node dependencies
-   * @param {DependencyTreeNode[]=} ignoredNodes 
+   * @param {DependencyTreeNode[]=} ignoredNodes
    */
   getAllDependencies(ignoredNodes = []) {
     const dependencies = this.dependencies
-        .filter(dep => !ignoredNodes.includes(dep))
-        .map((node) => node.getAllDependencies(ignoredNodes.concat([this])))
-        .reduce((acc, dep) => acc.concat(dep), []) // Flatten nested dependencies
-        .concat(this.dependencies) // Add current node dependencies
+      .filter(dep => !ignoredNodes.includes(dep))
+      .map(node => node.getAllDependencies(ignoredNodes.concat([this])))
+      .reduce((acc, dep) => acc.concat(dep), []) // Flatten nested dependencies
+      .concat(this.dependencies) // Add current node dependencies
 
     return unique(dependencies)
   }
@@ -116,18 +115,18 @@ class DependencyTreeNode {
     return this.dependencies
   }
 
-  getLeafs({onlyUniques = true} = {}) {
-    if (this.isLeaf()) {
+  getLeafs({ onlyUniques = true } = {}) {
+    if (this.isLeaf())
       return [this]
-    }
+
 
     const leafs = this.children
-        .map((node) => node.getLeafs())
-        .reduce((acc, dep) => acc.concat(dep), []) // Flatten children leafs
+      .map(node => node.getLeafs())
+      .reduce((acc, dep) => acc.concat(dep), []) // Flatten children leafs
 
     return onlyUniques
-            ? unique(leafs)
-            : leafs
+      ? unique(leafs)
+      : leafs
   }
 
   isLeaf() {
@@ -140,7 +139,7 @@ class Branch {
    * @param options
    * @param {DependencyTreeNode} options.node
    */
-  constructor({node, id}) {
+  constructor({ node, id }) {
     this._node = node
     this._id = id
     this._nodesInCommonCache = new Map() // Cache for nodes in common for each branch
@@ -152,7 +151,7 @@ class Branch {
 
   getNodes() {
     return this._node.getAllDependencies()
-        .concat([this._node])
+      .concat([this._node])
   }
 
   nodesInCommon(branch) {
@@ -160,7 +159,7 @@ class Branch {
       const branchNodes = branch.getNodes()
 
       const nodesInCommon = this.getNodes()
-          .filter((node) => branchNodes.includes(node))
+        .filter(node => branchNodes.includes(node))
 
       this._nodesInCommonCache.set(branch, nodesInCommon)
     }
@@ -173,4 +172,4 @@ function unique(items) {
   return Array.from(new Set(items))
 }
 
-module.exports = {DependencyTree, DependencyTreeNode, Branch}
+module.exports = { DependencyTree, DependencyTreeNode, Branch }

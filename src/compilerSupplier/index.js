@@ -1,23 +1,22 @@
 // Original source code: https://github.com/trufflesuite/truffle/blob/v5.0.10/packages/truffle-compile/compilerSupplier/index.js
 
-const {Bundled} = require('./loadingStrategies')
+const { Bundled } = require('./loadingStrategies')
 
 class CompilerSupplier {
   constructor(_config) {
     _config = _config || {};
-    const defaultConfig = {version: null};
+    const defaultConfig = { version: null };
     this.config = Object.assign({}, defaultConfig, _config);
-    this.strategyOptions = {version: null};
+    this.strategyOptions = { version: null };
   }
 
   badInputError(userSpecification) {
-    const message =
-      `Could not find a compiler version matching ${userSpecification}. ` +
-      `compilers.solc.version option must be a string specifying:\n` +
-      `   - a path to a locally installed solcjs\n` +
-      `   - a solc version or range (ex: '0.4.22' or '^0.5.0')\n` +
-      `   - a docker image name (ex: 'stable')\n` +
-      `   - 'native' to use natively installed solc\n`;
+    const message = `Could not find a compiler version matching ${userSpecification}. `
+      + 'compilers.solc.version option must be a string specifying:\n'
+      + '   - a path to a locally installed solcjs\n'
+      + '   - a solc version or range (ex: \'0.4.22\' or \'^0.5.0\')\n'
+      + '   - a docker image name (ex: \'stable\')\n'
+      + '   - \'native\' to use natively installed solc\n';
     return new Error(message);
   }
 

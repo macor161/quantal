@@ -2,14 +2,13 @@
 
 const colors = require('colors');
 const TruffleError = require('truffle-error');
-const inherits = require('util').inherits;
+const { inherits } = require('util');
 
 inherits(CompileError, TruffleError);
 
 function CompileError(message) {
   // Note we trim() because solc likes to add extra whitespace.
-  const fancy_message =
-    message.trim() + '\n\n' + colors.red('Compilation failed. See above.');
+  const fancy_message = `${message.trim()}\n\n${colors.red('Compilation failed. See above.')}`;
   const normal_message = message.trim();
 
   CompileError.super_.call(this, normal_message);
