@@ -12,7 +12,7 @@ script:
   - yarn test
   - yarn test:coverage
 after_success:
-  - cat coverage/lcov.info | ./node_modules/.bin/coveralls
+  - yarn report-coverage
 branches:
   only: 
     - master
