@@ -10,3 +10,4 @@ install:
 script:
   - yarn lint
   - yarn test
+  - yarn report-coverage
