@@ -9,7 +9,7 @@
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --coverage --collectCoverageFrom='src/**/*.js'",
-    "report-coverage": "jest --coverage --collectCoverageFrom='src/**/*.js' --coverageReporters=text-lcov | coveralls",
+    "report-coverage": "cat coverage/lcov.info | coveralls",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix"
   },

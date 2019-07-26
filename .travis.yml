@@ -10,4 +10,10 @@ install:
 script:
   - yarn lint
   - yarn test
+  - yarn test:coverage
+after_success:
   - yarn report-coverage
+branches:
+  only: 
+    - master
+    - development
