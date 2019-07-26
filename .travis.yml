@@ -10,4 +10,10 @@ install:
 script:
   - yarn lint
   - yarn test
-  - yarn report-coverage
+  - yarn test:coverage
+after_success:
+  - cat coverage/lcov.info | ./node_modules/.bin/coveralls
+branches:
+  only: 
+    - master
+    - development
