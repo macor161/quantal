@@ -174,7 +174,7 @@ const compile = async function (inputSources, options, truffleOptions) {
 // contracts_directory: String. Directory where .sol files can be found.
 compile.all = async function (options, truffleOptions) {
   debug('compile.all started')
-  truffleOptions.paths = await findContractFiles(truffleOptions.contracts_directory)
+  options.paths = await findContractFiles(options.contractsDir)
   return compile.with_dependencies(options, truffleOptions)
 }
 
@@ -197,7 +197,7 @@ compile.necessary = function (options, truffleOptions) {
         })
       }
 
-      truffleOptions.paths = updated
+      options.paths = updated
       return res(compile.with_dependencies(options, truffleOptions))
     })
   })
@@ -206,7 +206,6 @@ compile.necessary = function (options, truffleOptions) {
 compile.with_dependencies = function (options, truffleOptions) {
   return new Promise((res, rej) => {
     expect.options(truffleOptions, [
-      'paths',
       'working_directory',
       'contracts_directory',
       'resolver',
@@ -216,8 +215,8 @@ compile.with_dependencies = function (options, truffleOptions) {
 
     Profiler.required_sources(
       config.with({
-        paths: truffleOptions.paths,
-        base_path: truffleOptions.contracts_directory,
+        paths: options.paths,
+        base_path: options.contractsDir,
         resolver: truffleOptions.resolver,
       }),
       (err, allSources, required) => {
