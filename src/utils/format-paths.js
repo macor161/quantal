@@ -24,7 +24,7 @@ function formatPaths(sources, compilationTargets) {
 
     // Just substitute replacement for original in target case. It's
     // a disposable subset of `sources`
-    if (hasTargets && options.compilationTargets.includes(source))
+    if (hasTargets && compilationTargets.includes(source))
       operatingSystemIndependentTargets[replacement] = sources[source]
 
 
