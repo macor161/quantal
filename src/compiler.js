@@ -34,7 +34,7 @@ const compile = async function (inputSources, options, truffleOptions) {
   const solcVersion = options.compiler.version
   truffleOptions.compilers.solc.version = solcVersion
   const compilerInfo = { name: 'solc', version: getFormattedVersion(solcVersion) }
-  const hasTargets = truffleOptions.compilationTargets && truffleOptions.compilationTargets.length
+  const hasTargets = options.compilationTargets && options.compilationTargets.length
 
   const {
     operatingSystemIndependentSources,
@@ -88,10 +88,10 @@ const compile = async function (inputSources, options, truffleOptions) {
   const returnVal = {}
 
   Object.keys(contracts).forEach(source_path => {
-    const files_contracts = contracts[source_path];
+    const files_contracts = contracts[source_path]
 
     Object.keys(files_contracts).forEach(contract_name => {
-      const contract = files_contracts[contract_name];
+      const contract = files_contracts[contract_name]
 
       // All source will have a key, but only the compiled source will have
       // the evm output.
@@ -118,44 +118,44 @@ const compile = async function (inputSources, options, truffleOptions) {
 
       // Reorder ABI so functions are listed in the order they appear
       // in the source file. Solidity tests need to execute in their expected sequence.
-      contract_definition.abi = orderABI(contract_definition);
+      contract_definition.abi = orderABI(contract_definition)
 
       // Go through the link references and replace them with older-style
       // identifiers. We'll do this until we're ready to making a breaking
       // change to this code.
       Object.keys(contract.evm.bytecode.linkReferences).forEach(file_name => {
-        const fileLinks = contract.evm.bytecode.linkReferences[file_name];
+        const fileLinks = contract.evm.bytecode.linkReferences[file_name]
 
         Object.keys(fileLinks).forEach(library_name => {
-          const linkReferences = fileLinks[library_name] || [];
+          const linkReferences = fileLinks[library_name] || []
 
           contract_definition.bytecode = replaceLinkReferences(
             contract_definition.bytecode,
             linkReferences,
             library_name,
-          );
+          )
           contract_definition.unlinked_binary = replaceLinkReferences(
             contract_definition.unlinked_binary,
             linkReferences,
             library_name,
-          );
-        });
-      });
+          )
+        })
+      })
 
       // Now for the deployed bytecode
       Object.keys(contract.evm.deployedBytecode.linkReferences).forEach(file_name => {
         const fileLinks = contract.evm.deployedBytecode.linkReferences[file_name]
 
         Object.keys(fileLinks).forEach(library_name => {
-          const linkReferences = fileLinks[library_name] || [];
+          const linkReferences = fileLinks[library_name] || []
 
           contract_definition.deployedBytecode = replaceLinkReferences(
             contract_definition.deployedBytecode,
             linkReferences,
             library_name,
-          );
-        });
-      });
+          )
+        })
+      })
 
       returnVal[contract_name] = contract_definition
     })
@@ -198,7 +198,7 @@ compile.necessary = function (options, truffleOptions) {
         })
       }
 
-      truffleOptions.paths = updated;
+      truffleOptions.paths = updated
       return res(compile.with_dependencies(options, truffleOptions))
     })
   })
@@ -206,7 +206,7 @@ compile.necessary = function (options, truffleOptions) {
 
 compile.with_dependencies = function (options, truffleOptions) {
   return new Promise((res, rej) => {
-    truffleOptions.contracts_directory = truffleOptions.contracts_directory || process.cwd();
+    truffleOptions.contracts_directory = truffleOptions.contracts_directory || process.cwd()
 
     expect.options(truffleOptions, [
       'paths',
@@ -227,7 +227,7 @@ compile.with_dependencies = function (options, truffleOptions) {
         if (err)
           return rej(err)
 
-        truffleOptions.compilationTargets = required
+        options.compilationTargets = required
         return res(compile(allSources, options, truffleOptions))
       },
     )

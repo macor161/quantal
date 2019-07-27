@@ -1,10 +1,10 @@
 // Original source code: https://github.com/trufflesuite/truffle/blob/v5.0.10/packages/truffle-compile/parser.js
 
-const debug = require('debug')('compile:parser'); // eslint-disable-line no-unused-vars
-const CompileError = require('./compileerror');
+const debug = require('debug')('compile:parser') // eslint-disable-line no-unused-vars
+const CompileError = require('./compileerror')
 
 // Warning issued by a pre-release compiler version, ignored by this component.
-const preReleaseCompilerWarning = 'This is a pre-release compiler version, please do not use it in production.';
+const preReleaseCompilerWarning = 'This is a pre-release compiler version, please do not use it in production.'
 
 module.exports = {
   // This needs to be fast! It is fast (as of this writing). Keep it fast!
@@ -24,15 +24,15 @@ module.exports = {
 
     // If we're using docker/native, we'll still want to use solcjs to do this part.
     if (solc.importsParser)
-      solc = solc.importsParser;
+      solc = solc.importsParser
 
     // Helper to detect import errors with an easy regex.
-    const importErrorKey = 'TRUFFLE_IMPORT';
+    const importErrorKey = 'TRUFFLE_IMPORT'
 
     // Inject failing import.
-    const failingImportFileName = '__Truffle__NotFound.sol';
+    const failingImportFileName = '__Truffle__NotFound.sol'
 
-    body = `${body}\n\nimport '${failingImportFileName}';\n`;
+    body = `${body}\n\nimport '${failingImportFileName}';\n`
 
     const solcStandardInput = {
       language: 'Solidity',
@@ -48,27 +48,27 @@ module.exports = {
           },
         },
       },
-    };
+    }
 
     // The existence of this function ensures we get a parsable error message.
     // Without this, we'll get an error message we *can* detect, but the key will make it easier.
     // Note: This is not a normal callback. See docs here: https://github.com/ethereum/solc-js#from-version-021
-    let output = solc.compile(JSON.stringify(solcStandardInput), () => ({ error: importErrorKey }));
+    let output = solc.compile(JSON.stringify(solcStandardInput), () => ({ error: importErrorKey }))
 
-    output = JSON.parse(output);
+    output = JSON.parse(output)
 
     // Filter out the "pre-release compiler" warning, if present.
-    const errors = output.errors.filter(solidity_error => solidity_error.message.indexOf(preReleaseCompilerWarning) < 0);
+    const errors = output.errors.filter(solidity_error => solidity_error.message.indexOf(preReleaseCompilerWarning) < 0)
 
     // If the import error key is not found, we must not have an import error.
     // This means we have a *different* parsing error which we should show to the user.
     // Note: solc can return multiple parsing errors at once.
     // We ignore the "pre-release compiler" warning message.
-    const nonImportErrors = errors.filter(solidity_error => solidity_error.formattedMessage.indexOf(importErrorKey) < 0);
+    const nonImportErrors = errors.filter(solidity_error => solidity_error.formattedMessage.indexOf(importErrorKey) < 0)
 
     // Should we try to throw more than one? (aside; we didn't before)
     if (nonImportErrors.length > 0)
-      throw new CompileError(nonImportErrors[0].formattedMessage);
+      throw new CompileError(nonImportErrors[0].formattedMessage)
 
 
     // Now, all errors must be import errors.
@@ -78,12 +78,12 @@ module.exports = {
       .map(solidity_error => {
         const matches = solidity_error.formattedMessage.match(
           /import[^'"]+("|')([^'"]+)("|')/,
-        );
+        )
 
         // Return the item between the quotes.
-        return matches[2];
-      });
+        return matches[2]
+      })
 
-    return imports;
+    return imports
   },
-};
+}

@@ -14,7 +14,7 @@ function formatPaths(sources, hasTargets, options) {
 
     // Turn G:/.../ into /G/.../ for Windows
     if (replacement.length >= 2 && replacement[1] === ':') {
-      replacement = `/${replacement}`;
+      replacement = `/${replacement}`
       replacement = replacement.replace(':', '')
     }
 
@@ -28,7 +28,7 @@ function formatPaths(sources, hasTargets, options) {
 
 
     // Map the replacement back to the original source path.
-    originalPathMappings[replacement] = source;
+    originalPathMappings[replacement] = source
   })
 
   return {

@@ -5,4 +5,4 @@ module.exports = {
   Local: {},
   Native: {},
   VersionRange: {},
-};
+}

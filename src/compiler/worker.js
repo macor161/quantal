@@ -72,8 +72,8 @@ module.exports = class Worker {
         })
 
       solc.stderr.on('data', data => {
-        console.log(`stderr: ${data}`);
-      });
+        console.log(`stderr: ${data}`)
+      })
 
       solc.on('close', () => {
         this._debug(`process connexion closed ${new Date().toISOString()}`)
