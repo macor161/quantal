@@ -12,21 +12,6 @@ const CONFIG_PATH = './quantal.json'
 const DEFAULT_SOLC_VERSION = '0.5.8'
 
 /**
- * @typedef {Object} QuantalOptions
- * @property {string} contractsDir
- * @property {string} builtContractsDir
- * @property {string} deploymentsDir
- * @property {GanacheOptions} ganache
- */
-const DEFAULT_OPTIONS = {
-  contractsDir: './contracts',
-  builtContractsDir: './build/contracts',
-  deploymentsDir: './deployments',
-  ganache: DEFAULT_GANACHE_OPTIONS,
-  compiler: DEFAULT_COMPILER_OPTIONS,
-}
-
-/**
  * @typedef {Object} CompilerOptions
  * @property {string} name
  * @property {string} evmVersion
@@ -63,18 +48,24 @@ const DEFAULT_COMPILER_OPTIONS = {
 }
 
 /**
- * @typedef {Object} GanacheOptions
- * @property {string} seed
+ * @typedef {Object} QuantalOptions
+ * @property {string} contractsDir
+ * @property {string} builtContractsDir
+ * @property {string} deploymentsDir
+ * @property {GanacheOptions} ganache
+ * @property {CompilerOptions} compiler
  */
-const DEFAULT_GANACHE_OPTIONS = {
-  seed: 'Ganache seed for development',
+const DEFAULT_OPTIONS = {
+  contractsDir: './contracts',
+  builtContractsDir: './build/contracts',
+  deploymentsDir: './deployments',
+  compiler: DEFAULT_COMPILER_OPTIONS,
 }
 
-// Options that represents a path
+// Path options
 const PATHS = [
   'contractsDir',
   'builtContractsDir',
-  'generatedJsDir',
   'deploymentsDir',
 ]
 
@@ -88,7 +79,7 @@ const PATHS = [
  */
 function getOptions(configFile = CONFIG_PATH) {
   const options = _(DEFAULT_OPTIONS)
-    .merge(getTruffleConfig())
+    .merge(convertTruffleToQuantalOptions(getTruffleOptions()))
     .merge(getQuantalConfig(getPath(configFile)))
     .mapValues((value, key) => (PATHS.includes(key) ? getPath(value) : value))
     .value()
@@ -135,38 +126,50 @@ function getSolcVersionFromPackageJson() {
   }
 }
 
-
-function getTruffleConfig() {
-  const truffleConfig = TruffleConfig.detect({ all: true })
-  const config = TruffleConfig.default().merge(truffleConfig)
-
-  const evmVersion = _.get(config, ['solc', 'evmVersion'])
-        || _.get(config, ['compilers', 'solc', 'evmVersion'])
-        || _.get(config, ['compilers', 'solc', 'settings', 'evmVersion'])
-        || undefined
-
-  const optimizer = _.get(config, ['solc', 'optimizer'])
-        || _.get(config, ['compilers', 'solc', 'settings', 'optimizer'])
-        || _.get(config, ['compilers', 'solc', 'optimizer'])
-        || undefined
-
-  const version = _.get(config, ['solc', 'vesion'])
-        || _.get(config, ['compilers', 'solc', 'settings', 'version'])
-        || _.get(config, ['compilers', 'solc', 'version'])
-        || undefined
-
-
-  // TODO: artifactContent
+function convertTruffleToQuantalOptions(truffleOptions) {
+  const solcVersion = truffleOptions.compilers.solc.settings.version
 
   return {
-    contractsDir: config.contracts_directory,
-    builtContractsDir: config.contracts_build_directory,
+    contractsDir: truffleOptions.contracts_directory,
+    builtContractsDir: truffleOptions.contracts_build_directory,
     compiler: {
-      ...(version && { version }),
-      evmVersion,
-      optimizer,
+      evmVersion: truffleOptions.compilers.solc.settings.evmVersion,
+      optimizer: truffleOptions.compilers.solc.settings.optimizer,
+      ...(solcVersion && { version: solcVersion }),
     },
   }
 }
 
-module.exports = getOptions
+function getTruffleOptions() {
+  // Currently recompiles all contracts everytime to make sure
+  // we receive all warning messages
+  const truffleConfig = TruffleConfig.detect({ all: true })
+  const config = TruffleConfig.default().merge(truffleConfig)
+
+  const evmVersion = _.get(config, ['compilers', 'solc', 'settings', 'evmVersion'])
+        || _.get(config, ['compilers', 'solc', 'evmVersion'])
+        || _.get(config, ['solc', 'evmVersion'])
+        || undefined
+
+  const optimizer = _.get(config, ['compilers', 'solc', 'settings', 'optimizer'])
+        || _.get(config, ['compilers', 'solc', 'optimizer'])
+        || _.get(config, ['solc', 'optimizer'])
+        || {}
+
+  const version = _.get(config, ['compilers', 'solc', 'settings', 'version'])
+        || _.get(config, ['compilers', 'solc', 'version'])
+        || _.get(config, ['solc', 'vesion'])
+        || undefined
+
+  config.compilersInfo = {}
+
+  config.compilers.solc.settings.evmVersion = evmVersion
+  config.compilers.solc.settings.optimizer = optimizer
+
+  if (version)
+    config.compilers.solc.settings.version = version
+
+  return config
+}
+
+module.exports = { getOptions, getTruffleOptions }
