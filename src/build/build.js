@@ -1,10 +1,10 @@
-/** @typedef {import('../get-options').QuantalOptions} BuildOptions */
+/** @typedef {import('../options').QuantalOptions} BuildOptions */
 
 const { mkdirp } = require('fs-extra')
 const Resolver = require('truffle-resolver')
 const Artifactor = require('truffle-artifactor')
 const solcCompile = require('../compiler')
-const { getTruffleOptions } = require('../get-options')
+const { getTruffleOptions } = require('../options')
 const { preloadCompiler } = require('../compiler/load-compiler')
 
 /**

@@ -4,7 +4,7 @@
 const { green } = require('chalk')
 const { formatErrors } = require('../formatting/format-error')
 const { formatWarnings } = require('../formatting/format-warnings')
-const { getOptions } = require('../get-options')
+const { getOptions } = require('../options')
 
 /**
  * Returns the build command for Quantal CLI

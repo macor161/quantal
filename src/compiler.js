@@ -70,7 +70,6 @@ const compile = async function (inputSources, options, truffleOptions) {
 
   debug('Starting compilation')
   const standardOutput = await compiler(operatingSystemIndependentSources, compilerSettings, options.compiler.version)
-
   debug('Compilation done')
 
   const { contracts, sources, errors: allErrors = [] } = standardOutput
