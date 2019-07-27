@@ -3,7 +3,8 @@
  * i.e., convert backslashes to forward slashes; things like C: are left intact.
  * This code comes from Truffle
  */
-function formatPaths(sources, hasTargets, options) {
+function formatPaths(sources, compilationTargets) {
+  const hasTargets = compilationTargets && compilationTargets.length
   const operatingSystemIndependentSources = {}
   const operatingSystemIndependentTargets = {}
   const originalPathMappings = {}

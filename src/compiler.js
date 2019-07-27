@@ -32,15 +32,14 @@ const defaultSelectors = {
 // the contracts. Does not evaulate dependencies that aren't already given.
 const compile = async function (inputSources, options, truffleOptions) {
   const solcVersion = options.compiler.version
-  truffleOptions.compilers.solc.version = solcVersion
   const compilerInfo = { name: 'solc', version: getFormattedVersion(solcVersion) }
-  const hasTargets = options.compilationTargets && options.compilationTargets.length
+  truffleOptions.compilers.solc.version = solcVersion
 
   const {
     operatingSystemIndependentSources,
     operatingSystemIndependentTargets,
     originalPathMappings,
-  } = formatPaths(inputSources, hasTargets, truffleOptions)
+  } = formatPaths(inputSources, options.compilationTargets)
 
   // Specify compilation targets
   // Each target uses defaultSelectors, defaulting to single target `*` if targets are unspecified
@@ -206,8 +205,6 @@ compile.necessary = function (options, truffleOptions) {
 
 compile.with_dependencies = function (options, truffleOptions) {
   return new Promise((res, rej) => {
-    truffleOptions.contracts_directory = truffleOptions.contracts_directory || process.cwd()
-
     expect.options(truffleOptions, [
       'paths',
       'working_directory',
