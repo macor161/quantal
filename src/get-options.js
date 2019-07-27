@@ -11,39 +11,63 @@ const TruffleConfig = require('./truffle-config')
 const CONFIG_PATH = './quantal.json'
 const DEFAULT_SOLC_VERSION = '0.5.8'
 
+/**
+ * @typedef {Object} QuantalOptions
+ * @property {string} contractsDir
+ * @property {string} builtContractsDir
+ * @property {string} deploymentsDir
+ * @property {GanacheOptions} ganache
+ */
 const DEFAULT_OPTIONS = {
   contractsDir: './contracts',
   builtContractsDir: './build/contracts',
   deploymentsDir: './deployments',
-  ganache: {
-    seed: 'Ganache seed for development',
+  ganache: DEFAULT_GANACHE_OPTIONS,
+  compiler: DEFAULT_COMPILER_OPTIONS,
+}
+
+/**
+ * @typedef {Object} CompilerOptions
+ * @property {string} name
+ * @property {string} evmVersion
+ * @property {Object} optimizer
+ * @property {boolean} optimizer.enabled
+ * @property {number} optimizer.runs
+ * @property {Object} artifactContent
+ */
+const DEFAULT_COMPILER_OPTIONS = {
+  name: 'solc',
+  evmVersion: undefined,
+  optimizer: {
+    enabled: false,
+    runs: 0,
   },
-  compiler: {
-    name: 'solc',
-    evmVersion: undefined,
-    optimizer: {
-      enabled: false,
-      runs: 0,
-    },
-    artifactContent: {
-      '*': {
-        '': [
-          'legacyAST',
-          'ast',
-        ],
-        '*': [
-          'abi',
-          'metadata',
-          'evm.bytecode.object',
-          'evm.bytecode.sourceMap',
-          'evm.deployedBytecode.object',
-          'evm.deployedBytecode.sourceMap',
-          'userdoc',
-          'devdoc',
-        ],
-      },
+  artifactContent: {
+    '*': {
+      '': [
+        'legacyAST',
+        'ast',
+      ],
+      '*': [
+        'abi',
+        'metadata',
+        'evm.bytecode.object',
+        'evm.bytecode.sourceMap',
+        'evm.deployedBytecode.object',
+        'evm.deployedBytecode.sourceMap',
+        'userdoc',
+        'devdoc',
+      ],
     },
   },
+}
+
+/**
+ * @typedef {Object} GanacheOptions
+ * @property {string} seed
+ */
+const DEFAULT_GANACHE_OPTIONS = {
+  seed: 'Ganache seed for development',
 }
 
 // Options that represents a path
@@ -54,7 +78,15 @@ const PATHS = [
   'deploymentsDir',
 ]
 
-module.exports = function getOptions(configFile = CONFIG_PATH) {
+/**
+ * Returns build options. Priority is as follow:
+ * 1. Command line args
+ * 2. quantal.json file
+ * 3. truffle-conf.js file
+ * @param {string} configFile Config file path
+ * @returns {QuantalOptions}
+ */
+function getOptions(configFile = CONFIG_PATH) {
   const options = _(DEFAULT_OPTIONS)
     .merge(getTruffleConfig())
     .merge(getQuantalConfig(getPath(configFile)))
@@ -63,7 +95,6 @@ module.exports = function getOptions(configFile = CONFIG_PATH) {
 
   if (!options.compiler.version)
     options.compiler.version = getSolcVersionFromPackageJson() || DEFAULT_SOLC_VERSION
-
 
   return options
 }
@@ -137,3 +168,5 @@ function getTruffleConfig() {
     },
   }
 }
+
+module.exports = getOptions
