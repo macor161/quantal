@@ -61,7 +61,7 @@ module.exports = function (sources, options, solcVersion) {
 
     Promise.all(compilers
       .map((worker, i) => worker.compile().then(result => {
-        multispinner.success(i);
+        multispinner.success(i)
         return result
       })))
       .then(results => new Promise(resolve => {

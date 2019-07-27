@@ -3,7 +3,8 @@
  * i.e., convert backslashes to forward slashes; things like C: are left intact.
  * This code comes from Truffle
  */
-function formatPaths(sources, hasTargets, options) {
+function formatPaths(sources, compilationTargets) {
+  const hasTargets = compilationTargets && compilationTargets.length
   const operatingSystemIndependentSources = {}
   const operatingSystemIndependentTargets = {}
   const originalPathMappings = {}
@@ -14,7 +15,7 @@ function formatPaths(sources, hasTargets, options) {
 
     // Turn G:/.../ into /G/.../ for Windows
     if (replacement.length >= 2 && replacement[1] === ':') {
-      replacement = `/${replacement}`;
+      replacement = `/${replacement}`
       replacement = replacement.replace(':', '')
     }
 
@@ -23,12 +24,12 @@ function formatPaths(sources, hasTargets, options) {
 
     // Just substitute replacement for original in target case. It's
     // a disposable subset of `sources`
-    if (hasTargets && options.compilationTargets.includes(source))
+    if (hasTargets && compilationTargets.includes(source))
       operatingSystemIndependentTargets[replacement] = sources[source]
 
 
     // Map the replacement back to the original source path.
-    originalPathMappings[replacement] = source;
+    originalPathMappings[replacement] = source
   })
 
   return {

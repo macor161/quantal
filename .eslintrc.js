@@ -33,7 +33,7 @@ module.exports = {
     'no-underscore-dangle': 0,
     'no-use-before-define': 0,
     'require-jsdoc': 0,
-    'semi': 0,
+    'semi': [1, "never"],
     'valid-jsdoc': 0,
   },
 };

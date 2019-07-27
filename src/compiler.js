@@ -9,7 +9,6 @@ const { findContractFiles } = require('./find-contract-files')
 const Config = require('./truffle-config')
 const detailedError = require('./detailed-error')
 const { getFormattedVersion } = require('./compiler/load-compiler')
-const getOptions = require('./get-options')
 const { formatPaths } = require('./utils/format-paths')
 const { orderABI, replaceLinkReferences } = require('./utils/artifacts')
 
@@ -31,39 +30,16 @@ const defaultSelectors = {
 // Most basic of the compile commands. Takes a hash of sources, where
 // the keys are file or module paths and the values are the bodies of
 // the contracts. Does not evaulate dependencies that aren't already given.
-const compile = async function (inputSources, options) {
-  const solcVersion = getOptions().compiler.version
-  options.compilers.solc.version = solcVersion
+const compile = async function (inputSources, options, truffleOptions) {
+  const solcVersion = options.compiler.version
   const compilerInfo = { name: 'solc', version: getFormattedVersion(solcVersion) }
-  const hasTargets = options.compilationTargets && options.compilationTargets.length
-
-  expect.options(options, ['contracts_directory', 'compilers'])
-  expect.options(options.compilers, ['solc'])
-
-  options.compilers.solc.settings.evmVersion = _.get(options, ['compilers', 'solc', 'settings', 'evmVersion'])
-      || _.get(options, ['compilers', 'solc', 'evmVersion'])
-      || undefined
-
-  options.compilers.solc.settings.optimizer = _.get(options, ['compilers', 'solc', 'settings', 'optimizer'])
-      || _.get(options, ['compilers', 'solc', 'optimizer'])
-      || {}
-
-  options.compilers.solc.version = _.get(options, ['solc', 'vesion'])
-      || _.get(options, ['compilers', 'solc', 'settings', 'version'])
-      || _.get(options, ['compilers', 'solc', 'version'])
-      || undefined
-
-  // Grandfather in old solc config
-  if (options.solc) {
-    options.compilers.solc.settings.evmVersion = options.solc.evmVersion
-    options.compilers.solc.settings.optimizer = options.solc.optimizer
-  }
+  truffleOptions.compilers.solc.version = solcVersion
 
   const {
     operatingSystemIndependentSources,
     operatingSystemIndependentTargets,
     originalPathMappings,
-  } = formatPaths(inputSources, hasTargets, options)
+  } = formatPaths(inputSources, options.compilationTargets)
 
   // Specify compilation targets
   // Each target uses defaultSelectors, defaulting to single target `*` if targets are unspecified
@@ -77,8 +53,8 @@ const compile = async function (inputSources, options) {
     outputSelection['*'] = defaultSelectors
 
   const compilerSettings = {
-    evmVersion: options.compilers.solc.settings.evmVersion,
-    optimizer: options.compilers.solc.settings.optimizer,
+    evmVersion: options.compiler.evmVersion,
+    optimizer: options.compiler.optimizer,
     outputSelection,
   }
 
@@ -93,8 +69,7 @@ const compile = async function (inputSources, options) {
   }
 
   debug('Starting compilation')
-  const standardOutput = await compiler(operatingSystemIndependentSources, compilerSettings, options.compilers.solc.version)
-
+  const standardOutput = await compiler(operatingSystemIndependentSources, compilerSettings, options.compiler.version)
   debug('Compilation done')
 
   const { contracts, sources, errors: allErrors = [] } = standardOutput
@@ -111,10 +86,10 @@ const compile = async function (inputSources, options) {
   const returnVal = {}
 
   Object.keys(contracts).forEach(source_path => {
-    const files_contracts = contracts[source_path];
+    const files_contracts = contracts[source_path]
 
     Object.keys(files_contracts).forEach(contract_name => {
-      const contract = files_contracts[contract_name];
+      const contract = files_contracts[contract_name]
 
       // All source will have a key, but only the compiled source will have
       // the evm output.
@@ -141,44 +116,44 @@ const compile = async function (inputSources, options) {
 
       // Reorder ABI so functions are listed in the order they appear
       // in the source file. Solidity tests need to execute in their expected sequence.
-      contract_definition.abi = orderABI(contract_definition);
+      contract_definition.abi = orderABI(contract_definition)
 
       // Go through the link references and replace them with older-style
       // identifiers. We'll do this until we're ready to making a breaking
       // change to this code.
       Object.keys(contract.evm.bytecode.linkReferences).forEach(file_name => {
-        const fileLinks = contract.evm.bytecode.linkReferences[file_name];
+        const fileLinks = contract.evm.bytecode.linkReferences[file_name]
 
         Object.keys(fileLinks).forEach(library_name => {
-          const linkReferences = fileLinks[library_name] || [];
+          const linkReferences = fileLinks[library_name] || []
 
           contract_definition.bytecode = replaceLinkReferences(
             contract_definition.bytecode,
             linkReferences,
             library_name,
-          );
+          )
           contract_definition.unlinked_binary = replaceLinkReferences(
             contract_definition.unlinked_binary,
             linkReferences,
             library_name,
-          );
-        });
-      });
+          )
+        })
+      })
 
       // Now for the deployed bytecode
       Object.keys(contract.evm.deployedBytecode.linkReferences).forEach(file_name => {
         const fileLinks = contract.evm.deployedBytecode.linkReferences[file_name]
 
         Object.keys(fileLinks).forEach(library_name => {
-          const linkReferences = fileLinks[library_name] || [];
+          const linkReferences = fileLinks[library_name] || []
 
           contract_definition.deployedBytecode = replaceLinkReferences(
             contract_definition.deployedBytecode,
             linkReferences,
             library_name,
-          );
-        });
-      });
+          )
+        })
+      })
 
       returnVal[contract_name] = contract_definition
     })
@@ -196,19 +171,19 @@ const compile = async function (inputSources, options) {
 
 
 // contracts_directory: String. Directory where .sol files can be found.
-compile.all = async function (options) {
+compile.all = async function (options, truffleOptions) {
   debug('compile.all started')
-  options.paths = await findContractFiles(options.contracts_directory)
-  return compile.with_dependencies(options)
+  options.paths = await findContractFiles(options.contractsDir)
+  return compile.with_dependencies(options, truffleOptions)
 }
 
 // contracts_directory: String. Directory where .sol files can be found.
 // build_directory: String. Optional. Directory where .sol.js files can be found. Only required if `all` is false.
 // all: Boolean. Compile all sources found. Defaults to true. If false, will compare sources against built files
 //      in the build directory to see what needs to be compiled.
-compile.necessary = function (options) {
+compile.necessary = function (options, truffleOptions) {
   return new Promise((res, rej) => {
-    Profiler.updated(options, (err, updated) => {
+    Profiler.updated(truffleOptions, (err, updated) => {
       if (err)
         return rej(err)
 
@@ -221,40 +196,37 @@ compile.necessary = function (options) {
         })
       }
 
-      options.paths = updated;
-      return res(compile.with_dependencies(options))
+      options.paths = updated
+      return res(compile.with_dependencies(options, truffleOptions))
     })
   })
 }
 
-compile.with_dependencies = function (options) {
+compile.with_dependencies = function (options, truffleOptions) {
   return new Promise((res, rej) => {
-    options.contracts_directory = options.contracts_directory || process.cwd();
-
-    expect.options(options, [
-      'paths',
+    expect.options(truffleOptions, [
       'working_directory',
       'contracts_directory',
       'resolver',
     ])
 
-    const config = Config.default().merge(options)
+    const config = Config.default().merge(truffleOptions)
 
     Profiler.required_sources(
       config.with({
         paths: options.paths,
-        base_path: options.contracts_directory,
-        resolver: options.resolver,
+        base_path: options.contractsDir,
+        resolver: truffleOptions.resolver,
       }),
       (err, allSources, required) => {
         if (err)
           return rej(err)
 
         options.compilationTargets = required
-        return res(compile(allSources, options))
+        return res(compile(allSources, options, truffleOptions))
       },
-    );
+    )
   })
-};
+}
 
 module.exports = compile

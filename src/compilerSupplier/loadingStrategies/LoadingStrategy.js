@@ -1,9 +1,9 @@
 /* Original source code: https://github.com/trufflesuite/truffle/blob/v5.0.10/packages/truffle-compile/compilerSupplier/loadingStrategies/LoadingStrategy.js */
 /* eslint no-unused-vars: 0 */
 
-const path = require('path');
-const fs = require('fs');
-const Config = require('../../truffle-config');
+const path = require('path')
+const fs = require('fs')
+const Config = require('../../truffle-config')
 
 class LoadingStrategy {
   constructor(options) {
@@ -15,29 +15,29 @@ class LoadingStrategy {
       ],
       dockerTagsUrl:
         'https://registry.hub.docker.com/v2/repositories/ethereum/solc/tags/',
-    };
-    this.config = Object.assign({}, defaultConfig, options);
+    }
+    this.config = Object.assign({}, defaultConfig, options)
 
     const compilersDir = path.resolve(
       Config.getTruffleDataDirectory(),
       'compilers',
-    );
-    const compilerCachePath = path.resolve(compilersDir, 'node_modules'); // because babel binds to require & does weird things
+    )
+    const compilerCachePath = path.resolve(compilersDir, 'node_modules') // because babel binds to require & does weird things
     if (!fs.existsSync(compilersDir))
-      fs.mkdirSync(compilersDir);
+      fs.mkdirSync(compilersDir)
     if (!fs.existsSync(compilerCachePath))
-      fs.mkdirSync(compilerCachePath); // for 5.0.8 users
+      fs.mkdirSync(compilerCachePath) // for 5.0.8 users
 
-    this.compilerCachePath = compilerCachePath;
+    this.compilerCachePath = compilerCachePath
   }
 
   addFileToCache(code, fileName) {
-    const filePath = this.resolveCache(fileName);
-    fs.writeFileSync(filePath, code);
+    const filePath = this.resolveCache(fileName)
+    fs.writeFileSync(filePath, code)
   }
 
   errors(kind, input, error) {
-    const info = 'Run `truffle compile --list` to see available versions.';
+    const info = 'Run `truffle compile --list` to see available versions.'
 
     const kinds = {
       noPath: `Could not find compiler at: ${input}`,
@@ -67,20 +67,20 @@ class LoadingStrategy {
         + 'Received: '}${
           input
         } instead.`,
-    };
+    }
 
-    return new Error(kinds[kind]);
+    return new Error(kinds[kind])
   }
 
   fileIsCached(fileName) {
-    const file = this.resolveCache(fileName);
-    return fs.existsSync(file);
+    const file = this.resolveCache(fileName)
+    return fs.existsSync(file)
   }
 
   load(_userSpecification) {
     throw new Error(
       'Abstract method LoadingStrategy.load is not implemented for this strategy.',
-    );
+    )
   }
 
   /**
@@ -88,16 +88,16 @@ class LoadingStrategy {
    * previous implementation, note to self - ask Tim about this)
    */
   removeListener() {
-    const listeners = process.listeners('uncaughtException');
-    const execeptionHandler = listeners[listeners.length - 1];
+    const listeners = process.listeners('uncaughtException')
+    const execeptionHandler = listeners[listeners.length - 1]
 
     if (execeptionHandler)
-      process.removeListener('uncaughtException', execeptionHandler);
+      process.removeListener('uncaughtException', execeptionHandler)
   }
 
   resolveCache(fileName) {
-    return path.resolve(this.compilerCachePath, fileName);
+    return path.resolve(this.compilerCachePath, fileName)
   }
 }
 
-module.exports = LoadingStrategy;
+module.exports = LoadingStrategy
