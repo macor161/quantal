@@ -1,11 +1,19 @@
-/** @typedef {import('../options').QuantalOptions} BuildOptions */
+/**
+ * @typedef {import('../options').QuantalOptions} BuildOptions
+ * @typedef {import('../detailed-error').DetailedCompilerError} DetailedCompilerError
+ */
 
-const { mkdirp } = require('fs-extra')
+const { mkdirp, exists } = require('fs-extra')
+const path = require('path')
 const Resolver = require('truffle-resolver')
 const Artifactor = require('truffle-artifactor')
+const _ = require('lodash')
 const solcCompile = require('../compiler')
 const { getTruffleOptions } = require('../options')
 const { preloadCompiler } = require('../compiler/load-compiler')
+const { WarningCache } = require('./warning-cache')
+
+const CACHED_WARNING_FILENAME = '.cached-warnings.json'
 
 /**
  * Build contracts from Solidity sources and write output
@@ -13,16 +21,18 @@ const { preloadCompiler } = require('../compiler/load-compiler')
  * @param {BuildOptions} options Options
  */
 async function build(options) {
+  const warningCache = new WarningCache({ builtContractsDir: options.builtContractsDir })
   await preloadCompiler(options.compiler.version)
   const truffleOptions = getTruffleOptions()
   truffleOptions.resolver = new Resolver(truffleOptions)
 
   const compilation = await compileSources(options, truffleOptions)
+  const allWarnings = await warningCache.updateCache({ contracts: compilation.contracts, warnings: compilation.warnings })
 
   return {
     outputs: { [compilation.compiler]: compilation.files },
     contracts: compilation.contracts,
-    warnings: compilation.warnings || [],
+    warnings: allWarnings,
     errors: compilation.errors,
   }
 }
@@ -46,7 +56,10 @@ async function compileSources(options, truffleOptions) {
     await writeContracts(contracts, options.builtContractsDir)
 
   return {
-    contracts, files, warnings, errors,
+    contracts,
+    files,
+    warnings,
+    errors,
   }
 }
 
@@ -59,6 +72,14 @@ async function writeContracts(contracts, builtContractsDir) {
   const artifactor = new Artifactor(builtContractsDir)
   await mkdirp(builtContractsDir)
   await artifactor.saveAll(contracts)
+}
+
+async function getCachedWarnings(builtContractsDir) {
+  const cachedWarningsFile = path.join(builtContractsDir, CACHED_WARNING_FILENAME)
+
+  return (await exists(cachedWarningsFile))
+    ? (await readJson(cachedWarningsFile)).warnings
+    : []
 }
 
 
