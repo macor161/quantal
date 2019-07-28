@@ -13,24 +13,17 @@ const { preloadCompiler } = require('../compiler/load-compiler')
  * @param {BuildOptions} options Options
  */
 async function build(options) {
-  try {
-    await preloadCompiler(options.compiler.version)
-    const truffleOptions = getTruffleOptions()
-    truffleOptions.resolver = new Resolver(truffleOptions)
+  await preloadCompiler(options.compiler.version)
+  const truffleOptions = getTruffleOptions()
+  truffleOptions.resolver = new Resolver(truffleOptions)
 
-    const compilation = await compileSources(options, truffleOptions)
+  const compilation = await compileSources(options, truffleOptions)
 
-    return {
-      outputs: { [compilation.compiler]: compilation.files },
-      contracts: compilation.contracts,
-      warnings: compilation.warnings || [],
-      errors: [],
-    }
-  } catch (errors) {
-    if (errors.length)
-      return { errors }
-
-    throw errors
+  return {
+    outputs: { [compilation.compiler]: compilation.files },
+    contracts: compilation.contracts,
+    warnings: compilation.warnings || [],
+    errors: compilation.errors,
   }
 }
 
@@ -40,7 +33,7 @@ async function compileSources(options, truffleOptions) {
     : solcCompile.necessary
 
   const {
-    contracts, files, compilerInfo, warnings,
+    contracts, files, compilerInfo, warnings, errors,
   } = await compileFunc(options, truffleOptions)
 
   if (compilerInfo) {
@@ -49,27 +42,23 @@ async function compileSources(options, truffleOptions) {
     }
   }
 
-  if (contracts && Object.keys(contracts).length > 0) {
-    await writeContracts(contracts, {
-      builtContractsDir: options.builtContractsDir,
-      networkId: truffleOptions.network_id,
-    })
-  }
+  if (contracts && Object.keys(contracts).length > 0)
+    await writeContracts(contracts, options.builtContractsDir)
 
-  return { contracts, files, warnings }
+  return {
+    contracts, files, warnings, errors,
+  }
 }
 
 /**
  * Write contracts to json artifacts
  * @param {Object[]} contracts
- * @param {Object} options
- * @param {string} options.builtContractsDir
- * @param {string} options.networkId
+ * @param {string} builtContractsDir
  */
-async function writeContracts(contracts, options) {
-  const artifactor = new Artifactor(options.builtContractsDir)
-  await mkdirp(options.builtContractsDir)
-  await artifactor.saveAll(contracts, { network_id: options.networkId })
+async function writeContracts(contracts, builtContractsDir) {
+  const artifactor = new Artifactor(builtContractsDir)
+  await mkdirp(builtContractsDir)
+  await artifactor.saveAll(contracts)
 }
 
 

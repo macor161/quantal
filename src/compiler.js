@@ -63,8 +63,8 @@ const compile = async function (inputSources, options, truffleOptions) {
     return {
       contracts: [],
       files: {},
-      compilerInfo: null,
       warnings: [],
+      errors: [],
     }
   }
 
@@ -76,8 +76,14 @@ const compile = async function (inputSources, options, truffleOptions) {
   const warnings = allErrors.filter(error => error.severity === 'warning')
   const errors = allErrors.filter(error => error.severity !== 'warning')
 
-  if (errors.length > 0)
-    throw (await Promise.all(errors.map(err => detailedError(err))))
+  if (errors.length > 0) {
+    return {
+      contracts: [],
+      files: {},
+      warnings: [],
+      errors: await Promise.all(errors.map(err => detailedError(err))),
+    }
+  }
 
   const files = []
   for (const [filePath, source] of Object.entries(sources))
@@ -165,7 +171,11 @@ const compile = async function (inputSources, options, truffleOptions) {
   )
 
   return {
-    contracts: returnVal, files, compilerInfo, warnings: detailedWarnings,
+    contracts: returnVal,
+    files,
+    compilerInfo,
+    warnings: detailedWarnings,
+    errors: [],
   }
 }
 
