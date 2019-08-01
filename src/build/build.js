@@ -4,8 +4,8 @@
  */
 
 const { mkdirp } = require('fs-extra')
-const Resolver = require('truffle-resolver')
 const Artifactor = require('truffle-artifactor')
+const Resolver = require('../resolver')
 const solcCompile = require('../compiler')
 const { getTruffleOptions } = require('../options')
 const { preloadCompiler } = require('../compiler/load-compiler')

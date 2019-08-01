@@ -33,8 +33,10 @@
     "commander": "^2.20.0",
     "configstore": "^4.0.0",
     "debug": "^4.1.1",
+    "detect-installed": "^2.0.4",
     "find-up": "^2.1.0",
     "fs-extra": "^7.0.1",
+    "get-installed-path": "^4.0.8",
     "glob": "^7.1.4",
     "import-fresh": "^3.0.0",
     "line-column": "^1.0.2",
@@ -57,6 +59,7 @@
     "truffle-error": "0.0.5",
     "truffle-expect": "0.0.7",
     "truffle-provider": "0.1.10",
+    "truffle-provisioner": "^0.1.5",
     "truffle-resolver": "5.0.10",
     "v8-compile-cache": "^2.0.2"
   },
