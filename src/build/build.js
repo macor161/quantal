@@ -3,17 +3,13 @@
  * @typedef {import('../detailed-error').DetailedCompilerError} DetailedCompilerError
  */
 
-const { mkdirp, exists } = require('fs-extra')
-const path = require('path')
+const { mkdirp } = require('fs-extra')
 const Resolver = require('truffle-resolver')
 const Artifactor = require('truffle-artifactor')
-const _ = require('lodash')
 const solcCompile = require('../compiler')
 const { getTruffleOptions } = require('../options')
 const { preloadCompiler } = require('../compiler/load-compiler')
 const { WarningCache } = require('./warning-cache')
-
-const CACHED_WARNING_FILENAME = '.cached-warnings.json'
 
 /**
  * Build contracts from Solidity sources and write output
@@ -72,14 +68,6 @@ async function writeContracts(contracts, builtContractsDir) {
   const artifactor = new Artifactor(builtContractsDir)
   await mkdirp(builtContractsDir)
   await artifactor.saveAll(contracts)
-}
-
-async function getCachedWarnings(builtContractsDir) {
-  const cachedWarningsFile = path.join(builtContractsDir, CACHED_WARNING_FILENAME)
-
-  return (await exists(cachedWarningsFile))
-    ? (await readJson(cachedWarningsFile)).warnings
-    : []
 }
 
 

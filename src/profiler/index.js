@@ -3,6 +3,9 @@
 
 // Original source code: https://github.com/trufflesuite/truffle/blob/v5.0.30/packages/truffle-compile/profiler/index.js
 // const debug = require('debug')('compile:profiler')
+
+/* eslint no-await-in-loop: 0 */
+/* eslint prefer-destructuring: 0 */
 const path = require('path')
 const expect = require('truffle-expect')
 const semver = require('semver')
@@ -143,7 +146,6 @@ module.exports = {
                 currentFile,
                 resolved[currentFile],
                 solc,
-                parserSolc,
               )
             } catch (err) {
               err.message = `Error parsing ${currentFile}: ${err.message}`
@@ -168,7 +170,7 @@ module.exports = {
 
   // Resolves sources in several async passes. For each resolved set it detects unknown
   // imports from external packages and adds them to the set of files to resolve.
-  async resolveAllSources(resolver, initialPaths, solc, parserSolc) {
+  async resolveAllSources(resolver, initialPaths, solc) {
     const mapping = {}
     const allPaths = initialPaths.slice()
 
@@ -194,7 +196,10 @@ module.exports = {
 
         const promise = new Promise((accept, reject) => {
           resolver.resolve(file, parent, (err, body, absolutePath, source) => {
-            err ? reject(err) : accept({ file: absolutePath, body, source })
+            if (err)
+              return reject(err)
+
+            accept({ file: absolutePath, body, source })
           })
         })
         promises.push(promise)

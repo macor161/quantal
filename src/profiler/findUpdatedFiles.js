@@ -8,8 +8,7 @@ const findUpdatedFiles = (
   // the artifact updated times.
   const sourceFiles = Object.keys(sourceFilesArtifacts)
 
-  let sourceFileStats
-  sourceFileStats = sourceFiles.map(file => {
+  const sourceFileStats = sourceFiles.map(file => {
     try {
       return fse.statSync(file)
     } catch (error) {
@@ -33,8 +32,9 @@ const findUpdatedFiles = (
         sourceFileStat.mtime || sourceFileStat.ctime
       ).getTime()
 
-      if (sourceFileUpdatedTime > artifactsUpdatedTime)
-        return sourceFile
+      return sourceFileUpdatedTime > artifactsUpdatedTime
+        ? sourceFile
+        : null
     })
     .filter(file => file)
 }
