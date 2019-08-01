@@ -1,7 +1,7 @@
+// Original source: https://github.com/trufflesuite/truffle/blob/v5.0.30/packages/truffle-resolver/index.js
+
 const whilst = require('async/whilst')
-const contract = require('truffle-contract')
 const expect = require('truffle-expect')
-const provision = require('truffle-provisioner')
 const EPMSource = require('./epm')
 const NPMSource = require('./npm')
 const GlobalNPMSource = require('./globalnpm')
@@ -18,24 +18,6 @@ function Resolver(options) {
     new GlobalNPMSource(),
     new FSSource(options.working_directory, options.contracts_build_directory),
   ]
-}
-
-// This function might be doing too much. If so, too bad (for now).
-Resolver.prototype.require = function (import_path, search_path) {
-  const self = this
-
-  for (let i = 0; i < self.sources.length; i++) {
-    const source = self.sources[i]
-    const result = source.require(import_path, search_path)
-    if (result) {
-      const abstraction = contract(result)
-      provision(abstraction, self.options)
-      return abstraction
-    }
-  }
-  throw new Error(
-    `Could not find artifacts for ${import_path} from any sources`,
-  )
 }
 
 Resolver.prototype.resolve = function (import_path, imported_from, callback) {
