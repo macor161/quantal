@@ -13,12 +13,14 @@ class NPM {
     // If nothing's found, body returns `undefined`
     let body
     let modulesDir = this.working_directory
+    let absolutePath = import_path
 
     while (true) {
       const expected_path = path.join(modulesDir, 'node_modules', import_path)
 
       try {
         body = fs.readFileSync(expected_path, { encoding: 'utf8' })
+        absolutePath = expected_path
         break
       } catch (err) {}
 
@@ -28,7 +30,17 @@ class NPM {
       if (modulesDir === oldModulesDir)
         break
     }
-    return callback(null, body, import_path)
+    return callback(null, body, absolutePath)
+  }
+
+  // We're resolving package paths to other package paths, not absolute paths.
+  // This will ensure the source fetcher conintues to use the correct sources for packages.
+  // i.e., if some_module/contracts/MyContract.sol imported "./AnotherContract.sol",
+  // we're going to resolve it to some_module/contracts/AnotherContract.sol, ensuring
+  // that when this path is evaluated this source is used again.
+  resolve_dependency_path(import_path, dependency_path) {
+    const dirname = path.dirname(import_path)
+    return path.join(dirname, dependency_path)
   }
 }
 

@@ -199,7 +199,7 @@ module.exports = {
             if (err)
               return reject(err)
 
-            accept({ file: absolutePath, body, source })
+            accept({ file, body, source })
           })
         })
         promises.push(promise)

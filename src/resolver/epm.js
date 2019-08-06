@@ -18,6 +18,7 @@ class EPM {
 
     // If nothing's found, body returns `undefined`
     let body
+    let absolutePath = import_path
 
     while (true) {
       let file_path = path.join(installDir, 'installed_contracts', import_path)
@@ -31,6 +32,7 @@ class EPM {
 
       try {
         body = fs.readFileSync(file_path, { encoding: 'utf8' })
+        absolutePath = file_path
         break
       } catch (err) {}
 
@@ -41,7 +43,25 @@ class EPM {
         break
     }
 
-    return callback(null, body, import_path)
+    return callback(null, body, absolutePath)
+  }
+
+  // We're resolving package paths to other package paths, not absolute paths.
+  // This will ensure the source fetcher conintues to use the correct sources for packages.
+  // i.e., if some_module/contracts/MyContract.sol imported "./AnotherContract.sol",
+  // we're going to resolve it to some_module/contracts/AnotherContract.sol, ensuring
+  // that when this path is evaluated this source is used again.
+  resolve_dependency_path(import_path, dependency_path) {
+    const dirname = path.dirname(import_path)
+    let resolved_dependency_path = path.join(dirname, dependency_path)
+
+    // Note: We use `path.join()` here to take care of path idiosyncrasies
+    // like joining "something/" and "./something_else.sol". However, this makes
+    // paths OS dependent, and on Windows, makes the separator "\". Solidity
+    // needs the separator to be a forward slash. Let's massage that here.
+    resolved_dependency_path = resolved_dependency_path.replace(/\\/g, '/')
+
+    return resolved_dependency_path
   }
 }
 

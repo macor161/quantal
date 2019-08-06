@@ -42,6 +42,12 @@ class FS {
       callback(null, resolved_body, resolved_path)
     })
   }
+
+  // Here we're resolving from local files to local files, all absolute.
+  resolve_dependency_path(import_path, dependency_path) {
+    const dirname = path.dirname(import_path)
+    return path.resolve(path.join(dirname, dependency_path))
+  }
 }
 
 
