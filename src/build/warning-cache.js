@@ -1,7 +1,7 @@
 /** @typedef {import('../detailed-error').DetailedCompilerError} DetailedCompilerError */
 
 const {
-  mkdirp, readJson, writeJson, exists, remove,
+  mkdirp, readJson, writeJson, exists, remove, existsSync,
 } = require('fs-extra')
 const _ = require('lodash')
 const path = require('path')
@@ -23,7 +23,7 @@ class WarningCache {
 
   /**
    *
-   * @param {Object} compileResults
+   * @param {Object} compileResults Compile results
    * @param {Object} compileResults.contracts
    * @param {DetailedCompilerError[]} compileResults.warnings
    * @returns {DetailedCompilerError[]} All warnings from cache and compilation results
@@ -48,7 +48,7 @@ class WarningCache {
         const warningFilePath = _.get(warning, ['sourceLocation', 'file'])
 
         return warningFilePath
-          && this._contractFileExists(warningFilePath)
+          && this._contractFileExistsForWarning(warning)
           && !allCompiledFiles.includes(warningFilePath)
       })
 
@@ -75,8 +75,16 @@ class WarningCache {
     }
   }
 
-  _contractFileExists(contractPath) {
-    return contractPath && true
+  _getWarningFilePath(warning) {
+    return _.get(warning, ['sourceLocation', 'absolutePath'])
+      || _.get(warning, ['sourceLocation', 'file'])
+  }
+
+  _contractFileExistsForWarning(warning) {
+    const contractPath = this._getWarningFilePath(warning)
+    return contractPath
+      ? existsSync(contractPath)
+      : false
   }
 
   async _deleteCacheFile() {
