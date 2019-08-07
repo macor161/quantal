@@ -109,6 +109,7 @@ module.exports = {
               path: file,
               content: resolved[file].body,
               imports: resolved[file].imports,
+              absolutePath: resolved[file].absolutePath,
             }
           }
         })
@@ -199,7 +200,9 @@ module.exports = {
             if (err)
               return reject(err)
 
-            accept({ file, body, source })
+            accept({
+              file, body, source, absolutePath,
+            })
           })
         })
         promises.push(promise)
