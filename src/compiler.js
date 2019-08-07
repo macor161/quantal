@@ -81,7 +81,13 @@ const compile = async function (inputSources, options, truffleOptions) {
       contracts: [],
       files: {},
       warnings: [],
-      errors: await Promise.all(errors.map(err => detailedError(err))),
+      errors: await Promise.all(errors.map(err => {
+        const file = inputSources[_.get(err, ['sourceLocation', 'file'])]
+        return detailedError(err, file && {
+          source: file.content,
+          path: file.absolutePath,
+        })
+      })),
     }
   }
 
