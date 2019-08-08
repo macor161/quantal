@@ -8,6 +8,10 @@ const path = require('path')
 
 const CACHED_WARNING_FILENAME = '.cached-warnings.json'
 
+/**
+ * Caches compilation warnings in a file so they can be retrieved
+ * even if a smart contract wasn't recompiled
+ */
 class WarningCache {
   /**
    * @param {Object} options Options
