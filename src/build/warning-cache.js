@@ -30,18 +30,7 @@ class WarningCache {
    */
   async updateCache(compileResults) {
     await this._fetchCache()
-    const { contracts, warnings } = compileResults
-
-    const compiledFiles = Object.values(contracts)
-      .map(contract => contract.sourcePath)
-      .filter(file => file !== undefined)
-
-    const compiledWarningFiles = warnings
-      .map(warning => _.get(warning, ['sourceLocation', 'file']))
-
-    const allCompiledFiles = compiledFiles
-      .concat(compiledWarningFiles)
-      .filter(file => file !== undefined)
+    const { warnings } = compileResults
 
     const cachedWarnings = this._cachedWarnings
       .filter(warning => {
@@ -49,10 +38,12 @@ class WarningCache {
 
         return warningFilePath
           && this._contractFileExistsForWarning(warning)
-          && !allCompiledFiles.includes(warningFilePath)
       })
 
-    const allWarnings = warnings.concat(cachedWarnings)
+    const allWarnings = _(warnings)
+      .concat(cachedWarnings)
+      .uniqBy(getWarningHash)
+      .value()
 
     await this._saveWarnings(allWarnings)
 
@@ -99,6 +90,15 @@ class WarningCache {
   async _saveWarnings(warnings) {
     await writeJson(this._cachePath, { warnings })
   }
+}
+
+/**
+ * @param {DetailedCompilerError} warn
+ */
+function getWarningHash(warn) {
+  return warn.sourceLocation
+    ? `${warn.sourceLocation}:${warn.sourceLocation.start}:${warn.sourceLocation.end}`
+    : warn.formattedMessage
 }
 
 module.exports = { WarningCache }
