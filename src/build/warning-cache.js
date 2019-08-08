@@ -10,7 +10,6 @@ const CACHED_WARNING_FILENAME = '.cached-warnings.json'
 
 class WarningCache {
   /**
-   *
    * @param {Object} options Options
    * @param {string} options.builtContractsDir
    */
@@ -22,7 +21,6 @@ class WarningCache {
   }
 
   /**
-   *
    * @param {Object} compileResults Compile results
    * @param {Object} compileResults.contracts
    * @param {DetailedCompilerError[]} compileResults.warnings
@@ -32,16 +30,9 @@ class WarningCache {
     await this._fetchCache()
     const { warnings } = compileResults
 
-    const cachedWarnings = this._cachedWarnings
-      .filter(warning => {
-        const warningFilePath = _.get(warning, ['sourceLocation', 'file'])
-
-        return warningFilePath
-          && this._contractFileExistsForWarning(warning)
-      })
-
-    const allWarnings = _(warnings)
-      .concat(cachedWarnings)
+    const allWarnings = _(this._cachedWarnings)
+      .filter(warn => this._contractFileExistsForWarning(warn))
+      .concat(warnings)
       .uniqBy(getWarningHash)
       .value()
 
@@ -66,13 +57,8 @@ class WarningCache {
     }
   }
 
-  _getWarningFilePath(warning) {
-    return _.get(warning, ['sourceLocation', 'absolutePath'])
-      || _.get(warning, ['sourceLocation', 'file'])
-  }
-
   _contractFileExistsForWarning(warning) {
-    const contractPath = this._getWarningFilePath(warning)
+    const contractPath = getWarningFilePath(warning)
     return contractPath
       ? existsSync(contractPath)
       : false
@@ -99,6 +85,14 @@ function getWarningHash(warn) {
   return warn.sourceLocation
     ? `${warn.sourceLocation}:${warn.sourceLocation.start}:${warn.sourceLocation.end}`
     : warn.formattedMessage
+}
+
+/**
+ * @param {DetailedCompilerError} warn
+ */
+function getWarningFilePath(warning) {
+  return _.get(warning, ['sourceLocation', 'absolutePath'])
+    || _.get(warning, ['sourceLocation', 'file'])
 }
 
 module.exports = { WarningCache }
