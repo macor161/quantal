@@ -68,7 +68,6 @@ The following truffle config options are currently supported:
 * The current alpha version is not recommended for production use.
 * Windows is currently not supported
 * Some solc versions are not supported yet. See list below.
-* Cache is not implemented yet. This means quantal will recompile all smart contracts every time it’s launched. Cache support is coming soon.
 * Formatted error messages are not supported for solc versions below 0.4.20
 
 ## Supported solc versions
