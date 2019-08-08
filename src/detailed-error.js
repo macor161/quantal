@@ -38,7 +38,7 @@ module.exports = async function detailedCompilerOutputError(compilerOutputError,
   try {
     const absolutePath = options.path
     const path = absolutePath || get(compilerOutputError, ['sourceLocation', 'file'])
-    const fileContent = options.source || (path && await readFile(path, 'utf-8'))
+    const fileContent = options.source || (path && isAbsolute(path) && await readFile(path, 'utf-8'))
 
     if (!fileContent)
       return compilerOutputError
