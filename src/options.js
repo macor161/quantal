@@ -141,9 +141,7 @@ function convertTruffleToQuantalOptions(truffleOptions) {
 }
 
 function getTruffleOptions() {
-  // Currently recompiles all contracts everytime to make sure
-  // we receive all warning messages
-  const truffleConfig = TruffleConfig.detect({ all: true })
+  const truffleConfig = TruffleConfig.detect()
   const config = TruffleConfig.default().merge(truffleConfig)
 
   const evmVersion = _.get(config, ['compilers', 'solc', 'settings', 'evmVersion'])

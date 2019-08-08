@@ -81,7 +81,13 @@ const compile = async function (inputSources, options, truffleOptions) {
       contracts: [],
       files: {},
       warnings: [],
-      errors: await Promise.all(errors.map(err => detailedError(err))),
+      errors: await Promise.all(errors.map(err => {
+        const file = inputSources[_.get(err, ['sourceLocation', 'file'])]
+        return detailedError(err, file && {
+          source: file.content,
+          path: file.absolutePath,
+        })
+      })),
     }
   }
 
@@ -167,7 +173,13 @@ const compile = async function (inputSources, options, truffleOptions) {
 
 
   const detailedWarnings = await Promise.all(
-    warnings.map(warn => detailedError(warn, sources[_.get(warn, ['sourceLocation', 'file'])])),
+    warnings.map(warn => {
+      const file = inputSources[_.get(warn, ['sourceLocation', 'file'])]
+      return detailedError(warn, file && {
+        source: file.content,
+        path: file.absolutePath,
+      })
+    }),
   )
 
   return {

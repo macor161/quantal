@@ -29,14 +29,16 @@ const LINES_OF_CONTEXT = 6
  * Returns a `DetailedCompilerError` from a solc error
  *
  * @param compilerOutputError solc error
- * @param compileResult compiler's result
+ * @param {Object} options
+ * @param {string} options.source File source code
+ * @param {string} options.path File path
  * @returns {DetailedCompilerOutputError}
  */
-module.exports = async function detailedCompilerOutputError(compilerOutputError, compileResult) {
+module.exports = async function detailedCompilerOutputError(compilerOutputError, options = {}) {
   try {
-    const fileContent = get(compileResult, 'source')
-      ? compileResult.source
-      : await getSource(compilerOutputError)
+    const absolutePath = options.path
+    const path = absolutePath || get(compilerOutputError, ['sourceLocation', 'file'])
+    const fileContent = options.source || (path && isAbsolute(path) && await readFile(path, 'utf-8'))
 
     if (!fileContent)
       return compilerOutputError
@@ -44,6 +46,7 @@ module.exports = async function detailedCompilerOutputError(compilerOutputError,
     const error = {
       ...compilerOutputError,
       sourceLocation: {
+        absolutePath,
         ...compilerOutputError.sourceLocation,
         ...lineColumn(fileContent, compilerOutputError.sourceLocation.start),
       },
@@ -74,10 +77,4 @@ function addSourceContext(error, fileContent) {
     sourceContext: range(lineStart, lineEnd)
       .reduce((acc, line) => ({ ...acc, [line]: lines[line - 1] }), {}),
   }
-}
-
-
-function getSource(compilerOutputError) {
-  if (compilerOutputError.sourceLocation && isAbsolute(compilerOutputError.sourceLocation.file))
-    return readFile(compilerOutputError.sourceLocation.file, 'utf-8')
 }
