@@ -1,0 +1,10 @@
+{
+  "name": "synthetix",
+  "version": "2.5.6",
+  "license": "MIT",
+  "author": "Synthetix",
+  "devDependencies": {},
+  "dependencies": {
+    "openzeppelin-solidity": "2.0.0"
+  }
+}
