@@ -10,7 +10,7 @@ const path = require('path')
 const expect = require('truffle-expect')
 const semver = require('semver')
 const { findContractFiles } = require('../find-contract-files')
-const CompilerSupplier = require('../compilerSupplier')
+const CompilerSupplier = require('../compiler-supplier')
 const { readAndParseArtifactFiles } = require('./readAndParseArtifactFiles')
 const {
   minimumUpdatedTimePerSource,
@@ -22,14 +22,12 @@ const { getImports } = require('./getImports')
 module.exports = {
   async updated(options, callback) {
     const callbackPassed = typeof callback === 'function'
-    expect.options(options, ['resolver'])
-
-    const { contracts_directory, contracts_build_directory } = options
+    const { contractsDir, builtContractsDir } = options
 
     async function getFiles() {
       if (options.files)
         return options.files
-      return findContractFiles(contracts_directory)
+      return findContractFiles(contractsDir)
     }
 
     let sourceFilesArtifacts = {}
@@ -39,7 +37,7 @@ module.exports = {
       const sourceFiles = await getFiles()
       sourceFilesArtifacts = readAndParseArtifactFiles(
         sourceFiles,
-        contracts_build_directory,
+        builtContractsDir,
       )
       sourceFilesArtifactsUpdatedTimes = minimumUpdatedTimePerSource(
         sourceFilesArtifacts,
@@ -89,7 +87,7 @@ module.exports = {
         ).sort()
 
         // Load compiler
-        const supplier = new CompilerSupplier(options.compilers.solc)
+        const supplier = new CompilerSupplier()
         return supplier.load()
       })
       .then(async solc => {

@@ -52,6 +52,7 @@ const DEFAULT_COMPILER_OPTIONS = {
  * @property {string} contractsDir
  * @property {string} builtContractsDir
  * @property {string} deploymentsDir
+ * @property {string} cwd
  * @property {GanacheOptions} ganache
  * @property {CompilerOptions} compiler
  */
@@ -130,8 +131,9 @@ function convertTruffleToQuantalOptions(truffleOptions) {
   const solcVersion = truffleOptions.compilers.solc.settings.version
 
   return {
-    contractsDir: truffleOptions.contracts_directory,
     builtContractsDir: truffleOptions.contracts_build_directory,
+    contractsDir: truffleOptions.contracts_directory,
+    cwd: truffleOptions.working_directory,
     compiler: {
       evmVersion: truffleOptions.compilers.solc.settings.evmVersion,
       optimizer: truffleOptions.compilers.solc.settings.optimizer,

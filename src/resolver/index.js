@@ -1,22 +1,24 @@
 // Original source: https://github.com/trufflesuite/truffle/blob/v5.0.30/packages/truffle-resolver/index.js
 
 const whilst = require('async/whilst')
-const expect = require('truffle-expect')
 const EPMSource = require('./epm')
 const NPMSource = require('./npm')
 const GlobalNPMSource = require('./globalnpm')
 const FSSource = require('./fs')
 
+/**
+ * @param {Object} options
+ * @param {string} options.cwd
+ * @param {string} options.buildDir
+ */
 function Resolver(options) {
-  expect.options(options, ['working_directory', 'contracts_build_directory'])
-
   this.options = options
 
   this.sources = [
-    new EPMSource(options.working_directory, options.contracts_build_directory),
-    new NPMSource(options.working_directory),
+    new EPMSource(options.cwd, options.buildDir),
+    new NPMSource(options.cwd),
     new GlobalNPMSource(),
-    new FSSource(options.working_directory, options.contracts_build_directory),
+    new FSSource(options.cwd, options.buildDir),
   ]
 }
 

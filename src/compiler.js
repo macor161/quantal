@@ -1,12 +1,10 @@
 // Original source code: https://github.com/trufflesuite/truffle/blob/v5.0.10/packages/truffle-compile/index.js
 
-const debug = require('debug')('compile')
-const expect = require('truffle-expect')
+// const debug = require('debug')('compile')
 const _ = require('lodash')
 const compiler = require('./compiler/multiprocess-compiler')
 const Profiler = require('./profiler')
 const { findContractFiles } = require('./find-contract-files')
-const Config = require('./truffle-config')
 const detailedError = require('./detailed-error')
 const { getFormattedVersion } = require('./compiler/load-compiler')
 const { formatPaths } = require('./utils/format-paths')
@@ -30,10 +28,9 @@ const defaultSelectors = {
 // Most basic of the compile commands. Takes a hash of sources, where
 // the keys are file or module paths and the values are the bodies of
 // the contracts. Does not evaulate dependencies that aren't already given.
-const compile = async function (inputSources, options, truffleOptions) {
+const compile = async function (inputSources, options) {
   const solcVersion = options.compiler.version
   const compilerInfo = { name: 'solc', version: getFormattedVersion(solcVersion) }
-  truffleOptions.compilers.solc.version = solcVersion
 
   const {
     operatingSystemIndependentSources,
@@ -68,9 +65,8 @@ const compile = async function (inputSources, options, truffleOptions) {
     }
   }
 
-  debug('Starting compilation')
+
   const standardOutput = await compiler(operatingSystemIndependentSources, compilerSettings, options.compiler.version)
-  debug('Compilation done')
 
   const { contracts, sources, errors: allErrors = [] } = standardOutput
   const warnings = allErrors.filter(error => error.severity === 'warning')
@@ -194,7 +190,6 @@ const compile = async function (inputSources, options, truffleOptions) {
 
 // contracts_directory: String. Directory where .sol files can be found.
 compile.all = async function (options, truffleOptions) {
-  debug('compile.all started')
   options.paths = await findContractFiles(options.contractsDir)
   return compile.with_dependencies(options, truffleOptions)
 }
@@ -203,9 +198,9 @@ compile.all = async function (options, truffleOptions) {
 // build_directory: String. Optional. Directory where .sol.js files can be found. Only required if `all` is false.
 // all: Boolean. Compile all sources found. Defaults to true. If false, will compare sources against built files
 //      in the build directory to see what needs to be compiled.
-compile.necessary = function (options, truffleOptions) {
+compile.necessary = function (options) {
   return new Promise((res, rej) => {
-    Profiler.updated(truffleOptions, (err, updated) => {
+    Profiler.updated(options, (err, updated) => {
       if (err)
         return rej(err)
 
@@ -219,33 +214,26 @@ compile.necessary = function (options, truffleOptions) {
       }
 
       options.paths = updated
-      return res(compile.with_dependencies(options, truffleOptions))
+      return res(compile.with_dependencies(options))
     })
   })
 }
 
-compile.with_dependencies = function (options, truffleOptions) {
+compile.with_dependencies = function (options) {
   return new Promise((res, rej) => {
-    expect.options(truffleOptions, [
-      'working_directory',
-      'contracts_directory',
-      'resolver',
-    ])
-
-    const config = Config.default().merge(truffleOptions)
-
     Profiler.required_sources(
-      config.with({
+      {
         paths: options.paths,
         base_path: options.contractsDir,
-        resolver: truffleOptions.resolver,
-      }),
+        resolver: options.resolver,
+        contracts_directory: options.contractsDir,
+      },
       (err, allSources, required) => {
         if (err)
           return rej(err)
 
         options.compilationTargets = required
-        return res(compile(allSources, options, truffleOptions))
+        return res(compile(allSources, options))
       },
     )
   })
