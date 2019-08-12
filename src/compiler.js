@@ -189,9 +189,9 @@ const compile = async function (inputSources, options) {
 
 
 // contracts_directory: String. Directory where .sol files can be found.
-compile.all = async function (options, truffleOptions) {
+compile.all = async function (options) {
   options.paths = await findContractFiles(options.contractsDir)
-  return compile.with_dependencies(options, truffleOptions)
+  return compile.with_dependencies(options)
 }
 
 // contracts_directory: String. Directory where .sol files can be found.

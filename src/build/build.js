@@ -7,7 +7,6 @@ const { mkdirp } = require('fs-extra')
 const Artifactor = require('truffle-artifactor')
 const Resolver = require('../resolver')
 const solcCompile = require('../compiler')
-const { getTruffleOptions } = require('../options')
 const { preloadCompiler } = require('../compiler/load-compiler')
 const { WarningCache } = require('./warning-cache')
 
@@ -19,13 +18,13 @@ const { WarningCache } = require('./warning-cache')
 async function build(options) {
   const warningCache = new WarningCache({ builtContractsDir: options.builtContractsDir })
   await preloadCompiler(options.compiler.version)
-  const truffleOptions = getTruffleOptions()
-  const resolver = new Resolver({ cwd: options.cwd, buildDir: options.builtContractsDir })
-  truffleOptions.resolver = resolver
-  options.resolver = resolver
+  options.resolver = new Resolver({ cwd: options.cwd, buildDir: options.builtContractsDir })
 
-  const compilation = await compileSources(options, truffleOptions)
+  const compilation = await solcCompile.necessary(options)
   const allWarnings = await warningCache.updateCache({ contracts: compilation.contracts, warnings: compilation.warnings })
+
+  if (compilation.contracts && Object.keys(compilation.contracts).length > 0)
+    await writeContracts(compilation.contracts, options.builtContractsDir)
 
   return {
     outputs: { [compilation.compiler]: compilation.files },
@@ -35,31 +34,6 @@ async function build(options) {
   }
 }
 
-async function compileSources(options, truffleOptions) {
-  const compileFunc = truffleOptions.all === true || truffleOptions.compileAll === true
-    ? solcCompile.all
-    : solcCompile.necessary
-
-  const {
-    contracts, files, compilerInfo, warnings, errors,
-  } = await compileFunc(options, truffleOptions)
-
-  if (compilerInfo) {
-    truffleOptions.compilersInfo[compilerInfo.name] = {
-      version: compilerInfo.version,
-    }
-  }
-
-  if (contracts && Object.keys(contracts).length > 0)
-    await writeContracts(contracts, options.builtContractsDir)
-
-  return {
-    contracts,
-    files,
-    warnings,
-    errors,
-  }
-}
 
 /**
  * Write contracts to json artifacts
