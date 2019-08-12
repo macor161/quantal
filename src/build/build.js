@@ -20,7 +20,9 @@ async function build(options) {
   const warningCache = new WarningCache({ builtContractsDir: options.builtContractsDir })
   await preloadCompiler(options.compiler.version)
   const truffleOptions = getTruffleOptions()
-  truffleOptions.resolver = new Resolver({ cwd: options.cwd, buildDir: options.builtContractsDir })
+  const resolver = new Resolver({ cwd: options.cwd, buildDir: options.builtContractsDir })
+  truffleOptions.resolver = resolver
+  options.resolver = resolver
 
   const compilation = await compileSources(options, truffleOptions)
   const allWarnings = await warningCache.updateCache({ contracts: compilation.contracts, warnings: compilation.warnings })

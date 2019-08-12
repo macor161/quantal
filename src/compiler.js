@@ -68,9 +68,8 @@ const compile = async function (inputSources, options, truffleOptions) {
     }
   }
 
-  debug('Starting compilation')
+
   const standardOutput = await compiler(operatingSystemIndependentSources, compilerSettings, options.compiler.version)
-  debug('Compilation done')
 
   const { contracts, sources, errors: allErrors = [] } = standardOutput
   const warnings = allErrors.filter(error => error.severity === 'warning')
@@ -226,20 +225,14 @@ compile.necessary = function (options, truffleOptions) {
 
 compile.with_dependencies = function (options, truffleOptions) {
   return new Promise((res, rej) => {
-    expect.options(truffleOptions, [
-      'working_directory',
-      'contracts_directory',
-      'resolver',
-    ])
-
-    const config = Config.default().merge(truffleOptions)
-
     Profiler.required_sources(
-      config.with({
+      {
         paths: options.paths,
         base_path: options.contractsDir,
-        resolver: truffleOptions.resolver,
-      }),
+        resolver: options.resolver,
+        compilers: truffleOptions.compilers,
+        contracts_directory: options.contractsDir,
+      },
       (err, allSources, required) => {
         if (err)
           return rej(err)
