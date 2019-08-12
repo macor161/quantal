@@ -10,7 +10,7 @@ const path = require('path')
 const expect = require('truffle-expect')
 const semver = require('semver')
 const { findContractFiles } = require('../find-contract-files')
-const CompilerSupplier = require('../compilerSupplier')
+const CompilerSupplier = require('../compiler-supplier')
 const { readAndParseArtifactFiles } = require('./readAndParseArtifactFiles')
 const {
   minimumUpdatedTimePerSource,
@@ -87,7 +87,7 @@ module.exports = {
         ).sort()
 
         // Load compiler
-        const supplier = new CompilerSupplier(options.compilers.solc)
+        const supplier = new CompilerSupplier()
         return supplier.load()
       })
       .then(async solc => {
