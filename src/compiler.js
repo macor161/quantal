@@ -204,7 +204,7 @@ compile.all = async function (options, truffleOptions) {
 //      in the build directory to see what needs to be compiled.
 compile.necessary = function (options, truffleOptions) {
   return new Promise((res, rej) => {
-    Profiler.updated(truffleOptions, (err, updated) => {
+    Profiler.updated(options, (err, updated) => {
       if (err)
         return rej(err)
 
