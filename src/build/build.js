@@ -16,21 +16,27 @@ const { WarningCache } = require('./warning-cache')
  * @param {BuildOptions} options Options
  */
 async function build(options) {
-  const warningCache = new WarningCache({ builtContractsDir: options.builtContractsDir })
   await preloadCompiler(options.compiler.version)
+  const warningCache = new WarningCache({ builtContractsDir: options.builtContractsDir })
   options.resolver = new Resolver({ cwd: options.cwd, buildDir: options.builtContractsDir })
 
-  const compilation = await solcCompile.necessary(options)
-  const allWarnings = await warningCache.updateCache({ contracts: compilation.contracts, warnings: compilation.warnings })
+  const {
+    contracts, files, warnings, errors, compiler,
+  } = await solcCompile.necessary(options)
+  let allWarnings = warnings
 
-  if (compilation.contracts && Object.keys(compilation.contracts).length > 0)
-    await writeContracts(compilation.contracts, options.builtContractsDir)
+  if (options.builtContractsDir) {
+    allWarnings = await warningCache.updateCache({ contracts, warnings })
+
+    if (contracts && Object.keys(contracts).length > 0)
+      await writeContracts(contracts, options.builtContractsDir)
+  }
 
   return {
-    outputs: { [compilation.compiler]: compilation.files },
-    contracts: compilation.contracts,
+    outputs: { [compiler]: files },
+    contracts,
     warnings: allWarnings,
-    errors: compilation.errors,
+    errors,
   }
 }
 
