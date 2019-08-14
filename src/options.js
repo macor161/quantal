@@ -49,6 +49,7 @@ const DEFAULT_COMPILER_OPTIONS = {
 
 /**
  * @typedef {Object} QuantalOptions
+ * @property {string} configFile Quantal config file path
  * @property {string} contractsDir
  * @property {string} builtContractsDir
  * @property {string} deploymentsDir
@@ -72,23 +73,26 @@ const PATHS = [
 
 /**
  * Returns build options. Priority is as follow:
- * 1. Command line args
+ * 1. Options param (Command line args)
  * 2. quantal.json file
  * 3. truffle-conf.js file
- * @param {string} configFile Config file path
+ * @param {QuantalOptions} options Options
  * @returns {QuantalOptions}
  */
-function getOptions(configFile = CONFIG_PATH) {
-  const options = _(DEFAULT_OPTIONS)
-    .merge(convertTruffleToQuantalOptions(getTruffleOptions()))
-    .merge(getQuantalConfig(getPath(configFile)))
-    .mapValues((value, key) => (PATHS.includes(key) ? getPath(value) : value))
+function getOptions(options = {}) {
+  const { configFile = CONFIG_PATH, cwd } = options
+
+  const returnedOptions = _(DEFAULT_OPTIONS)
+    .merge(convertTruffleToQuantalOptions(getTruffleOptions({ cwd })))
+    .merge(getQuantalConfig(getPath(configFile, cwd)))
+    .merge(options)
+    .mapValues((value, key) => (PATHS.includes(key) ? getPath(value, cwd) : value))
     .value()
 
-  if (!options.compiler.version)
-    options.compiler.version = getSolcVersionFromPackageJson() || DEFAULT_SOLC_VERSION
+  if (!returnedOptions.compiler.version)
+    returnedOptions.compiler.version = getSolcVersionFromPackageJson() || DEFAULT_SOLC_VERSION
 
-  return options
+  return returnedOptions
 }
 
 function getQuantalConfig(configFile) {
@@ -130,7 +134,7 @@ function getSolcVersionFromPackageJson() {
 function convertTruffleToQuantalOptions(truffleOptions) {
   const solcVersion = truffleOptions.compilers.solc.settings.version
 
-  return {
+  return _({
     builtContractsDir: truffleOptions.contracts_build_directory,
     contractsDir: truffleOptions.contracts_directory,
     cwd: truffleOptions.working_directory,
@@ -139,12 +143,17 @@ function convertTruffleToQuantalOptions(truffleOptions) {
       optimizer: truffleOptions.compilers.solc.settings.optimizer,
       ...(solcVersion && { version: solcVersion }),
     },
-  }
+  })
+    .mapValues((value, key) => (PATHS.includes(key) ? getPath(value) : value))
+    .value()
 }
 
-function getTruffleOptions() {
-  const truffleConfig = TruffleConfig.detect()
-  const config = TruffleConfig.default().merge(truffleConfig)
+function getTruffleOptions(options = {}) {
+  const config = options.cwd
+    ? TruffleConfig.detect({ working_directory: options.cwd })
+    : TruffleConfig.detect()
+
+  //  const config = TruffleConfig.default().merge(truffleConfig)
 
   const evmVersion = _.get(config, ['compilers', 'solc', 'settings', 'evmVersion'])
         || _.get(config, ['compilers', 'solc', 'evmVersion'])
