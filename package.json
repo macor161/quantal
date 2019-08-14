@@ -75,6 +75,9 @@
   "files": [
     "src"
   ],
+  "jest": {
+    "testEnvironment": "node"
+  },
   "keywords": [
     "ethereumn",
     "solidity"
