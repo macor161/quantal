@@ -66,8 +66,9 @@ const DEFAULT_OPTIONS = {
 
 // Path options
 const PATHS = [
-  'contractsDir',
   'builtContractsDir',
+  'contractsDir',
+  'cwd',
   'deploymentsDir',
 ]
 
