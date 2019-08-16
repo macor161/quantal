@@ -7,7 +7,7 @@ const { getOptions } = require('../../src/options')
 describe('bytecode comparison', () => {
   test('synthetix', async () => {
     const PATH = path.join(__dirname, 'synthetix')
-    const options = getOptions({ cwd: PATH })
+    const options = getOptions({ cwd: PATH, noCache: true })
 
     const result = await build(options)
     const truffleContracts = requireAll(path.join(PATH, 'build', 'contracts'))
@@ -18,9 +18,9 @@ describe('bytecode comparison', () => {
       if (!truffleContract)
         throw new Error(`Cannot find truffle contract ${contractName}`)
 
-      if (artifact.bytecode !== truffleContract.metadata) {
+      if (artifact.bytecode !== truffleContract.bytecode) {
         console.error(`Bytecode mismatch for contract ${contractName}`)
-        expect(artifact.bytecode).toEqual(truffleContract.metadata)
+        expect(artifact.bytecode).toEqual(truffleContract.bytecode)
       }
     }
   }, 30000)

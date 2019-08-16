@@ -54,6 +54,7 @@ const DEFAULT_COMPILER_OPTIONS = {
  * @property {string} builtContractsDir
  * @property {string} deploymentsDir
  * @property {string} cwd
+ * @property {boolean} noCache Recompile all contracts
  * @property {GanacheOptions} ganache
  * @property {CompilerOptions} compiler
  */

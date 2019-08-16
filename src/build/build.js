@@ -19,10 +19,13 @@ async function build(options) {
   await preloadCompiler(options.compiler.version)
   const warningCache = new WarningCache({ builtContractsDir: options.builtContractsDir })
   options.resolver = new Resolver({ cwd: options.cwd, buildDir: options.builtContractsDir })
+  const compileFunc = options.noCache
+    ? solcCompile.all
+    : solcCompile.necessary
 
   const {
     contracts, files, warnings, errors, compiler,
-  } = await solcCompile.necessary(options)
+  } = await compileFunc(options)
   let allWarnings = warnings
 
   if (options.builtContractsDir) {
