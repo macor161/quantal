@@ -1,0 +1,15 @@
+{
+  "name": "openzeppelin-solidity",
+  "version": "2.3.0",
+  "description": "Secure Smart Contract library for Solidity",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OpenZeppelin/zeppelin-solidity.git"
+  },
+  "author": "OpenZeppelin Community <maintainers@openzeppelin.org>",
+  "license": "MIT",
+  "homepage": "https://github.com/OpenZeppelin/zeppelin-solidity",
+  "devDependencies": {
+    "truffle": "^5.0.18"
+  }
+}
