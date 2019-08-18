@@ -80,6 +80,24 @@ module.exports = function (sources, options, solcVersion) {
   })
 }
 
+async function runWorkers(workers, onUpdate = () => null) {
+  return new Promise((res, rej) => {
+    const results = []
+
+    for (const worker of workers) {
+      worker.compile()
+        .then(result => {
+          onUpdate(workers.map(w => w.getState()))
+          results.push(result)
+
+          if (results.length >= workers.length)
+            res(results)
+        })
+        .catch(rej)
+    }
+  })
+}
+
 /**
  * Returns as many workers as cpu available.
  * First worker is not creating a child process.
