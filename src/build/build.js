@@ -7,7 +7,6 @@ const { mkdirp } = require('fs-extra')
 const Artifactor = require('truffle-artifactor')
 const Resolver = require('../resolver')
 const solcCompile = require('../compiler')
-const { getTruffleOptions } = require('../options')
 const { preloadCompiler } = require('../compiler/load-compiler')
 const { WarningCache } = require('./warning-cache')
 
@@ -17,49 +16,33 @@ const { WarningCache } = require('./warning-cache')
  * @param {BuildOptions} options Options
  */
 async function build(options) {
-  const warningCache = new WarningCache({ builtContractsDir: options.builtContractsDir })
   await preloadCompiler(options.compiler.version)
-  const truffleOptions = getTruffleOptions()
-  const resolver = new Resolver({ cwd: options.cwd, buildDir: options.builtContractsDir })
-  truffleOptions.resolver = resolver
-  options.resolver = resolver
-
-  const compilation = await compileSources(options, truffleOptions)
-  const allWarnings = await warningCache.updateCache({ contracts: compilation.contracts, warnings: compilation.warnings })
-
-  return {
-    outputs: { [compilation.compiler]: compilation.files },
-    contracts: compilation.contracts,
-    warnings: allWarnings,
-    errors: compilation.errors,
-  }
-}
-
-async function compileSources(options, truffleOptions) {
-  const compileFunc = truffleOptions.all === true || truffleOptions.compileAll === true
+  const warningCache = new WarningCache({ builtContractsDir: options.builtContractsDir })
+  options.resolver = new Resolver({ cwd: options.cwd, buildDir: options.builtContractsDir })
+  const compileFunc = options.noCache
     ? solcCompile.all
     : solcCompile.necessary
 
   const {
-    contracts, files, compilerInfo, warnings, errors,
-  } = await compileFunc(options, truffleOptions)
+    contracts, files, warnings, errors, compiler,
+  } = await compileFunc(options)
+  let allWarnings = warnings
 
-  if (compilerInfo) {
-    truffleOptions.compilersInfo[compilerInfo.name] = {
-      version: compilerInfo.version,
-    }
+  if (options.builtContractsDir) {
+    allWarnings = await warningCache.updateCache({ contracts, warnings })
+
+    if (contracts && Object.keys(contracts).length > 0)
+      await writeContracts(contracts, options.builtContractsDir)
   }
 
-  if (contracts && Object.keys(contracts).length > 0)
-    await writeContracts(contracts, options.builtContractsDir)
-
   return {
+    outputs: { [compiler]: files },
     contracts,
-    files,
-    warnings,
+    warnings: allWarnings,
     errors,
   }
 }
+
 
 /**
  * Write contracts to json artifacts
