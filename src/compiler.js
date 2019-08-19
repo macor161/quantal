@@ -66,7 +66,7 @@ const compile = async function (inputSources, options) {
   }
 
 
-  const standardOutput = await compiler(operatingSystemIndependentSources, compilerSettings, options.compiler.version)
+  const standardOutput = await compiler(operatingSystemIndependentSources, compilerSettings, options.compiler.version, options.onUpdate)
 
   const { contracts, sources, errors: allErrors = [] } = standardOutput
   const warnings = allErrors.filter(error => error.severity === 'warning')

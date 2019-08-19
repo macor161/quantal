@@ -1,5 +1,5 @@
 /**
- * @typedef {import('../options').QuantalOptions} BuildOptions
+ * @typedef {import('../options').QuantalOptions} QuantalOptions
  * @typedef {import('../detailed-error').DetailedCompilerError} DetailedCompilerError
  */
 
@@ -11,9 +11,15 @@ const { preloadCompiler } = require('../compiler/load-compiler')
 const { WarningCache } = require('./warning-cache')
 
 /**
+ * @typedef {Object} BuildOptions
+ * @augments QuantalOptions
+ * @property {function} onUpdate
+ */
+
+/**
  * Build contracts from Solidity sources and write output
  * artifacts to json files
- * @param {BuildOptions} options Options
+ * @param {QuantalOptions} options Options
  */
 async function build(options) {
   await preloadCompiler(options.compiler.version)
@@ -24,7 +30,7 @@ async function build(options) {
     : solcCompile.necessary
 
   const {
-    contracts, files, warnings, errors, compiler,
+    contracts, files, warnings, errors,
   } = await compileFunc(options)
   let allWarnings = warnings
 
@@ -36,7 +42,7 @@ async function build(options) {
   }
 
   return {
-    outputs: { [compiler]: files },
+    files,
     contracts,
     warnings: allWarnings,
     errors,

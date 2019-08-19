@@ -2,6 +2,9 @@
  * @typedef {import('commander').Command} Command
  */
 const { green } = require('chalk')
+const { basename } = require('path')
+const chalk = require('chalk')
+const Multispinner = require('multispinner')
 const { formatErrors } = require('../formatting/format-error')
 const { formatWarnings } = require('../formatting/format-warnings')
 const { getOptions } = require('../options')
@@ -28,6 +31,19 @@ function getBuildCmd({ argv, logger }) {
       logger.log('Starting build')
       const { build } = require('./build')
       const options = getOptions()
+      let multispinner
+
+      options.onUpdate = workerStates => {
+        if (!multispinner)
+          multispinner = createSpinners(workerStates)
+        else {
+          for (const state of workerStates) {
+            if (state.status === 'complete')
+              multispinner.success(state.id)
+          }
+        }
+      }
+
       handleBuildResults(await build(options))
     }
   }
@@ -45,6 +61,29 @@ function getBuildCmd({ argv, logger }) {
     else
       logger.log(green.bold('Build successful'))
   }
+}
+
+function createSpinners(compilers) {
+  const spinners = compilers
+    .reduce((acc, compiler, i) => ({
+      ...acc,
+      [parseInt(compiler.id, 10)]: `Compiler #${i + 1} ${chalk.gray(`${`${unique(compiler.contracts)
+        .map(key => basename(key))
+        .join(', ')
+        .substring(0, 60)}...`}`)}`,
+    }), {})
+
+  return new Multispinner(spinners, {
+    autoStart: true,
+    indent: 1,
+    color: {
+      incomplete: 'white',
+    },
+  })
+}
+
+function unique(items) {
+  return Array.from(new Set(items))
 }
 
 
