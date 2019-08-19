@@ -69,6 +69,7 @@ async function runWorkers(workers, onUpdate = () => null) {
         })
         .catch(rej)
     }
+    onUpdate(workers.map(w => w.getState()))
   })
 }
 
