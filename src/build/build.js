@@ -1,6 +1,10 @@
 /**
  * @typedef {import('../options').QuantalOptions} QuantalOptions
  * @typedef {import('../detailed-error').DetailedCompilerError} DetailedCompilerError
+ *
+ * @typedef {Object} BuildOptions
+ * @augments QuantalOptions
+ * @property {function} onUpdate
  */
 
 const { mkdirp } = require('fs-extra')
@@ -11,15 +15,9 @@ const { preloadCompiler } = require('../compiler/load-compiler')
 const { WarningCache } = require('./warning-cache')
 
 /**
- * @typedef {Object} BuildOptions
- * @augments QuantalOptions
- * @property {function} onUpdate
- */
-
-/**
  * Build contracts from Solidity sources and write output
  * artifacts to json files
- * @param {QuantalOptions} options Options
+ * @param {BuildOptions} options Options
  */
 async function build(options) {
   await preloadCompiler(options.compiler.version)
