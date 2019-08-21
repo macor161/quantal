@@ -26,8 +26,7 @@ async function compiler(options) {
 
   const batches = dispatchWork(dependencyTree, cpus.length)
 
-  for (const [i] of batches.entries()) {
-    const batch = batches[i]
+  for (const [i, batch] of batches.entries()) {
     const worker = workers[i]
 
     for (const branch of batch.getBranches())
@@ -42,15 +41,16 @@ async function compiler(options) {
 }
 
 async function runWorkers(workers, onUpdate = () => null) {
-  const asyncResults = workers
-    .map(async worker => {
-      const result = await worker.compile()
-      onUpdate(workers.map(w => w.getState()))
-      return result
-    })
+  onUpdate(workers.map(worker => worker.getState()))
 
-  onUpdate(workers.map(w => w.getState()))
-  return Promise.all(asyncResults)
+  return Promise.all(
+    workers
+      .map(async worker => {
+        const result = await worker.compile()
+        onUpdate(workers.map(w => w.getState()))
+        return result
+      }),
+  )
 }
 
 /**
