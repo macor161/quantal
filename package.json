@@ -5,7 +5,7 @@
   "bin": {
     "quantal": "src/index.js"
   },
-  "main": "src/index.js",
+  "main": "src/quantal-library.js",
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --coverage --collectCoverageFrom='src/**/*.js'",

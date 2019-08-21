@@ -3,6 +3,15 @@ const JSONStream = require('JSONStream')
 const { isEmpty } = require('lodash')
 const { loadCompiler } = require('./load-compiler')
 
+/**
+ * State of a worker at a given time
+ *
+ * @typedef {Object} WorkerState
+ * @property {number} id
+ * @property {'running' | 'complete'} status Worker status
+ * @property {string[]} contracts Path of the contracts handled by the worker
+ */
+
 module.exports = class Worker {
   constructor({ version, compilerOptions, id } = {}) {
     this.solcVersion = version
@@ -14,6 +23,7 @@ module.exports = class Worker {
       settings: compilerOptions,
       sources: null,
     }
+    this._status = null
 
     // solc doesn't support empty brackets
     if (isEmpty(this.input.settings.evmVersion))
@@ -44,6 +54,7 @@ module.exports = class Worker {
   async compile() {
     this._debug('compiling %o', this.input)
     this._debug(`time ${new Date().toISOString()}`)
+    this._status = 'running'
 
     const result = await this._sendInputToProcess()
 
@@ -53,6 +64,17 @@ module.exports = class Worker {
 
     this._debug('compile done')
     return result
+  }
+
+  /**
+   * @returns {WorkerState}
+   */
+  getState() {
+    return {
+      id: this.id,
+      status: this._status,
+      contracts: Object.keys(this.input.sources),
+    }
   }
 
   _sendInputToProcess() {
@@ -67,6 +89,7 @@ module.exports = class Worker {
         .pipe(JSONStream.parse())
         .on('data', data => {
           this._debug(`data received ${new Date().toISOString()}`)
+          this._status = 'complete'
           // Data could eventually be returned incrementally
           res(data)
         })
@@ -76,6 +99,7 @@ module.exports = class Worker {
       })
 
       solc.on('close', () => {
+        this._status = 'complete'
         this._debug(`process connexion closed ${new Date().toISOString()}`)
       })
 

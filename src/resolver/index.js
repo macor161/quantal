@@ -7,69 +7,73 @@ const GlobalNPMSource = require('./globalnpm')
 const FSSource = require('./fs')
 
 /**
- * @param {Object} options
- * @param {string} options.cwd
- * @param {string} options.buildDir
+ * Resolve solidity import paths using various sources: file system, npm
+ * packages (locally and globally installed) and EthPM
  */
-function Resolver(options) {
-  this.options = options
+class Resolver {
+  /**
+   * @param {Object} options
+   * @param {string} options.cwd
+   * @param {string} options.buildDir
+   */
+  constructor(options) {
+    this.options = options
 
-  this.sources = [
-    new EPMSource(options.cwd, options.buildDir),
-    new NPMSource(options.cwd),
-    new GlobalNPMSource(),
-    new FSSource(options.cwd, options.buildDir),
-  ]
-}
-
-Resolver.prototype.resolve = function (import_path, imported_from, callback) {
-  const self = this
-
-  if (typeof imported_from === 'function') {
-    callback = imported_from
-    imported_from = null
+    this.sources = [
+      new EPMSource(options.cwd, options.buildDir),
+      new NPMSource(options.cwd),
+      new GlobalNPMSource(),
+      new FSSource(options.cwd, options.buildDir),
+    ]
   }
 
-  let resolved_body = null
-  let resolved_path = null
-  let current_index = -1
-  let current_source
+  resolve(import_path, imported_from, callback) {
+    if (typeof imported_from === 'function') {
+      callback = imported_from
+      imported_from = null
+    }
 
-  whilst(
-    () => !resolved_body && current_index < self.sources.length - 1,
-    next => {
-      current_index += 1
-      current_source = self.sources[current_index]
+    let resolved_body = null
+    let resolved_path = null
+    let current_index = -1
+    let current_source
 
-      current_source.resolve(import_path, imported_from, (
-        err,
-        body,
-        file_path,
-      ) => {
-        if (!err && body) {
-          resolved_body = body
-          resolved_path = file_path
+    whilst(
+      () => !resolved_body && current_index < this.sources.length - 1,
+      next => {
+        current_index += 1
+        current_source = this.sources[current_index]
+
+        current_source.resolve(import_path, imported_from, (
+          err,
+          body,
+          file_path,
+        ) => {
+          if (!err && body) {
+            resolved_body = body
+            resolved_path = file_path
+          }
+          next(err)
+        })
+      },
+      err => {
+        if (err)
+          return callback(err)
+
+        if (!resolved_body) {
+          let message = `Could not find ${import_path} from any sources`
+
+          if (imported_from)
+            message += `; imported from ${imported_from}`
+
+
+          return callback(new Error(message))
         }
-        next(err)
-      })
-    },
-    err => {
-      if (err)
-        return callback(err)
 
-      if (!resolved_body) {
-        let message = `Could not find ${import_path} from any sources`
-
-        if (imported_from)
-          message += `; imported from ${imported_from}`
-
-
-        return callback(new Error(message))
-      }
-
-      callback(null, resolved_body, resolved_path, current_source)
-    },
-  )
+        callback(null, resolved_body, resolved_path, current_source)
+      },
+    )
+  }
 }
 
 module.exports = Resolver

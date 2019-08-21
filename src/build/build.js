@@ -1,6 +1,10 @@
 /**
- * @typedef {import('../options').QuantalOptions} BuildOptions
+ * @typedef {import('../options').QuantalOptions} QuantalOptions
  * @typedef {import('../detailed-error').DetailedCompilerError} DetailedCompilerError
+ *
+ * @typedef {Object} BuildOptions
+ * @augments QuantalOptions
+ * @property {function} onUpdate
  */
 
 const { mkdirp } = require('fs-extra')
@@ -24,7 +28,7 @@ async function build(options) {
     : solcCompile.necessary
 
   const {
-    contracts, files, warnings, errors, compiler,
+    contracts, files, warnings, errors,
   } = await compileFunc(options)
   let allWarnings = warnings
 
@@ -36,7 +40,7 @@ async function build(options) {
   }
 
   return {
-    outputs: { [compiler]: files },
+    files,
     contracts,
     warnings: allWarnings,
     errors,
