@@ -45,7 +45,7 @@ async function necessary(options) {
 }
 
 async function compile(inputSources, options) {
-  const solcVersion = options.compiler.version
+  const { version: solcVersion, outputSelection: artifactsContent } = options.compiler
   const compilerInfo = { name: 'solc', version: getFormattedVersion(solcVersion) }
 
   const {
@@ -61,9 +61,9 @@ async function compile(inputSources, options) {
   const targetPaths = Object.keys(targets)
 
   if (targetPaths.length > 0)
-    targetPaths.forEach(key => { outputSelection[key] = options.outputSelection })
+    targetPaths.forEach(key => { outputSelection[key] = artifactsContent })
   else
-    outputSelection['*'] = options.outputSelection
+    outputSelection['*'] = artifactsContent
 
   const compilerSettings = {
     evmVersion: options.compiler.evmVersion,
