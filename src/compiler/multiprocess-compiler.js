@@ -7,7 +7,9 @@ const Worker = require('./worker')
 const { dispatchWork } = require('./dispatch-work')
 const { CompilerResultsMerger } = require('./compiler-results-merger')
 
-module.exports = function (sources, compilerOptions, solcVersion, onUpdate) {
+module.exports = function ({
+  sources, compilerOptions, solcVersion, onUpdate,
+} = {}) {
   return new Promise(res => {
     debug(`Generating dependency tree for ${cpus.length} workers`)
 
