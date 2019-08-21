@@ -1,8 +1,7 @@
 // Original source code: https://github.com/trufflesuite/truffle/blob/v5.0.10/packages/truffle-compile/index.js
 
-// const debug = require('debug')('compile')
 const _ = require('lodash')
-const compiler = require('./compiler/multiprocess-compiler')
+const { compiler } = require('./compiler/multiprocess-compiler')
 const Profiler = require('./profiler')
 const { findContractFiles } = require('./find-contract-files')
 const detailedError = require('./detailed-error')
@@ -10,11 +9,43 @@ const { getFormattedVersion } = require('./compiler/load-compiler')
 const { formatPaths } = require('./utils/format-paths')
 const { orderABI, replaceLinkReferences } = require('./utils/artifacts')
 
-// Most basic of the compile commands. Takes a hash of sources, where
-// the keys are file or module paths and the values are the bodies of
-// the contracts. Does not evaulate dependencies that aren't already given.
-const compile = async function (inputSources, options) {
-  const solcVersion = options.compiler.version
+
+/**
+ * Compile all contracts, regardless of their last modification time
+ * @param {Object} options
+ */
+async function all(options) {
+  options.paths = await findContractFiles(options.contractsDir)
+  return withDependencies(options)
+}
+
+/**
+ * Compile contracts that have changed since last compilation
+ * @param {Object} options
+ */
+async function necessary(options) {
+  return new Promise((res, rej) => {
+    Profiler.updated(options, (err, updated) => {
+      if (err)
+        return rej(err)
+
+      if (updated.length === 0) {
+        return res({
+          contracts: [],
+          files: {},
+          compilerInfo: null,
+          warnings: [],
+        })
+      }
+
+      options.paths = updated
+      return res(withDependencies(options))
+    })
+  })
+}
+
+async function compile(inputSources, options) {
+  const { version: solcVersion, outputSelection: artifactsContent } = options.compiler
   const compilerInfo = { name: 'solc', version: getFormattedVersion(solcVersion) }
 
   const {
@@ -30,9 +61,9 @@ const compile = async function (inputSources, options) {
   const targetPaths = Object.keys(targets)
 
   if (targetPaths.length > 0)
-    targetPaths.forEach(key => { outputSelection[key] = options.outputSelection })
+    targetPaths.forEach(key => { outputSelection[key] = artifactsContent })
   else
-    outputSelection['*'] = options.outputSelection
+    outputSelection['*'] = artifactsContent
 
   const compilerSettings = {
     evmVersion: options.compiler.evmVersion,
@@ -178,38 +209,7 @@ const compile = async function (inputSources, options) {
 }
 
 
-// contracts_directory: String. Directory where .sol files can be found.
-compile.all = async function (options) {
-  options.paths = await findContractFiles(options.contractsDir)
-  return compile.with_dependencies(options)
-}
-
-// contracts_directory: String. Directory where .sol files can be found.
-// build_directory: String. Optional. Directory where .sol.js files can be found. Only required if `all` is false.
-// all: Boolean. Compile all sources found. Defaults to true. If false, will compare sources against built files
-//      in the build directory to see what needs to be compiled.
-compile.necessary = function (options) {
-  return new Promise((res, rej) => {
-    Profiler.updated(options, (err, updated) => {
-      if (err)
-        return rej(err)
-
-      if (updated.length === 0) {
-        return res({
-          contracts: [],
-          files: {},
-          compilerInfo: null,
-          warnings: [],
-        })
-      }
-
-      options.paths = updated
-      return res(compile.with_dependencies(options))
-    })
-  })
-}
-
-compile.with_dependencies = function (options) {
+async function withDependencies(options) {
   return new Promise((res, rej) => {
     Profiler.required_sources(
       {
@@ -229,4 +229,4 @@ compile.with_dependencies = function (options) {
   })
 }
 
-module.exports = compile
+module.exports = { all, necessary }

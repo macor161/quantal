@@ -70,7 +70,9 @@
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.14.3",
-    "jest": "^24.8.0"
+    "execa": "^2.0.4",
+    "jest": "^24.8.0",
+    "require-all": "^3.0.0"
   },
   "files": [
     "src"
