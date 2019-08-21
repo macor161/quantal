@@ -10,21 +10,6 @@ const { getFormattedVersion } = require('./compiler/load-compiler')
 const { formatPaths } = require('./utils/format-paths')
 const { orderABI, replaceLinkReferences } = require('./utils/artifacts')
 
-const defaultSelectors = {
-  '': ['legacyAST', 'ast'],
-  '*': [
-    'abi',
-    'metadata',
-    'evm.bytecode.object',
-    'evm.bytecode.sourceMap',
-    'evm.deployedBytecode.object',
-    'evm.deployedBytecode.sourceMap',
-    'userdoc',
-    'devdoc',
-  ],
-}
-
-
 // Most basic of the compile commands. Takes a hash of sources, where
 // the keys are file or module paths and the values are the bodies of
 // the contracts. Does not evaulate dependencies that aren't already given.
@@ -45,9 +30,9 @@ const compile = async function (inputSources, options) {
   const targetPaths = Object.keys(targets)
 
   if (targetPaths.length > 0)
-    targetPaths.forEach(key => { outputSelection[key] = defaultSelectors })
+    targetPaths.forEach(key => { outputSelection[key] = options.outputSelection })
   else
-    outputSelection['*'] = defaultSelectors
+    outputSelection['*'] = options.outputSelection
 
   const compilerSettings = {
     evmVersion: options.compiler.evmVersion,
@@ -66,7 +51,12 @@ const compile = async function (inputSources, options) {
   }
 
 
-  const standardOutput = await compiler(operatingSystemIndependentSources, compilerSettings, options.compiler.version, options.onUpdate)
+  const standardOutput = await compiler({
+    sources: operatingSystemIndependentSources,
+    compilerOptions: compilerSettings,
+    solcVersion: options.compiler.version,
+    onUpdate: options.onUpdate,
+  })
 
   const { contracts, sources, errors: allErrors = [] } = standardOutput
   const warnings = allErrors.filter(error => error.severity === 'warning')
