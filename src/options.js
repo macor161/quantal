@@ -27,23 +27,21 @@ const DEFAULT_COMPILER_OPTIONS = {
     enabled: false,
     runs: 0,
   },
-  artifactContent: {
-    '*': {
-      '': [
-        'legacyAST',
-        'ast',
-      ],
-      '*': [
-        'abi',
-        'metadata',
-        'evm.bytecode.object',
-        'evm.bytecode.sourceMap',
-        'evm.deployedBytecode.object',
-        'evm.deployedBytecode.sourceMap',
-        'userdoc',
-        'devdoc',
-      ],
-    },
+  outputSelection: {
+    '': [
+      'legacyAST',
+      'ast',
+    ],
+    '*': [
+      'abi',
+      'metadata',
+      'evm.bytecode.object',
+      'evm.bytecode.sourceMap',
+      'evm.deployedBytecode.object',
+      'evm.deployedBytecode.sourceMap',
+      'userdoc',
+      'devdoc',
+    ],
   },
 }
 
