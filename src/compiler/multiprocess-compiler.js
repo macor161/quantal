@@ -1,78 +1,56 @@
 const debug = require('debug')('multiprocess-compiler')
 const os = require('os')
 const { DependencyTree } = require('../dependency-tree')
-
-const cpus = os.cpus()
 const Worker = require('./worker')
 const { dispatchWork } = require('./dispatch-work')
 const { CompilerResultsMerger } = require('./compiler-results-merger')
 
-module.exports = function ({
-  sources, compilerOptions, solcVersion, onUpdate,
-} = {}) {
-  return new Promise(res => {
-    debug(`Generating dependency tree for ${cpus.length} workers`)
+const cpus = os.cpus()
 
-    const workers = initWorkers(solcVersion, compilerOptions)
+/**
+ * Compiler using multiple solc processes in parallel
+ * @param {Object} options
+ */
+async function compiler(options) {
+  const {
+    sources, compilerOptions, solcVersion, onUpdate,
+  } = options
 
-    const dependencyTree = new DependencyTree()
+  debug(`Generating dependency tree for ${cpus.length} workers`)
 
-    for (const key in sources) {
-      // debug(`adding ${key} to dep tree`)
-      dependencyTree.addFile(sources[key])
-    }
+  const workers = initWorkers(solcVersion, compilerOptions)
+  const dependencyTree = new DependencyTree()
 
-    debug('creating work batches')
-    const batches = dispatchWork(dependencyTree, cpus.length)
+  for (const key in sources)
+    dependencyTree.addFile(sources[key])
 
-    debug('dispatching batches to workers')
+  const batches = dispatchWork(dependencyTree, cpus.length)
 
-    for (const [i] of batches.entries()) {
-      const batch = batches[i]
-      const worker = workers[i]
-      debug(`batch ${i} load: ${batch.workload()}`)
+  for (const [i] of batches.entries()) {
+    const batch = batches[i]
+    const worker = workers[i]
 
-      for (const branch of batch.getBranches())
-        worker.addSource(branch)
-    }
+    for (const branch of batch.getBranches())
+      worker.addSource(branch)
+  }
 
+  const results = await runWorkers(workers.filter(worker => worker.hasSources()), onUpdate)
+  const merger = new CompilerResultsMerger(results)
 
-    debug(`sending input ${new Date().toISOString()}`)
-
-    runWorkers(workers.filter(worker => worker.hasSources()), onUpdate)
-      .then(results => new Promise(resolve => {
-        // Must wait 80ms to prevent a display bug in multispinner
-        setTimeout(() => resolve(results), 80)
-      }))
-      .then(results => {
-        debug('merging results')
-        // const result = results[0]
-        const merger = new CompilerResultsMerger(results)
-
-        debug('results merged')
-        res(merger.getResults())
-        workers.forEach(worker => worker.close())
-      })
-  })
+  workers.forEach(worker => worker.close())
+  return merger.getResults()
 }
 
 async function runWorkers(workers, onUpdate = () => null) {
-  return new Promise((res, rej) => {
-    const results = []
+  const asyncResults = workers
+    .map(async worker => {
+      const result = await worker.compile()
+      onUpdate(workers.map(w => w.getState()))
+      return result
+    })
 
-    for (const worker of workers) {
-      worker.compile()
-        .then(result => {
-          onUpdate(workers.map(w => w.getState()))
-          results.push(result)
-
-          if (results.length >= workers.length)
-            res(results)
-        })
-        .catch(rej)
-    }
-    onUpdate(workers.map(w => w.getState()))
-  })
+  onUpdate(workers.map(w => w.getState()))
+  return Promise.all(asyncResults)
 }
 
 /**
@@ -83,3 +61,6 @@ function initWorkers(solcVersion, options) {
   return cpus
     .map((cpu, index) => new Worker({ version: solcVersion, id: index, compilerOptions: options }))
 }
+
+
+module.exports = { compiler }

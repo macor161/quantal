@@ -61,7 +61,6 @@ module.exports = class Worker {
     for (const path in result.sources)
       result.sources[path].source = this.input.sources[path] && this.input.sources[path].content
 
-
     this._debug('compile done')
     return result
   }
