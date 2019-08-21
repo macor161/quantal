@@ -2,6 +2,11 @@
 
 Quantal is a fast and lightweight build tool for Solidity. 
 
+<p align="left">
+    <a href="https://travis-ci.org/macor161/quantal"><img alt="Build Status" src="https://travis-ci.org/macor161/quantal.svg?branch=development" /></a>
+    <a href='https://coveralls.io/github/macor161/quantal'><img src='https://coveralls.io/repos/github/macor161/quantal/badge.svg' alt='Coverage Status' /></a>
+</p>
+
 ## Fast, lightweight
 
 
@@ -50,6 +55,7 @@ The following truffle config options are currently supported:
 ```javascript
 {
     contracts_build_directory,
+    contracts_directory,
     compilers: {
         solc: {
             version, // See supported versions below

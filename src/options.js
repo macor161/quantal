@@ -153,8 +153,6 @@ function getTruffleOptions(options = {}) {
     ? TruffleConfig.detect({ working_directory: options.cwd })
     : TruffleConfig.detect()
 
-  //  const config = TruffleConfig.default().merge(truffleConfig)
-
   const evmVersion = _.get(config, ['compilers', 'solc', 'settings', 'evmVersion'])
         || _.get(config, ['compilers', 'solc', 'evmVersion'])
         || _.get(config, ['solc', 'evmVersion'])
