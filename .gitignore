@@ -3,4 +3,6 @@ yarn-error.log
 .vscode
 coverage
 build
+quantal-build
+truffle-build
 !src/build

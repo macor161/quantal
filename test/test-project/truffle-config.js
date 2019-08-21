@@ -1,14 +1,8 @@
 module.exports = {
-  networks: {
-    development: {
-      host: 'localhost',
-      port: 8545,
-      network_id: '*',
-    },
-  },
+  contracts_build_directory: 'truffle-build',
   solc: {
     optimizer: {
-      enabled: true,
+      enabled: false,
       runs: 200,
     },
   },
