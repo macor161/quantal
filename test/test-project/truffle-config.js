@@ -1,21 +1,21 @@
 module.exports = {
-  "networks": {
+  networks: {
     development: {
-      host: "localhost",
+      host: 'localhost',
       port: 8545,
-      network_id: "*"   
-    }   
+      network_id: '*',
+    },
   },
   solc: {
     optimizer: {
       enabled: true,
-      runs: 200
-    }
+      runs: 200,
+    },
   },
-  /*
+
   compilers: {
     solc: {
-         version: '0.5.0',
+      version: '0.5.8',
     },
-  }*/
+  },
 }
