@@ -6219,25 +6219,10 @@ truffle-provider@0.1.10:
     truffle-interface-adapter "^0.1.6"
     web3 "1.0.0-beta.37"
 
-truffle-provisioner@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/truffle-provisioner/-/truffle-provisioner-0.1.4.tgz#a470f7e603d069b481481dba92f5c9d2f1a8526a"
-  integrity sha512-d4GhAsS4bEtYIfuedaFl9k22o7UJOsmgMZM8M3fQYI0uAGt9ApEGEL0Yvdy7/uWw/0T1796ZVe+EuzlbcjaiUQ==
-
 truffle-provisioner@^0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/truffle-provisioner/-/truffle-provisioner-0.1.5.tgz#f940b2e0aa3a26d5227dfc4ebe8d29ebc68a9e03"
   integrity sha512-XSzD4Tj1T16E8qwoIHnQ9sOuvoemP1yqxX9Jg0VvvoLTdl8X17uau6dN08JgNR09hJroTrXPbkAi5Y8IfKhVMw==
-
-truffle-resolver@5.0.10:
-  version "5.0.10"
-  resolved "https://registry.yarnpkg.com/truffle-resolver/-/truffle-resolver-5.0.10.tgz#4009263b16d9c954b671d464987b7db911b32a78"
-  integrity sha512-jjXvEJcYusOfRKXSec2Gyg0ptM75BzKE0Czi162iaod9UgyhIyp32wRrajqPYP3mXhu0OGIUNf95po/fIqsrtQ==
-  dependencies:
-    async "2.6.1"
-    truffle-contract "^4.0.11"
-    truffle-expect "^0.0.7"
-    truffle-provisioner "^0.1.4"
 
 tslib@^1.9.0:
   version "1.9.3"

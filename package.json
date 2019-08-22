@@ -60,7 +60,6 @@
     "truffle-expect": "0.0.7",
     "truffle-provider": "0.1.10",
     "truffle-provisioner": "^0.1.5",
-    "truffle-resolver": "5.0.10",
     "v8-compile-cache": "^2.0.2"
   },
   "devDependencies": {
