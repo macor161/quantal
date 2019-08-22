@@ -1,6 +1,6 @@
 {
   "name": "quantal",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Fast and lightweight build tool for Solidity",
   "bin": {
     "quantal": "src/index.js"
