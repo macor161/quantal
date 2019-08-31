@@ -83,6 +83,8 @@ The following truffle config options are currently supported:
 
 Mojave (10.14) and High Sierra (10.13) currently supported for the following solc versions:
 
+- 0.5.11
+- 0.5.10
 - 0.5.9
 - 0.5.8
 - 0.5.7
@@ -112,6 +114,8 @@ Mojave (10.14) and High Sierra (10.13) currently supported for the following sol
 
 **Linux**
 
+- 0.5.11
+- 0.5.10
 - 0.5.9
 - 0.5.8
 - 0.5.7
