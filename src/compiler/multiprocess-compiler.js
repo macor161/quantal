@@ -1,6 +1,8 @@
 const debug = require('debug')('multiprocess-compiler')
 const os = require('os')
-const { spawn } = require('child_process')
+const { promisify } = require('util')
+const execFile = promisify(require('child_process').execFile)
+const { loadCompiler } = require('./load-compiler')
 const { DependencyTree } = require('../dependency-tree')
 const Worker = require('./worker')
 const { dispatchWork } = require('./dispatch-work')
@@ -46,6 +48,18 @@ class MultiprocessCompiler {
 
     workers.forEach(worker => worker.close())
     return merger.getResults()
+  }
+
+  /**
+   * Return the full solc version, with commit hash and
+   * platform
+   */
+  async getFullVersion() {
+    const { stdout } = await execFile(
+      await loadCompiler(this.solcVersion),
+      ['--version'],
+    )
+    return /Version: (.*?)\n/g.exec(stdout)[1]
   }
 
 
