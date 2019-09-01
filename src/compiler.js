@@ -45,8 +45,7 @@ async function necessary(options) {
 }
 
 async function compile(inputSources, options) {
-  const { version: solcVersion, outputSelection: artifactsContent } = options.compiler
-  const compilerInfo = { name: 'solc', version: getFormattedVersion(solcVersion) }
+  const { outputSelection: artifactsContent } = options.compiler
 
   const {
     operatingSystemIndependentSources,
@@ -86,7 +85,9 @@ async function compile(inputSources, options) {
     version: options.compiler.version,
     onUpdate: options.onUpdate,
   })
+
   const standardOutput = await multiprocessCompiler.compile(operatingSystemIndependentSources)
+  const compilerInfo = { name: 'solc', version: await multiprocessCompiler.getFullVersion() }
 
   const { contracts, sources, errors: allErrors = [] } = standardOutput
   const warnings = allErrors.filter(error => error.severity === 'warning')
