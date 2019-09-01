@@ -2,7 +2,7 @@
 
 exports[`Error and warning formatting formatError should return the correct formatting 1`] = `
 "
-[47m[30m../../../../test-project/contracts/ERC20.sol[39m[49m
+[47m[30mERC20.sol[39m[49m
    [1mLine 33:[22m Unused local variable.
 
   [90m 30 |[39m     * @dev Total number of tokens in existence
@@ -17,7 +17,7 @@ exports[`Error and warning formatting formatError should return the correct form
 
 exports[`Error and warning formatting formatErrors should return the correct formatting 1`] = `
 "
-[47m[30m../../../../test-project/contracts/ERC20.sol[39m[49m
+[47m[30mERC20.sol[39m[49m
    [1mLine 33:[22m Unused local variable.
 
   [90m 30 |[39m     * @dev Total number of tokens in existence
@@ -28,7 +28,7 @@ exports[`Error and warning formatting formatErrors should return the correct for
   [90m 34 |[39m         [35mreturn[39m _totalSupply;
   [90m 35 |[39m     }
 
-[47m[30m../../../../test-project/contracts/Test2.sol[39m[49m
+[47m[30mTest2.sol[39m[49m
    [1mLine 15:[22m Unused function parameter. Remove or comment out the variable name to silence this warning.
 
   [90m 12 |[39m     [35mreturn[39m s;
@@ -39,7 +39,7 @@ exports[`Error and warning formatting formatErrors should return the correct for
   [90m 16 |[39m     [35mreturn[39m 4;
   [90m 17 |[39m   }   
 
-[47m[30m../../../../test-project/contracts/Test2.sol[39m[49m
+[47m[30mTest2.sol[39m[49m
    [1mLine 15:[22m Function state mutability can be restricted to pure
 
   [90m 12 |[39m     [35mreturn[39m s;
@@ -56,7 +56,7 @@ exports[`Error and warning formatting formatErrors should return the correct for
 
 exports[`Error and warning formatting formatWarning should return the correct formatting 1`] = `
 "
-[47m[30m../../../../test-project/contracts/ERC20.sol[39m[49m
+[47m[30mERC20.sol[39m[49m
    [1mLine 33:[22m Unused local variable.
 
   [90m 30 |[39m     * @dev Total number of tokens in existence
@@ -71,7 +71,7 @@ exports[`Error and warning formatting formatWarning should return the correct fo
 
 exports[`Error and warning formatting formatWarnings should return the correct formatting 1`] = `
 "
-[47m[30m../../../../test-project/contracts/ERC20.sol[39m[49m
+[47m[30mERC20.sol[39m[49m
    [1mLine 33:[22m Unused local variable.
 
   [90m 30 |[39m     * @dev Total number of tokens in existence
@@ -82,7 +82,7 @@ exports[`Error and warning formatting formatWarnings should return the correct f
   [90m 34 |[39m         [35mreturn[39m _totalSupply;
   [90m 35 |[39m     }
 
-[47m[30m../../../../test-project/contracts/Test2.sol[39m[49m
+[47m[30mTest2.sol[39m[49m
    [1mLine 15:[22m Unused function parameter. Remove or comment out the variable name to silence this warning.
 
   [90m 12 |[39m     [35mreturn[39m s;
@@ -93,7 +93,7 @@ exports[`Error and warning formatting formatWarnings should return the correct f
   [90m 16 |[39m     [35mreturn[39m 4;
   [90m 17 |[39m   }   
 
-[47m[30m../../../../test-project/contracts/Test2.sol[39m[49m
+[47m[30mTest2.sol[39m[49m
    [1mLine 15:[22m Function state mutability can be restricted to pure
 
   [90m 12 |[39m     [35mreturn[39m s;

@@ -17,13 +17,13 @@ function getMockedColors() {
 const warnings = [
   {
     component: 'general',
-    formattedMessage: '/test-project/contracts/ERC20.sol:33:9: Warning: Unused local variable.\n        uint256 t = 3;\n        ^-------^\n',
+    formattedMessage: 'contracts/ERC20.sol:33:9: Warning: Unused local variable.\n        uint256 t = 3;\n        ^-------^\n',
     message: 'Unused local variable.',
     severity: 'warning',
     sourceLocation: {
       absolutePath: '/test-project/contracts/ERC20.sol',
       end: 1192,
-      file: '/test-project/contracts/ERC20.sol',
+      file: 'ERC20.sol',
       start: 1183,
       line: 33,
       col: 9,
@@ -46,7 +46,7 @@ const warnings = [
     sourceLocation: {
       absolutePath: '/test-project/contracts/Test2.sol',
       end: 233,
-      file: '/test-project/contracts/Test2.sol',
+      file: 'Test2.sol',
       start: 213,
       line: 15,
       col: 17,
@@ -69,7 +69,7 @@ const warnings = [
     sourceLocation: {
       absolutePath: '/test-project/contracts/Test2.sol',
       end: 278,
-      file: '/test-project/contracts/Test2.sol',
+      file: 'Test2.sol',
       start: 199,
       line: 15,
       col: 3,
