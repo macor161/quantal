@@ -1,4 +1,3 @@
-const debug = require('debug')('multiprocess-compiler')
 const os = require('os')
 const { promisify } = require('util')
 const execFile = promisify(require('child_process').execFile)

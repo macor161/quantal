@@ -1,5 +1,7 @@
 const outdent = require('outdent')
 const { formatSource } = require('../src/formatting')
+const { formatWarning, formatWarnings } = require('../src/formatting/format-warnings')
+const { formatError, formatErrors } = require('../src/formatting/format-error')
 
 
 function getMockedColors() {
@@ -11,6 +13,78 @@ function getMockedColors() {
     lineNumbers: jest.fn(text => text),
   }
 }
+
+const warnings = [
+  {
+    component: 'general',
+    formattedMessage: '/test-project/contracts/ERC20.sol:33:9: Warning: Unused local variable.\n        uint256 t = 3;\n        ^-------^\n',
+    message: 'Unused local variable.',
+    severity: 'warning',
+    sourceLocation: {
+      absolutePath: '/test-project/contracts/ERC20.sol',
+      end: 1192,
+      file: '/test-project/contracts/ERC20.sol',
+      start: 1183,
+      line: 33,
+      col: 9,
+    },
+    type: 'Warning',
+    sourceContext: {
+      30: '    * @dev Total number of tokens in existence',
+      31: '    */',
+      32: '    function totalSupply() public view returns (uint256) {',
+      33: '        uint256 t = 3;',
+      34: '        return _totalSupply;',
+      35: '    }',
+    },
+  },
+  {
+    component: 'general',
+    formattedMessage: '/test-project/contracts/Test2.sol:15:17: Warning: Unused function parameter. Remove or comment out the variable name to silence this warning.\n  function setS(string memory _value) public returns(uint256) {\n                ^------------------^\n',
+    message: 'Unused function parameter. Remove or comment out the variable name to silence this warning.',
+    severity: 'warning',
+    sourceLocation: {
+      absolutePath: '/test-project/contracts/Test2.sol',
+      end: 233,
+      file: '/test-project/contracts/Test2.sol',
+      start: 213,
+      line: 15,
+      col: 17,
+    },
+    type: 'Warning',
+    sourceContext: {
+      12: '    return s;',
+      13: '  }  ',
+      14: '',
+      15: '  function setS(string memory _value) public returns(uint256) {',
+      16: '    return 4;',
+      17: '  }   ',
+    },
+  },
+  {
+    component: 'general',
+    formattedMessage: '/test-project/contracts/Test2.sol:15:3: Warning: Function state mutability can be restricted to pure\n  function setS(string memory _value) public returns(uint256) {\n  ^ (Relevant source part starts here and spans across multiple lines).\n',
+    message: 'Function state mutability can be restricted to pure',
+    severity: 'warning',
+    sourceLocation: {
+      absolutePath: '/test-project/contracts/Test2.sol',
+      end: 278,
+      file: '/test-project/contracts/Test2.sol',
+      start: 199,
+      line: 15,
+      col: 3,
+    },
+    type: 'Warning',
+    sourceContext: {
+      12: '    return s;',
+      13: '  }  ',
+      14: '',
+      15: '  function setS(string memory _value) public returns(uint256) {',
+      16: '    return 4;',
+      17: '  }   ',
+    },
+  },
+]
 
 describe('Fromatting', () => {
   test('Format types', async () => {
@@ -130,5 +204,23 @@ describe('Fromatting', () => {
     expect(colors.comments.mock.calls.length).toBe(2)
     expect(colors.comments.mock.calls[0][0]).toBe('// This is a test')
     expect(colors.comments.mock.calls[1][0]).toBe('// This is another test')
+  })
+})
+
+describe('Error and warning formatting', () => {
+  test('formatWarning should return the correct formatting', async () => {
+    expect(formatWarning(warnings[0])).toMatchSnapshot()
+  })
+
+  test('formatWarnings should return the correct formatting', async () => {
+    expect(formatWarnings(warnings)).toMatchSnapshot()
+  })
+
+  test('formatError should return the correct formatting', async () => {
+    expect(formatError(warnings[0])).toMatchSnapshot()
+  })
+
+  test('formatErrors should return the correct formatting', async () => {
+    expect(formatErrors(warnings)).toMatchSnapshot()
   })
 })

@@ -1,0 +1,109 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Error and warning formatting formatError should return the correct formatting 1`] = `
+"
+[47m[30m../../../../test-project/contracts/ERC20.sol[39m[49m
+   [1mLine 33:[22m Unused local variable.
+
+  [90m 30 |[39m     * @dev Total number of tokens in existence
+  [90m 31 |[39m     */
+  [90m 32 |[39m     [34mfunction[39m totalSupply() [34mpublic[39m view [35mreturns[39m ([36muint256[39m) {
+[1m[31m>[39m[22m [90m 33 |[39m         [36muint256[39m t = 3;
+  [90m    |[39m [1m[31m        ^[39m[22m
+  [90m 34 |[39m         [35mreturn[39m _totalSupply;
+  [90m 35 |[39m     }
+"
+`;
+
+exports[`Error and warning formatting formatErrors should return the correct formatting 1`] = `
+"
+[47m[30m../../../../test-project/contracts/ERC20.sol[39m[49m
+   [1mLine 33:[22m Unused local variable.
+
+  [90m 30 |[39m     * @dev Total number of tokens in existence
+  [90m 31 |[39m     */
+  [90m 32 |[39m     [34mfunction[39m totalSupply() [34mpublic[39m view [35mreturns[39m ([36muint256[39m) {
+[1m[31m>[39m[22m [90m 33 |[39m         [36muint256[39m t = 3;
+  [90m    |[39m [1m[31m        ^[39m[22m
+  [90m 34 |[39m         [35mreturn[39m _totalSupply;
+  [90m 35 |[39m     }
+
+[47m[30m../../../../test-project/contracts/Test2.sol[39m[49m
+   [1mLine 15:[22m Unused function parameter. Remove or comment out the variable name to silence this warning.
+
+  [90m 12 |[39m     [35mreturn[39m s;
+  [90m 13 |[39m   }  
+  [90m 14 |[39m 
+[1m[31m>[39m[22m [90m 15 |[39m   [34mfunction[39m setS([36mstring[39m [34mmemory[39m _value) [34mpublic[39m [35mreturns[39m([36muint256[39m) {
+  [90m    |[39m [1m[31m                ^[39m[22m
+  [90m 16 |[39m     [35mreturn[39m 4;
+  [90m 17 |[39m   }   
+
+[47m[30m../../../../test-project/contracts/Test2.sol[39m[49m
+   [1mLine 15:[22m Function state mutability can be restricted to pure
+
+  [90m 12 |[39m     [35mreturn[39m s;
+  [90m 13 |[39m   }  
+  [90m 14 |[39m 
+[1m[31m>[39m[22m [90m 15 |[39m   [34mfunction[39m setS([36mstring[39m [34mmemory[39m _value) [34mpublic[39m [35mreturns[39m([36muint256[39m) {
+  [90m    |[39m [1m[31m  ^[39m[22m
+  [90m 16 |[39m     [35mreturn[39m 4;
+  [90m 17 |[39m   }   
+
+[1m[31mFailed to compile: 3 error(s) found.[39m[22m
+"
+`;
+
+exports[`Error and warning formatting formatWarning should return the correct formatting 1`] = `
+"
+[47m[30m../../../../test-project/contracts/ERC20.sol[39m[49m
+   [1mLine 33:[22m Unused local variable.
+
+  [90m 30 |[39m     * @dev Total number of tokens in existence
+  [90m 31 |[39m     */
+  [90m 32 |[39m     [34mfunction[39m totalSupply() [34mpublic[39m view [35mreturns[39m ([36muint256[39m) {
+[1m[33m>[39m[22m [90m 33 |[39m         [36muint256[39m t = 3;
+  [90m    |[39m [1m[33m        ^[39m[22m
+  [90m 34 |[39m         [35mreturn[39m _totalSupply;
+  [90m 35 |[39m     }
+"
+`;
+
+exports[`Error and warning formatting formatWarnings should return the correct formatting 1`] = `
+"
+[47m[30m../../../../test-project/contracts/ERC20.sol[39m[49m
+   [1mLine 33:[22m Unused local variable.
+
+  [90m 30 |[39m     * @dev Total number of tokens in existence
+  [90m 31 |[39m     */
+  [90m 32 |[39m     [34mfunction[39m totalSupply() [34mpublic[39m view [35mreturns[39m ([36muint256[39m) {
+[1m[33m>[39m[22m [90m 33 |[39m         [36muint256[39m t = 3;
+  [90m    |[39m [1m[33m        ^[39m[22m
+  [90m 34 |[39m         [35mreturn[39m _totalSupply;
+  [90m 35 |[39m     }
+
+[47m[30m../../../../test-project/contracts/Test2.sol[39m[49m
+   [1mLine 15:[22m Unused function parameter. Remove or comment out the variable name to silence this warning.
+
+  [90m 12 |[39m     [35mreturn[39m s;
+  [90m 13 |[39m   }  
+  [90m 14 |[39m 
+[1m[33m>[39m[22m [90m 15 |[39m   [34mfunction[39m setS([36mstring[39m [34mmemory[39m _value) [34mpublic[39m [35mreturns[39m([36muint256[39m) {
+  [90m    |[39m [1m[33m                ^[39m[22m
+  [90m 16 |[39m     [35mreturn[39m 4;
+  [90m 17 |[39m   }   
+
+[47m[30m../../../../test-project/contracts/Test2.sol[39m[49m
+   [1mLine 15:[22m Function state mutability can be restricted to pure
+
+  [90m 12 |[39m     [35mreturn[39m s;
+  [90m 13 |[39m   }  
+  [90m 14 |[39m 
+[1m[33m>[39m[22m [90m 15 |[39m   [34mfunction[39m setS([36mstring[39m [34mmemory[39m _value) [34mpublic[39m [35mreturns[39m([36muint256[39m) {
+  [90m    |[39m [1m[33m  ^[39m[22m
+  [90m 16 |[39m     [35mreturn[39m 4;
+  [90m 17 |[39m   }   
+   
+[1m[33mCompiled with 3 warning(s)[39m[22m
+"
+`;

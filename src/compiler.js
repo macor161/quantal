@@ -5,7 +5,6 @@ const { MultiprocessCompiler } = require('./compiler/multiprocess-compiler')
 const Profiler = require('./profiler')
 const { findContractFiles } = require('./find-contract-files')
 const detailedError = require('./detailed-error')
-const { getFormattedVersion } = require('./compiler/load-compiler')
 const { formatPaths } = require('./utils/format-paths')
 const { orderABI, replaceLinkReferences } = require('./utils/artifacts')
 
