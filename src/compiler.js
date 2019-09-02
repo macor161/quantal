@@ -1,11 +1,10 @@
 // Original source code: https://github.com/trufflesuite/truffle/blob/v5.0.10/packages/truffle-compile/index.js
 
 const _ = require('lodash')
-const { compiler } = require('./compiler/multiprocess-compiler')
+const { MultiprocessCompiler } = require('./compiler/multiprocess-compiler')
 const Profiler = require('./profiler')
 const { findContractFiles } = require('./find-contract-files')
 const detailedError = require('./detailed-error')
-const { getFormattedVersion } = require('./compiler/load-compiler')
 const { formatPaths } = require('./utils/format-paths')
 const { orderABI, replaceLinkReferences } = require('./utils/artifacts')
 
@@ -45,8 +44,7 @@ async function necessary(options) {
 }
 
 async function compile(inputSources, options) {
-  const { version: solcVersion, outputSelection: artifactsContent } = options.compiler
-  const compilerInfo = { name: 'solc', version: getFormattedVersion(solcVersion) }
+  const { outputSelection: artifactsContent } = options.compiler
 
   const {
     operatingSystemIndependentSources,
@@ -81,13 +79,14 @@ async function compile(inputSources, options) {
     }
   }
 
-
-  const standardOutput = await compiler({
-    sources: operatingSystemIndependentSources,
-    compilerOptions: compilerSettings,
-    solcVersion: options.compiler.version,
+  const multiprocessCompiler = new MultiprocessCompiler({
+    solcOptions: compilerSettings,
+    version: options.compiler.version,
     onUpdate: options.onUpdate,
   })
+
+  const standardOutput = await multiprocessCompiler.compile(operatingSystemIndependentSources)
+  const compilerInfo = { name: 'solc', version: await multiprocessCompiler.getFullVersion() }
 
   const { contracts, sources, errors: allErrors = [] } = standardOutput
   const warnings = allErrors.filter(error => error.severity === 'warning')
