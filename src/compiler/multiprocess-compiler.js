@@ -8,6 +8,7 @@ const { dispatchWork } = require('./dispatch-work')
 const { CompilerResultsMerger } = require('./compiler-results-merger')
 
 const cpus = os.cpus()
+// const cpus = [1]
 
 /**
  * Compiler using multiple solc processes in parallel
