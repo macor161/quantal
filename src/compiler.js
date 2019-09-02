@@ -127,7 +127,7 @@ async function compile(inputSources, options) {
       const contract_definition = {
         contract_name,
         sourcePath: originalPathMappings[source_path], // Save original source path, not modified ones
-        source: operatingSystemIndependentSources[source_path],
+        source: operatingSystemIndependentSources[source_path].content,
         sourceMap: contract.evm.bytecode.sourceMap,
         deployedSourceMap: contract.evm.deployedBytecode.sourceMap,
         legacyAST: sources[source_path].legacyAST,
