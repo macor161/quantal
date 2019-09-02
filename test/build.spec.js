@@ -16,11 +16,11 @@ describe('build', () => {
       builtContractsDir: 'quantal-build',
       noCache: true,
     })
-
     const result = await build(options)
+
     const truffleContracts = requireAll(path.join(PATH, 'truffle-build'))
     compareContracts(result.contracts, truffleContracts)
-  }, 30000)
+  }, 60000)
 })
 
 function compareContracts(contracts, truffleContracts) {

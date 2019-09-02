@@ -24,7 +24,7 @@ class MultiprocessCompiler {
   }
 
   async compile(sources) {
-    const workers = this._initWorkers(this._version, this._solcOptions)
+    const workers = this._initWorkers()
     const dependencyTree = new DependencyTree()
 
     for (const key in sources)
@@ -55,7 +55,7 @@ class MultiprocessCompiler {
    */
   async getFullVersion() {
     const { stdout } = await execFile(
-      await loadCompiler(this.solcVersion),
+      await loadCompiler(this._version),
       ['--version'],
     )
     return /Version: (.*?)\n/g.exec(stdout)[1]
@@ -79,9 +79,9 @@ class MultiprocessCompiler {
    * Returns as many workers as cpu available.
    * First worker is not creating a child process.
    */
-  _initWorkers(solcVersion, options) {
+  _initWorkers() {
     return cpus
-      .map((cpu, index) => new Worker({ version: solcVersion, id: index, compilerOptions: options }))
+      .map((cpu, index) => new Worker({ version: this._version, id: index, compilerOptions: this._solcOptions }))
   }
 }
 
