@@ -1,4 +1,3 @@
-/* eslint-disable prefer-destructuring */
 const _ = require('lodash')
 
 
@@ -89,7 +88,8 @@ class CompilerResultsMerger {
    * @param {{ originalId:number, newId:number }[]} idMapping
    */
   _updateSourceMap(sourceMap, idMapping) {
-    let newSourceMap = decompressSourceMap(sourceMap)
+    // No need to decompress sourcemap
+    let newSourceMap = sourceMap
 
     for (const { originalId, newId } of idMapping) {
       const reg = new RegExp(`(\\d+\\:\\d+\\:)${originalId}(\\:|\\;)`, 'g')
@@ -98,34 +98,6 @@ class CompilerResultsMerger {
 
     return newSourceMap
   }
-}
-
-
-function decompressSourceMap(sourceMap) {
-  const instructions = sourceMap.split(';')
-  let last = []
-
-  return instructions
-    .map(current => {
-      const ret = [...last]
-      const fields = current.split(':')
-
-      if (fields[0] && fields[0] !== '-1' && fields[0].length)
-        ret[0] = parseInt(fields[0], 10)
-
-      if (fields[1] && fields[1] !== '-1' && fields[1].length)
-        ret[1] = parseInt(fields[1], 10)
-
-      if (fields[2] && fields[2].length)
-        ret[2] = parseInt(fields[2], 10)
-
-      if (fields[3] && fields[3].length)
-        ret[3] = fields[3]
-
-      last = ret
-      return ret.join(':')
-    })
-    .join(';')
 }
 
 
