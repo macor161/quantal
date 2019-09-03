@@ -52,6 +52,7 @@
     "request-promise": "^4.2.2",
     "semver": "^6.1.1",
     "solc": "0.5.0",
+    "solidity-ast-traverse": "^0.0.1",
     "strip-ansi": "^5.2.0",
     "truffle-artifactor": "4.0.10",
     "truffle-config": "1.1.17",

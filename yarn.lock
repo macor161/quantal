@@ -5860,6 +5860,11 @@ solc@0.5.0:
     semver "^5.5.0"
     yargs "^11.0.0"
 
+solidity-ast-traverse@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/solidity-ast-traverse/-/solidity-ast-traverse-0.0.1.tgz#335464a9c32d8e121285946fedba4598bd468b52"
+  integrity sha512-ueHitchetpYk7BKeuDSOqI/dznp8Kr8dGdBnRQVDAJmG6id146k/ksvk9np78xMmVkzzGzRYEG1Fji240wsZNw==
+
 source-map-resolve@^0.5.0:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/source-map-resolve/-/source-map-resolve-0.5.2.tgz#72e2cc34095543e43b2c62b2c4c10d4a9054f259"

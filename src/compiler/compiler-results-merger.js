@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const solidityAstTraverse = require('solidity-ast-traverse')
 
 
 class CompilerResultsMerger {
@@ -24,6 +25,8 @@ class CompilerResultsMerger {
         newId: (newIdSources[path] || this._results.sources[path]).id,
       }))
 
+    this._updateAstSrcFields(newIdSources, idMapping)
+
     const newSourceMapContracts = this._updateSourceMaps(compilerResults.contracts, idMapping)
 
     this._results.sources = { ...(this._results.sources), ...newIdSources }
@@ -35,6 +38,20 @@ class CompilerResultsMerger {
 
   getResults() {
     return this._results
+  }
+
+  _updateAstSrcFields(sources, idMapping) {
+    Object.entries(sources).forEach(([, source]) => {
+      solidityAstTraverse(source.ast, node => {
+        if (node.src && typeof node.src === 'string') {
+          const [offset, length, id] = node.src.split(':')
+          const sourceId = parseInt(id, 10)
+
+          if (sourceId >= 0 && idMapping[id])
+            node.src = `${offset}:${length}:${idMapping[sourceId]}`
+        }
+      })
+    })
   }
 
   /**
