@@ -7,7 +7,7 @@ const { decompressSourcemap } = require('../src/utils/sourcemap')
 
 
 describe('build', () => {
-  test('outputs valid bytecodes', async () => {
+  test('outputs valid artifacts', async () => {
     const PATH = path.join(__dirname, 'test-project')
     await execa('npm', ['install'], { cwd: PATH })
     await execa('./node_modules/.bin/truffle', ['compile', '--all'], { cwd: PATH })
@@ -17,18 +17,16 @@ describe('build', () => {
       builtContractsDir: 'quantal-build',
       noCache: true,
     })
-    const result = await build(options)
-    // console.log(Object.keys(result.files))
-    // console.log(result.)
-    console.log(Object.keys(result.contracts.ERC20))
 
+    const result = await build(options)
     const truffleArtifacts = requireAll(path.join(PATH, 'truffle-build'))
-    compareContractBytecodes(result.contracts, truffleArtifacts)
+
+    compareBytecodes(result.contracts, truffleArtifacts)
     compareSourcemaps(result.contracts, truffleArtifacts)
   }, 60000)
 })
 
-function compareContractBytecodes(contracts, truffleContracts) {
+function compareBytecodes(contracts, truffleContracts) {
   for (const [contractName, artifact] of Object.entries(contracts)) {
     const truffleContract = findContract(contractName, truffleContracts)
 
