@@ -6,6 +6,7 @@
 
 /* eslint no-await-in-loop: 0 */
 /* eslint prefer-destructuring: 0 */
+/* eslint prefer-object-spread: 0 */
 const path = require('path')
 const expect = require('truffle-expect')
 const semver = require('semver')
