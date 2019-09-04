@@ -48,7 +48,7 @@ class CompilerResultsMerger {
           const sourceId = parseInt(id, 10)
 
           if (sourceId >= 0 && idMapping[id])
-            node.src = `${offset}:${length}:${idMapping[sourceId]}`
+            node.src = `${offset}:${length}:${idMapping[sourceId].newId}`
         }
       })
     })
