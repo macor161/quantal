@@ -66,13 +66,13 @@
   },
   "devDependencies": {
     "coveralls": "^3.0.5",
-    "eslint": "^5.16.0",
+    "eslint": "^6.3.0",
     "eslint-config-airbnb": "^17.1.1",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.14.3",
     "execa": "^2.0.4",
-    "jest": "^24.8.0",
+    "jest": "^24.9.0",
     "require-all": "^3.0.0"
   },
   "files": [
