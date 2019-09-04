@@ -5,8 +5,8 @@
 const importFresh = require('import-fresh')
 const _ = require('lodash')
 const semver = require('semver')
+const TruffleConfig = require('truffle-config')
 const getPath = require('./utils/get-path')
-const TruffleConfig = require('./truffle-config')
 
 const CONFIG_PATH = './quantal.json'
 const DEFAULT_SOLC_VERSION = '0.5.11'
