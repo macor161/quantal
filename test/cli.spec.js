@@ -11,12 +11,13 @@ describe('CLI', () => {
     process.argv[3] = ''
 
     process.cwd = () => path.join(__dirname, 'test-project')
+
+    console.log('argv: ', process.argv)
+
     global.console = {
       log: jest.fn(),
       error: jest.fn(),
     }
-
-    console.info('argv: ', process.argv)
 
     require('../src/index')
 
