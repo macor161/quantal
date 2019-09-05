@@ -11,9 +11,6 @@ describe('CLI', () => {
     process.argv[3] = ''
 
     process.cwd = () => path.join(__dirname, 'test-project')
-
-    console.log('argv: ', process.argv)
-
     global.console = {
       log: jest.fn(),
       error: jest.fn(),
@@ -23,7 +20,7 @@ describe('CLI', () => {
 
     await wait(30000)
 
-    expect(console.log).toHaveBeenCalledWith()
+    expect(console.log).toHaveBeenCalledWith(green.bold('Build successful'))
     expect(console.error).not.toHaveBeenCalled()
   }, 60000)
 })
