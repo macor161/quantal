@@ -34,10 +34,10 @@ async function preloadCompiler(version = LATEST_VERSION) {
  * @return {string} Compiler's path
  */
 async function loadCompiler(version = LATEST_VERSION) {
-  version = getFormattedVersion(version)
   if (!isOsSupported(getOs()))
     throw new Error(`Unsupported OS: ${getOs()}`)
 
+  version = getFormattedVersion(version)
 
   return (await isCompilerInCache(version))
     ? getCachedCompiler(version)

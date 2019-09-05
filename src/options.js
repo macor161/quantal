@@ -149,9 +149,7 @@ function convertTruffleToQuantalOptions(truffleOptions) {
 }
 
 function getTruffleOptions(options = {}) {
-  const config = options.cwd
-    ? TruffleConfig.detect({ working_directory: options.cwd })
-    : TruffleConfig.detect()
+  const config = TruffleConfig.detect({ working_directory: options.cwd || process.cwd() })
 
   const evmVersion = _.get(config, ['compilers', 'solc', 'settings', 'evmVersion'])
         || _.get(config, ['compilers', 'solc', 'evmVersion'])

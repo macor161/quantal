@@ -15,12 +15,14 @@ const logger = new Logger()
 async function main() {
   try {
     debug('Quantal start')
+    // console.log(process.argv)
 
     const argv = require('commander')
       .option('-w, --watch', 'Watch for changes')
       .version(jsonPackage.version)
       .parse(process.argv)
 
+    console.log('cwd: ', process.cwd())
     const command = loadCommand({ argv })
     debug('command loaded')
 

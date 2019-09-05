@@ -1,7 +1,7 @@
 const path = require('path')
 const execa = require('execa')
 const requireAll = require('require-all')
-const { build } = require('../src/build/build')
+const { build } = require('../src/quantal-library')
 const { getOptions } = require('../src/options')
 const { decompressSourcemap } = require('../src/utils/sourcemap')
 

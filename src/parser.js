@@ -1,7 +1,6 @@
 // Original source code: https://github.com/trufflesuite/truffle/blob/v5.0.10/packages/truffle-compile/parser.js
 
 const debug = require('debug')('compile:parser') // eslint-disable-line no-unused-vars
-const CompileError = require('./compileerror')
 
 // Warning issued by a pre-release compiler version, ignored by this component.
 const preReleaseCompilerWarning = 'This is a pre-release compiler version, please do not use it in production.'
@@ -68,7 +67,7 @@ module.exports = {
 
     // Should we try to throw more than one? (aside; we didn't before)
     if (nonImportErrors.length > 0)
-      throw new CompileError(nonImportErrors[0].formattedMessage)
+      throw new Error(`Import parse error: ${nonImportErrors[0].formattedMessage}`)
 
 
     // Now, all errors must be import errors.

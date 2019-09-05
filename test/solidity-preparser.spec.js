@@ -1,27 +1,27 @@
-const { preParse } = require('../src/solidity-preparser')
 const { readFile } = require('fs-extra')
 const path = require('path')
 const debug = require('debug')('test')
 const outdent = require('outdent')
+const { preParse } = require('../src/solidity-preparser')
 
 describe('preParse', () => {
-    test('Supports NO whitespace between solidity and version', async () => {
-        const content = outdent`
+  test('Supports NO whitespace between solidity and version', async () => {
+    const content = outdent`
         pragma solidity^0.4.24;
 
         contract TestContract {}
         `
 
-        const nbOfLines = preParse(content)
-            .split('\n')
-            .length
+    const nbOfLines = preParse(content)
+      .split('\n')
+      .length
 
-        expect(nbOfLines).toEqual(1)
-    })
+    expect(nbOfLines).toEqual(1)
+  })
 
-    
-    test('Supports global imports', async () => {
-        const content = outdent`
+
+  test('Supports global imports', async () => {
+    const content = outdent`
         pragma solidity 0.4.18;
 
         import "zeppelin-solidity/contracts/math/SafeMath.sol";
@@ -34,16 +34,16 @@ describe('preParse', () => {
             uint 3;
         }`
 
-        
-        const nbOfLines = preParse(content)
-            .split('\n')
-            .length
 
-        expect(nbOfLines).toEqual(3)
-    })
+    const nbOfLines = preParse(content)
+      .split('\n')
+      .length
 
-    test('Supports named symbols imports', async () => {
-        const content = outdent`
+    expect(nbOfLines).toEqual(3)
+  })
+
+  test('Supports named symbols imports', async () => {
+    const content = outdent`
         pragma solidity 0.4.18;
 
         import { Contract1, Contract2 } from "./libraries/Test.sol";
@@ -55,11 +55,11 @@ describe('preParse', () => {
         contract Contract {
         }`
 
-        
-        const nbOfLines = preParse(content)
-            .split('\n')
-            .length
 
-        expect(nbOfLines).toEqual(3)
-    })
+    const nbOfLines = preParse(content)
+      .split('\n')
+      .length
+
+    expect(nbOfLines).toEqual(3)
+  })
 })
