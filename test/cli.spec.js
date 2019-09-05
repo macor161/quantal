@@ -7,17 +7,22 @@ describe('CLI', () => {
   test('build successfully', async () => {
     process.argv[0] = 'node'
     process.argv[1] = 'quantal'
+    process.argv[2] = ''
+    process.argv[3] = ''
+
     process.cwd = () => path.join(__dirname, 'test-project')
     global.console = {
       log: jest.fn(),
       error: jest.fn(),
     }
 
+    console.info('argv: ', process.argv)
+
     require('../src/index')
 
     await wait(30000)
 
-    expect(console.log).toHaveBeenCalledWith(green.bold('Build successful'))
+    expect(console.log).toHaveBeenCalledWith()
     expect(console.error).not.toHaveBeenCalled()
   }, 60000)
 })
