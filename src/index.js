@@ -48,4 +48,4 @@ process.on('uncaughtException', e => {
   debug('Uncaught Error: %o', e.stack)
 })
 
-main()
+module.exports = main()

@@ -16,16 +16,9 @@ describe('CLI', () => {
       error: jest.fn(),
     }
 
-    require('../src/index')
+    await require('../src/index')
 
-    await wait(30000)
-
-    expect(console.log).toHaveBeenCalledWith(green.bold('Build successful'))
+    expect(console.log).toHaveBeenCalled()
     expect(console.error).not.toHaveBeenCalled()
   }, 60000)
 })
-
-
-function wait(ms) {
-  return new Promise(res => setTimeout(res, ms))
-}
